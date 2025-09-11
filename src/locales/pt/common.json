@@ -1,0 +1,46 @@
+{
+  "app": {
+    "title": "Spectr Trading",
+    "dashboard": "Visão Geral",
+    "signals": "Sinais",
+    "news": "Notícias",
+    "arbitrage": "Arbitragem",
+    "copySim": "Copy (Sim)",
+    "staking": "Staking",
+    "academy": "Academia",
+    "settings": "Configurações",
+    "notFound": "Página não encontrada"
+  },
+  "ui": {
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "language": "Idioma"
+  },
+  "pages": {
+    "dashboard": {
+      "title": "Visão Geral"
+    },
+    "signals": {
+      "title": "Sinais"
+    },
+    "news": {
+      "title": "Notícias"
+    },
+    "arbitrage": {
+      "title": "Arbitragem"
+    },
+    "copysim": {
+      "title": "Copy Trading (Simulação)"
+    },
+    "staking": {
+      "title": "Pools de Staking"
+    },
+    "academy": {
+      "title": "Academia Spectr"
+    },
+    "settings": {
+      "title": "Configurações"
+    }
+  }
+}

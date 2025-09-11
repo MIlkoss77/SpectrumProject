@@ -1,0 +1,22 @@
+# Зависимости
+node_modules/
+dist/
+.cache/
+
+# Окружение
+.env
+.env.local
+
+# Логи
+logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

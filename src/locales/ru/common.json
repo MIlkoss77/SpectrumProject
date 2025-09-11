@@ -1,0 +1,50 @@
+{
+    "app": {
+        "title": "Spectr Trading",
+        "dashboard": "Обзор",
+        "signals": "Сигналы",
+        "news": "Новости",
+        "arbitrage": "Арбитраж",
+        "copySim": "Копитрейдинг (симуляция)",
+        "staking": "Стейкинг",
+        "academy": "Академия",
+        "settings": "Настройки",
+         "ta": "Аналитика" ,
+        "pricing": "Тарифы",
+        "notFound": "Страница не найдена"
+    },
+  "ui": {
+    "theme": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "language": "Язык"
+  },
+  "pages": {
+    "dashboard": {
+        "title": "Обзор",
+        "ta": { "title": "Аналитика" },
+        "pricing": { "title": "Тарифы" }
+    },
+    "signals": {
+      "title": "Сигналы"
+    },
+    "news": {
+      "title": "Новости"
+    },
+    "arbitrage": {
+      "title": "Арбитраж"
+    },
+    "copysim": {
+      "title": "Копитрейдинг (симуляция)"
+    },
+    "staking": {
+      "title": "Пулы стейкинга"
+    },
+    "academy": {
+      "title": "Академия Spectr"
+    },
+    "settings": {
+      "title": "Настройки"
+    }
+  }
+}
