@@ -8,6 +8,7 @@ const links = [
   { to: "/", key: "dashboard" },
   { to: "/signals", key: "signals" },
   { to: "/news", key: "news" },
+  { to: "/backtest", key: "backtest" },
   { to: "/arbitrage", key: "arbitrage" },
   { to: "/copy/sim", key: "copySim" },
   { to: "/staking", key: "staking" },

@@ -60,6 +60,7 @@ function miniLine({points, height=220}){
 
 export default function TA(){
   const { t } = useTranslation();
+  const [source, setSource] = useState("binance");
   const [symbol, setSymbol] = useState("BTCUSDT");
   const [tf, setTf] = useState("15m");
   const [limit, setLimit] = useState(200);

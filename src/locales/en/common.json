@@ -10,6 +10,7 @@
         "academy": "Academy",
         "settings": "Settings",
         "pricing": "Pricing",
+        "backtest": "Backtest",
         "ta": "Analytics",
         "notFound": "Page not found"
     },
@@ -21,6 +22,7 @@
     "pages": {
         "dashboard": { "title": "Overview" },
         "signals": { "title": "Signals" },
+        "backtest": { "title": "Backtest" },
         "news": { "title": "News" },
         "arbitrage": { "title": "Arbitrage" },
         "copysim": { "title": "Copy Trading (Simulation)" },

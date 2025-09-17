@@ -1,22 +1,29 @@
-# Зависимости
+# Node / Vite
 node_modules/
 dist/
-.cache/
-
-# Окружение
-.env
-.env.local
-
-# Логи
-logs
+.vite/
 *.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.cache/
+.temp/
+coverage/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# Env
+.env
+.env.*
+!.env.example
 
-# OS
+# OS / IDE
+.vs/
 .DS_Store
 Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.iml
+
+# Misc
+*.local

@@ -13,6 +13,7 @@ import Settings from "./pages/Settings.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Events from "./pages/Events.jsx";
 import Forecasts from "./pages/Forecasts.jsx";
+import Backtest from "./pages/Backtest.jsx";
 import TA from "./pages/TA.jsx";
 
 const router = createBrowserRouter([
@@ -23,7 +24,8 @@ const router = createBrowserRouter([
     children: [
         { index: true, element: <Dashboard /> },
         { path: "pricing", element: <Pricing /> },
-      { path: "signals", element: <Signals /> },
+        { path: "signals", element: <Signals /> },
+        { path: "backtest", element: <Backtest /> },
       { path: "news", element: <News /> },
       { path: "arbitrage", element: <Arbitrage /> },
         { path: "copy/sim", element: <CopySim /> },
