@@ -15,6 +15,7 @@ import Events from "./pages/Events.jsx";
 import Forecasts from "./pages/Forecasts.jsx";
 import Backtest from "./pages/Backtest.jsx";
 import TA from "./pages/TA.jsx";
+import Calibration from "./pages/Calibration.jsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { path: "arbitrage", element: <Arbitrage /> },
         { path: "copy/sim", element: <CopySim /> },
         { path: "ta", element: <TA /> },
+        { path: "calibration", element: <Calibration /> },
         { path: "forecasts", element: <Forecasts /> },
       { path: "staking", element: <Staking /> },
         { path: "academy", element: <Academy /> },

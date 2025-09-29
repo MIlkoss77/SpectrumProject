@@ -49,7 +49,7 @@ export default function Pricing() {
 
   return (
     <section className="page">
-          <h1 className="page-title">{t("pages.pricing.title") || "Pricing"}</h1>
+      <h1 className="page-title">{t("pages.pricing.title") || "Pricing"}</h1>
 
       <div className="card" style={{marginBottom:12}}>
         <div>Current plan: <strong>{status.plan}</strong>{status.trialUntil ? ` (trial until ${new Date(status.trialUntil).toLocaleString()})` : ""}</div>
