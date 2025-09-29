@@ -1,0 +1,47 @@
+services:
+  # --- API (Node/Express) ---
+  - type: web
+    name: spectr-api
+    env: node
+    plan: free               # поменяй на starter/standard при нагрузке
+    region: oregon           # выбери ближайший регион
+    repo: https://github.com/your/repo.git
+    branch: main
+    buildCommand: |
+      npm ci
+    startCommand: |
+      node server.js
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      # CORS: разрешаем фронтенд-домен (URL статического сайта на Render)
+      - key: ORIGIN
+        fromService:
+          type: static_site
+          name: spectr-web
+          property: url
+      # HMAC для n8n (опционально): Render сгенерит секрет
+      - key: N8N_SECRET
+        generateValue: true
+
+  # --- Frontend (Vite Static) ---
+  - type: static_site
+    name: spectr-web
+    plan: free
+    region: oregon
+    repo: https://github.com/your/repo.git
+    branch: main
+    buildCommand: |
+      npm ci
+      npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    envVars:
+      # Бэкенд для фронта: URL сервиса spectr-api
+      - key: VITE_API_BASE
+        fromService:
+          type: web
+          name: spectr-api
+          property: url
