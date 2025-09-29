@@ -1,14 +1,14 @@
+// src/services/http.js
 import axios from "axios";
 
-export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:8787",
-  timeout: 15000,
-});
+const host = import.meta.env.VITE_API_HOST; // приходит из render.yaml
+const base =
+  import.meta.env.VITE_API_BASE
+  || (host ? `https://${host}` : "http://localhost:8787"); // сборка полного URL
 
-http.interceptors.request.use(cfg => {
-  const token = localStorage.getItem("spectr.token");
-  if (token) cfg.headers.Authorization = `Bearer ${token}`;
-  return cfg;
+export const http = axios.create({
+  baseURL: base,
+  timeout: 10000,
 });
 
 http.interceptors.response.use(
