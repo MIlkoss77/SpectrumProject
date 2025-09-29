@@ -4,43 +4,123 @@
     "dashboard": "Visão Geral",
     "signals": "Sinais",
     "news": "Notícias",
+    "calibration": "Calibração",
     "arbitrage": "Arbitragem",
     "copySim": "Copy (Sim)",
     "staking": "Staking",
     "academy": "Academia",
     "settings": "Configurações",
+    "pricing": "Planos",
+    "backtest": "Backtest",
+    "ta": "Analítica",
     "notFound": "Página não encontrada"
   },
   "ui": {
+    "refresh": "Atualizar",
+    "loading": "Carregando…",
+    "error": "Erro",
     "theme": "Tema",
     "light": "Claro",
     "dark": "Escuro",
-    "language": "Idioma"
+    "language": "Idioma",
+    "viewMore": "Ver mais",
+    "stake": "Fazer stake",
+    "unstake": "Retirar"
   },
   "pages": {
     "dashboard": {
-      "title": "Visão Geral"
+      "title": "Visão Geral",
+      "portfolio": "Resumo do portfólio",
+      "planLabel": "Plano: {{plan}}",
+      "trialUntil": "trial até {{date}}",
+      "managePlan": "Gerenciar plano",
+      "capital": "Capital",
+      "pnl24h": "PnL 24h",
+      "winRate": "Taxa de acerto",
+      "brier": "Brier médio",
+      "allocations": "Alocações",
+      "currentAllocation": "Atual {{value}}",
+      "target": "Meta {{value}}",
+      "noChange": "Sem mudanças",
+      "recommendationTitle": "Recomendação AI · {{profile}}",
+      "recommendationFallback": "Sem contexto adicional.",
+      "quickActions": "Ações rápidas",
+      "quickActionsHint": "Acesse os fluxos principais do MVP",
+      "noQuickActions": "Nenhuma ação",
+      "latestSignals": "Sinais recentes",
+      "noSignals": "Ainda não há sinais",
+      "actionSignals": "Abrir sinais",
+      "actionSignalsDesc": "Revisar sinais de IA ao vivo",
+      "actionCopy": "Simular copy trading",
+      "actionCopyDesc": "Paper trading com líderes verificados",
+      "actionArb": "Ver arbitragem",
+      "actionArbDesc": "Conferir oportunidades líquidas",
+      "actionRebalance": "Disparar rebalanceamento",
+      "actionRebalanceDesc": "Enviar webhook para o n8n"
     },
     "signals": {
-      "title": "Sinais"
+      "title": "Sinais",
+      "appliedFromAcademy": "Aplicado pela Academia"
     },
-    "news": {
-      "title": "Notícias"
-    },
-    "arbitrage": {
-      "title": "Arbitragem"
-    },
-    "copysim": {
-      "title": "Copy Trading (Simulação)"
-    },
+    "backtest": { "title": "Backtest" },
+    "news": { "title": "Notícias" },
+    "arbitrage": { "title": "Arbitragem" },
+    "copysim": { "title": "Copy Trading (Simulação)" },
     "staking": {
-      "title": "Pools de Staking"
+      "title": "Pools de Staking",
+      "filterStatus": "Status",
+      "statusAll": "Todos",
+      "statusActive": "Ativos",
+      "statusUpcoming": "Em breve",
+      "statusEnded": "Finalizados",
+      "amount": "Valor, $",
+      "testnetOnly": "Somente testnet",
+      "empty": "Nenhum pool com esse filtro",
+      "lockup": "Lockup {{days}}d",
+      "flexible": "Flexível",
+      "apy": "APR",
+      "risk": "Risco: {{value}}",
+      "activity": "Atividade demo",
+      "activityEmpty": "Nenhuma operação demo ainda",
+      "actionStake": "Fazer stake",
+      "actionUnstake": "Retirar",
+      "amountFmt": "${{amount}}"
     },
+    "calibration": { "title": "Calibração de previsões" },
     "academy": {
-      "title": "Academia Spectr"
+      "title": "Academia Spectr",
+      "completed": "Cursos concluídos",
+      "hint": "Complete as lições para liberar badges e descontos.",
+      "duration": "~{{minutes}} min",
+      "badge": "Badge: {{badge}}",
+      "progress": "{{completed}} / {{total}} lições",
+      "apply": "Aplicar no gráfico",
+      "badgeGranted": "Badge {{badge}} ativado — desconto Trader 5% chegará via n8n.",
+      "badgeReady": "Badge {{badge}} desbloqueado. Confira as notificações.",
+      "courseDone": "Curso concluído",
+      "badgeReadyShort": "Badge desbloqueado"
     },
     "settings": {
-      "title": "Configurações"
-    }
+      "title": "Configurações",
+      "subscription": "Assinatura",
+      "currentPlan": "Plano atual: {{plan}}",
+      "trialUntil": "trial até {{date}}",
+      "managePlan": "Gerenciar plano",
+      "wallet": "Wallet",
+      "walletHint": "Conecte MetaMask para assinar as operações.",
+      "connectWallet": "Conectar wallet",
+      "switchWallet": "Trocar wallet",
+      "chain": "Rede: {{chain}}",
+      "notifications": "Notificações",
+      "push": "Web push",
+      "pushHint": "Receber alertas VIP no navegador.",
+      "telegram": "Telegram",
+      "telegramHint": "Receber deeplinks no bot.",
+      "vip": "Prioridade VIP",
+      "vipHint": "Entrega instantânea para Premium.",
+      "note": "Preferências armazenadas localmente neste MVP."
+    },
+    "pricing": { "title": "Planos" },
+    "ta": { "title": "Analítica" }
   }
 }
