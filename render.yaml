@@ -2,9 +2,9 @@ services:
   # --- API (Node/Express) ---
   - type: web
     name: spectr-api
-    env: node
-    plan: free               # поменяй на starter/standard при нагрузке
-    region: oregon           # выбери ближайший регион
+    runtime: node          # раньше было env: node — используем современное поле runtime
+    plan: free             # поменяй на starter/standard при нагрузке
+    region: oregon
     repo: https://github.com/your/repo.git
     branch: main
     buildCommand: |
@@ -16,19 +16,20 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 18
-      # CORS: разрешаем фронтенд-домен (URL статического сайта на Render)
+      # Разрешаем CORS с домена фронта (URL статического сайта на Render)
       - key: ORIGIN
         fromService:
-          type: static_site
+          type: web
           name: spectr-web
           property: url
-      # HMAC для n8n (опционально): Render сгенерит секрет
+      # HMAC для n8n (опционально)
       - key: N8N_SECRET
         generateValue: true
 
-  # --- Frontend (Vite Static) ---
-  - type: static_site
+  # --- Frontend (Vite React, статика на CDN Render) ---
+  - type: web
     name: spectr-web
+    runtime: static        # ключ для статических сайтов
     plan: free
     region: oregon
     repo: https://github.com/your/repo.git
@@ -38,6 +39,11 @@ services:
       npm run build
     staticPublishPath: dist
     autoDeploy: true
+    # SPA rewrite, чтобы маршруты React не падали в 404
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       # Бэкенд для фронта: URL сервиса spectr-api
       - key: VITE_API_BASE
