@@ -1,12 +1,17 @@
-// Spectr SW v1 — runtime cache + offline fallback
-const STATIC_CACHE = "spectr-static-v1";
-const RUNTIME_CACHE = "spectr-runtime-v1";
-const OFFLINE_URL = "/offline.html";
-const API_CACHE = "spectr-api-v1";
+
+// Spectr SW v2 — network-first strategy for critical assets
+const CACHE_VERSION = 'v2';
+const STATIC_CACHE = `spectr-static-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `spectr-runtime-${CACHE_VERSION}`;
+const API_CACHE = `spectr-api-${CACHE_VERSION}`;
+const OFFLINE_URL = '/offline.html';
 const API_ALLOW = [/\/signals/, /\/news/, /\/arbitrage/, /\/predictions/];
 
-self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(STATIC_CACHE).then(c => c.addAll([OFFLINE_URL])));
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll([OFFLINE_URL]))
+  );
   self.skipWaiting();
 });
 self.addEventListener("activate", (e) => {
@@ -16,7 +21,8 @@ self.addEventListener("activate", (e) => {
     if ('navigationPreload' in self.registration) await self.registration.navigationPreload.enable();
     self.clients.claim();
   })());
-});
+
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
@@ -30,26 +36,71 @@ self.addEventListener("fetch", (event) => {
       const network = fetch(req).then(res => { if (res.ok) cache.put(req, res.clone()); return res; }).catch(() => cached);
       return cached || network;
     })());
+
+}
+
+  const url = new URL(request.url);
+
+  if (API_ALLOW.some((rx) => rx.test(url.pathname))) {
+    event.respondWith(apiStaleWhileRevalidate(request));
     return;
   }
 
-  // Navigations — network-first
-  if (req.mode === "navigate") {
-    event.respondWith((async () => {
-      try { return await fetch(req); }
-      catch { const c = await caches.open(STATIC_CACHE); return c.match(OFFLINE_URL); }
-    })());
+  
+  if (request.mode === 'navigate') {
+    event.respondWith(navigationNetworkFirst(request));
     return;
   }
 
-  // Assets — cache-first
-  if (["style","script","image","font"].includes(req.destination)) {
-    event.respondWith((async () => {
-      const cache = await caches.open(RUNTIME_CACHE);
-      const cached = await cache.match(req);
-      if (cached) return cached;
-      try { const res = await fetch(req); if (res.ok) cache.put(req, res.clone()); return res; }
-      catch { return cached || Response.error(); }
-    })());
+  
+  if (['style', 'script', 'image', 'font'].includes(request.destination)) {
+    event.respondWith(assetNetworkFirst(request));
   }
 });
+
+async function navigationNetworkFirst(request) {
+  const cache = await caches.open(STATIC_CACHE);
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) {
+      return cached;
+    }
+    const offline = await cache.match(OFFLINE_URL);
+    return offline ?? Response.error();
+  }
+}
+
+async function assetNetworkFirst(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    return cached ?? Response.error();
+  }
+}
+
+async function apiStaleWhileRevalidate(request) {
+  const cache = await caches.open(API_CACHE);
+  const cached = await cache.match(request);
+  const networkFetch = fetch(request)
+    .then((response) => {
+      if (response && response.ok) {
+        cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch(() => undefined);
+
+  return cached || (await networkFetch) || Response.error();
+}
