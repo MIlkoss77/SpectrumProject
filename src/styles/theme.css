@@ -5,6 +5,8 @@
   --muted: #94a3b8;
   --brand: #60a5fa;
   --line: #243044;
+  --good: #22c55e;
+  --bad: #ef4444;
 }
 :root:not(.dark) {
   --bg: #f8fafc;
@@ -13,6 +15,8 @@
   --muted: #475569;
   --brand: #2563eb;
   --line: #e2e8f0;
+  --good: #16a34a;
+  --bad: #dc2626;
 }
 html, body, #root { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; }

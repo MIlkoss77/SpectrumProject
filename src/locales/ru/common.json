@@ -4,47 +4,123 @@
         "dashboard": "Обзор",
         "signals": "Сигналы",
         "news": "Новости",
+        "calibration": "Калибровка",
         "arbitrage": "Арбитраж",
         "copySim": "Копитрейдинг (симуляция)",
         "staking": "Стейкинг",
         "academy": "Академия",
         "settings": "Настройки",
-         "ta": "Аналитика" ,
         "pricing": "Тарифы",
+        "backtest": "Бэктест",
+        "ta": "Аналитика",
         "notFound": "Страница не найдена"
     },
-  "ui": {
-    "theme": "Тема",
-    "light": "Светлая",
-    "dark": "Тёмная",
-    "language": "Язык"
-  },
-  "pages": {
-    "dashboard": {
-        "title": "Обзор",
-        "ta": { "title": "Аналитика" },
-        "pricing": { "title": "Тарифы" }
+    "ui": {
+        "refresh": "Обновить",
+        "loading": "Загрузка…",
+        "error": "Ошибка",
+        "theme": "Тема",
+        "light": "Светлая",
+        "dark": "Тёмная",
+        "language": "Язык",
+        "viewMore": "Смотреть все",
+        "stake": "Застейкать",
+        "unstake": "Разстейкать"
     },
-    "signals": {
-      "title": "Сигналы"
-    },
-    "news": {
-      "title": "Новости"
-    },
-    "arbitrage": {
-      "title": "Арбитраж"
-    },
-    "copysim": {
-      "title": "Копитрейдинг (симуляция)"
-    },
-    "staking": {
-      "title": "Пулы стейкинга"
-    },
-    "academy": {
-      "title": "Академия Spectr"
-    },
-    "settings": {
-      "title": "Настройки"
+    "pages": {
+        "dashboard": {
+            "title": "Обзор",
+            "portfolio": "Сводка портфеля",
+            "planLabel": "Тариф: {{plan}}",
+            "trialUntil": "триал до {{date}}",
+            "managePlan": "Управлять тарифом",
+            "capital": "Капитал",
+            "pnl24h": "PnL 24ч",
+            "winRate": "Винрейт",
+            "brier": "Средний Brier",
+            "allocations": "Аллокации",
+            "currentAllocation": "Текущее {{value}}",
+            "target": "Цель {{value}}",
+            "noChange": "Без изменений",
+            "recommendationTitle": "AI‑рекомендация · {{profile}}",
+            "recommendationFallback": "Нет дополнительных комментариев.",
+            "quickActions": "Быстрые действия",
+            "quickActionsHint": "Переход к ключевым сценариям MVP",
+            "noQuickActions": "Действий нет",
+            "latestSignals": "Последние сигналы",
+            "noSignals": "Сигналов пока нет",
+            "actionSignals": "Открыть сигналы",
+            "actionSignalsDesc": "Посмотреть свежие AI сигналы",
+            "actionCopy": "Симулировать копитрейдинг",
+            "actionCopyDesc": "Потрейдить с лидерами в демо",
+            "actionArb": "Проверить арбитраж",
+            "actionArbDesc": "Найти net возможности",
+            "actionRebalance": "Запустить ребаланс",
+            "actionRebalanceDesc": "Отправить webhook в n8n"
+        },
+        "signals": {
+            "title": "Сигналы",
+            "appliedFromAcademy": "Применено из Академии"
+        },
+        "backtest": { "title": "Бэктест" },
+        "news": { "title": "Новости" },
+        "arbitrage": { "title": "Арбитраж" },
+        "copysim": { "title": "Копитрейдинг (симуляция)" },
+        "staking": {
+            "title": "Пулы стейкинга",
+            "filterStatus": "Статус",
+            "statusAll": "Все",
+            "statusActive": "Активные",
+            "statusUpcoming": "Скоро",
+            "statusEnded": "Завершены",
+            "amount": "Сумма, $",
+            "testnetOnly": "Только тестнет",
+            "empty": "Нет пулов по фильтру",
+            "lockup": "Локап {{days}}д",
+            "flexible": "Гибкий",
+            "apy": "APR",
+            "risk": "Риск: {{value}}",
+            "activity": "Демо‑активность",
+            "activityEmpty": "Демо‑операций ещё не было",
+            "actionStake": "Застейкать",
+            "actionUnstake": "Разстейкать",
+            "amountFmt": "${{amount}}"
+        },
+        "calibration": { "title": "Калибровка прогнозов" },
+        "academy": {
+            "title": "Академия Spectr",
+            "completed": "Пройдено курсов",
+            "hint": "Завершайте уроки, чтобы открыть бейджи и скидки.",
+            "duration": "~{{minutes}} мин",
+            "badge": "Бейдж: {{badge}}",
+            "progress": "{{completed}} / {{total}} уроков",
+            "apply": "Применить на график",
+            "badgeGranted": "Бейдж {{badge}} активирован — скидка 5% Trader отправится через n8n.",
+            "badgeReady": "Бейдж {{badge}} получен. Проверьте уведомления.",
+            "courseDone": "Курс завершён",
+            "badgeReadyShort": "Бейдж получен"
+        },
+        "settings": {
+            "title": "Настройки",
+            "subscription": "Подписка",
+            "currentPlan": "Текущий план: {{plan}}",
+            "trialUntil": "триал до {{date}}",
+            "managePlan": "Управлять тарифом",
+            "wallet": "Кошелёк",
+            "walletHint": "Подключите MetaMask для подписи сделок.",
+            "connectWallet": "Подключить кошелёк",
+            "switchWallet": "Сменить кошелёк",
+            "chain": "Сеть: {{chain}}",
+            "notifications": "Уведомления",
+            "push": "Web push",
+            "pushHint": "Получать VIP‑сигналы в браузере.",
+            "telegram": "Telegram",
+            "telegramHint": "Получать диплинки в боте.",
+            "vip": "VIP приоритет",
+            "vipHint": "Мгновенная доставка для Premium.",
+            "note": "Предпочтения сохраняются локально в MVP."
+        },
+        "pricing": { "title": "Тарифы" },
+        "ta": { "title": "Аналитика" }
     }
-  }
 }

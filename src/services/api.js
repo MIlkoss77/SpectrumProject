@@ -38,6 +38,11 @@ export const GamificationAPI = {
     badges: (params = {}) => http.get("/gamification/badges", { params }).then(r => r.data),
 };
 
+// Стейкинг
+export const StakingAPI = {
+    list: (params = {}) => http.get("/staking/pools", { params }).then(r => r.data),
+};
+
 // Биллинг (мок)
 export const BillingAPI = {
     me: () => http.get("/me").then(r => r.data),

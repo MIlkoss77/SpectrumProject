@@ -13,7 +13,7 @@ import Settings from "./pages/Settings.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import Events from "./pages/Events.jsx";
 import Forecasts from "./pages/Forecasts.jsx";
-import Backtest from "./pages/Backtest.jsx";
+import Backtest from "./pages/backtest.jsx";
 import TA from "./pages/TA.jsx";
 import Calibration from "./pages/Calibration.jsx";
 
