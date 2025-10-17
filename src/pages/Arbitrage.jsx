@@ -2,6 +2,37 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArbitrageAPI } from "../services/api";
 
+function OpportunityRow({ item }) {
+  const buy = item.buy || {};
+  const sell = item.sell || {};
+  return (
+    <div className="arb-row">
+      <div className="arb-symbol">
+        <div style={{ fontWeight: 700 }}>{item.symbol}</div>
+        <div className="muted">spread {(item.gross ?? 0).toFixed(2)}%</div>
+      </div>
+      <div className="arb-leg">
+        <div className="muted">Buy</div>
+        <div>{buy.exchange}</div>
+        <div>${buy.ask?.toFixed?.(2) ?? "—"}</div>
+      </div>
+      <div className="arb-leg">
+        <div className="muted">Sell</div>
+        <div>{sell.exchange}</div>
+        <div>${sell.bid?.toFixed?.(2) ?? "—"}</div>
+      </div>
+      <div className="arb-metrics">
+        <div>Fees {(item.fees ?? 0).toFixed(2)}%</div>
+        <div>Latency {(item.latency ?? 0).toFixed(2)}%</div>
+      </div>
+      <div className="arb-net">
+        <div style={{ fontSize: 20, fontWeight: 700 }}>{(item.net ?? 0).toFixed(2)}%</div>
+        <div className="muted">Updated {item.ts ? new Date(item.ts).toLocaleTimeString() : "—"}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function Arbitrage() {
   const { t } = useTranslation();
   const [rows, setRows] = useState([]);
@@ -13,12 +44,13 @@ export default function Arbitrage() {
     try {
       setErr(null); setLoading(true);
       const data = await ArbitrageAPI.list({ limit: 50 });
-      setRows(Array.isArray(data) ? data : data.items || []);
+      const list = Array.isArray(data) ? data : data.items || [];
+      setRows(list);
     } catch (e) { setErr(e); }
     finally { setLoading(false); }
   }
 
-  useEffect(() => { load(); const id = setInterval(load, 15000); return () => clearInterval(id); }, []);
+  useEffect(() => { load(); const id = setInterval(load, 20000); return () => clearInterval(id); }, []);
 
   const filtered = useMemo(() => rows.filter(r => (r.net || 0) >= minNet), [rows, minNet]);
 
@@ -26,23 +58,19 @@ export default function Arbitrage() {
     <section className="page">
       <h1 className="page-title">{t("pages.arbitrage.title")}</h1>
 
-      <div className="card" style={{display:"flex",gap:8,alignItems:"center",marginBottom:12}}>
-        <span style={{color:"var(--muted)"}}>Min net %</span>
+      <div className="card" style={{display:"flex",gap:12,alignItems:"center",marginBottom:12}}>
+        <span className="muted">Min net %</span>
         <input type="number" step="0.1" value={minNet} onChange={e=>setMinNet(parseFloat(e.target.value||0))} style={{width:90}}/>
         <button className="btn" onClick={load}>Refresh</button>
+        <div style={{marginLeft:"auto", fontSize:12, color:"var(--muted)"}}>Pairs monitored: {rows.length}</div>
       </div>
 
-      {err && <div className="card"><strong>API error:</strong><pre>{JSON.stringify(err,null,2)}</pre></div>}
-      <div className="card">
+      {err && <div className="card"><strong>API error</strong><pre>{JSON.stringify(err,null,2)}</pre></div>}
+      <div className="card arb-grid">
         {loading ? "Loading…" : filtered.length===0 ? "No opportunities" :
-          filtered.map((o, i) => (
-            <div key={o.id || i} style={{display:"grid",gridTemplateColumns:"100px 1fr 1fr 90px 90px",gap:12,padding:"8px 0",borderBottom:"1px solid var(--line)"}}>
-              <div>{o.symbol}</div>
-              <div>{o.buy?.exchange} → {o.sell?.exchange}</div>
-              <div>fees: {o.fees?.total?.toFixed?.(2) ?? o.fees}%</div>
-              <div style={{fontWeight:600}}>{(o.net ?? 0).toFixed(2)}%</div>
-              <div style={{color:"#94a3b8"}}>{o.ts ? new Date(o.ts).toLocaleTimeString() : ""}</div>
-            </div>
+          
+          filtered.map((o) => (
+            <OpportunityRow key={o.id} item={o} />
           ))
         }
       </div>

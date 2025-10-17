@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MarketAPI } from "../services/ohlc";
+import { ema, rsi, macd } from "../services/indicators.js";
 
 const DEFAULT_SYMBOLS = ["BTCUSDT","ETHUSDT","TONUSDT","SOLUSDT","BNBUSDT"];
 
@@ -77,11 +78,31 @@ export default function TA(){
   }
   useEffect(()=>{ load(); }, [symbol, tf, limit]);
 
+  useEffect(() => {
+    const search = new URLSearchParams(window.location.search);
+    const qsSymbol = search.get("symbol");
+    const qsTf = search.get("tf");
+    const saved = localStorage.getItem("spectr.applyToChart");
+    if (qsSymbol) setSymbol(qsSymbol.toUpperCase());
+    if (qsTf) setTf(qsTf);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.symbol) setSymbol(parsed.symbol);
+        if (parsed.timeframe) setTf(parsed.timeframe);
+      } catch { /* ignore */ }
+    }
+  }, []);
+
   const closes = useMemo(()=> rows.map(r=>r.c), [rows]);
   const ema50 = useMemo(()=> EMA(closes, 50), [closes]);
   const ema200 = useMemo(()=> EMA(closes, 200), [closes]);
   const rsi14 = useMemo(()=> RSI(closes, 14), [closes]);
   const macd = useMemo(()=> MACD(closes, 12, 26, 9), [closes]);
+  const ema50 = useMemo(()=> ema(closes, 50), [closes]);
+  const ema200 = useMemo(()=> ema(closes, 200), [closes]);
+  const rsi14 = useMemo(()=> rsi(closes, 14), [closes]);
+  const macdValues = useMemo(()=> macd(closes, 12, 26, 9), [closes]);
 
   const latest = rows.at(-1);
   const latestIdx = rows.length-1;
@@ -93,10 +114,13 @@ export default function TA(){
     const rsi = rsi14[latestIdx] ?? 50;
     const macdNow = macd.macd[latestIdx] ?? 0;
     const sigNow = macd.signal[latestIdx] ?? 0;
+    const macdNow = macdValues.macd[latestIdx] ?? 0;
+    const sigNow = macdValues.signal[latestIdx] ?? 0;
     const up = (e50 && e200 && e50>e200) || (c>e200 && macdNow>0 && rsi>55);
     const down = (e50 && e200 && e50<e200) || (c<e200 && macdNow<0 && rsi<45);
     return up ? "UPTREND" : down ? "DOWNTREND" : "RANGE";
   }, [latestIdx, closes, ema50, ema200, rsi14, macd]);
+  }, [latestIdx, closes, ema50, ema200, rsi14, macdValues]);
 
   const score = useMemo(()=>{
     if (latestIdx<0) return 0;
@@ -105,6 +129,8 @@ export default function TA(){
     const rsi = rsi14[latestIdx] ?? 50;
     const mac = macd.macd[latestIdx] ?? 0;
     const sig = macd.signal[latestIdx] ?? 0;
+    const mac = macdValues.macd[latestIdx] ?? 0;
+    const sig = macdValues.signal[latestIdx] ?? 0;
     let s = 0;
     if (mac>sig) s+=1; else s-=1;
     if (mac>0) s+=1; else s-=1;
@@ -112,6 +138,7 @@ export default function TA(){
     if (c>e200) s+=1; else s-=1;
     return s; // -4..+4
   }, [latestIdx, closes, ema200, rsi14, macd]);
+  }, [latestIdx, closes, ema200, rsi14, macdValues]);
 
   const signals = useMemo(()=>{
     const out=[];
@@ -119,6 +146,8 @@ export default function TA(){
       const rsip = rsi14[i-1], rsin = rsi14[i];
       const macp = macd.macd[i-1], macn = macd.macd[i];
       const sigp = macd.signal[i-1], sign = macd.signal[i];
+      const macp = macdValues.macd[i-1], macn = macdValues.macd[i];
+      const sigp = macdValues.signal[i-1], sign = macdValues.signal[i];
       const e50p = ema50[i-1], e50n = ema50[i];
       const e200p = ema200[i-1], e200n = ema200[i];
       if (rsip!=null && rsin!=null){
@@ -140,6 +169,7 @@ export default function TA(){
     }
     return out.slice(-10);
   }, [rows, rsi14, macd, ema50, ema200]);
+  }, [rows, rsi14, macdValues, ema50, ema200]);
 
   const priceLine = useMemo(()=>{
     const points = rows.map(r=>r.c);
@@ -191,6 +221,7 @@ export default function TA(){
         <div>
           <div style={{color:"var(--muted)"}}>MACD</div>
           <div style={{fontSize:22,fontWeight:700}}>{macd.macd.at(-1)?.toFixed(3) ?? "—"} / {macd.signal.at(-1)?.toFixed(3) ?? "—"}</div>
+          <div style={{fontSize:22,fontWeight:700}}>{macdValues.macd.at(-1)?.toFixed(3) ?? "—"} / {macdValues.signal.at(-1)?.toFixed(3) ?? "—"}</div>
         </div>
         <div>
           <div style={{color:"var(--muted)"}}>EMA(50/200)</div>

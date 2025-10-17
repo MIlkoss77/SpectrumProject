@@ -121,6 +121,11 @@ export default function Forecasts() {
                     <div style={{ gridColumn: "1/-1", color: "var(--muted)", fontSize: 12 }}>
                         * Расчёты по Kelly и EV носят информационный характер и не являются финансовой рекомендацией.
                     </div>
+                    {selected?.rationale?.length ? (
+                        <div style={{ gridColumn: "1/-1", display: "flex", flexWrap: "wrap", gap: 8 }}>
+                            {selected.rationale.map((item, idx) => <span key={idx} className="pill">{item}</span>)}
+                        </div>
+                    ) : null}
                 </div>
             )}
         </section>
