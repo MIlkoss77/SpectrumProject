@@ -79,8 +79,8 @@ server {
         proxy_pass https://api.binance.com/;
         proxy_ssl_server_name on;
         proxy_set_header Host api.binance.com;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
     # Bybit Proxy
@@ -88,7 +88,7 @@ server {
         proxy_pass https://api.bybit.com/;
         proxy_ssl_server_name on;
         proxy_set_header Host api.bybit.com;
-        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Real-IP \$remote_addr;
     }
 
     # Etherscan Proxy

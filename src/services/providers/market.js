@@ -1,12 +1,12 @@
 // src/services/providers/market.js
 // --- Binance API helper ------------------------------------------------------
 // Получение свечей с Binance API (через Vite proxy)
-const BINANCE_BASE = '/binance-api/api/v3';
+const BINANCE_BASE = '/binance-api'; // Nginx redirects /binance-api/ to api.binance.com/
 const TF_MAP = { '1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h', '1d': '1d' };
 
 export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) {
   const interval = TF_MAP[timeframe] || timeframe;
-  const url = `${BINANCE_BASE}/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  const url = `${BINANCE_BASE}/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
 
   try {
     const res = await fetch(url);
@@ -48,7 +48,7 @@ export async function fetchBinanceTicker(symbol) {
   const timeoutId = setTimeout(() => controller.abort(), 1200);
 
   try {
-    const res = await fetch(`${BINANCE_BASE}/ticker/price?symbol=${symbol}`, { signal: controller.signal });
+    const res = await fetch(`${BINANCE_BASE}/api/v3/ticker/price?symbol=${symbol}`, { signal: controller.signal });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error('Binance Ticker Error');
     const data = await res.json();
