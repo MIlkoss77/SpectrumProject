@@ -1,8 +1,4 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { ArrowRight, Activity, Zap, Shield, Globe, Play } from 'lucide-react'
-import NumberTicker from '@/components/NumberTicker'
+import logoImg from '@/assets/logo.png'
 
 export default function Landing() {
     return (
@@ -27,7 +23,7 @@ export default function Landing() {
             }}>
                 <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: '32px', height: '32px', flexShrink: 0, backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <img src="/logo.png" alt="Spectr" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        <img src={logoImg} alt="Spectr" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     </div>
                     <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-0.5px', display: 'flex', alignItems: 'center' }}>
                         <span style={{ color: '#fff' }}>SPECTR</span>

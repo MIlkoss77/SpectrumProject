@@ -41,7 +41,7 @@ export default function Settings() {
         }
       })
     } else {
-      alert('Push notifications not supported in this browser.')
+      console.warn('Push notifications not supported in this browser.')
     }
   }
 

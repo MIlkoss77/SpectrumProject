@@ -36,7 +36,7 @@ export default function Agent() {
 
     const toggleAgent = async () => {
         if (!hasApiKey) {
-            alert("Please configure your API Key in Settings first.");
+            console.warn("API Key missing");
             return;
         }
 

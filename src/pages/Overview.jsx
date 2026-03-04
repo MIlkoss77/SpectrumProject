@@ -16,6 +16,7 @@ import './overview.css'
 import PricePulse from '@/components/PricePulse'
 import Orderbook from '@/components/dashboard/Orderbook'
 import Skeleton from '@/components/ui/Skeleton'
+import logoImg from '@/assets/logo.png'
 
 function ActionCard({ action, loading, openTrade, t }) {
   if (loading) return (
@@ -403,7 +404,7 @@ export default function Overview() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   border: '1px solid rgba(0,255,255,0.2)'
                 }}>
-                  <img src="/logo.png" alt="Spectr" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+                  <img src={logoImg} alt="Spectr" style={{ width: 40, height: 40, objectFit: 'contain' }} />
                 </div>
                 <h2 style={{ fontSize: 24, fontWeight: 900, margin: '0 0 8px', letterSpacing: -0.5 }}>
                   Welcome to <span style={{ color: '#00FFFF' }}>Spectr Trading</span> 🚀

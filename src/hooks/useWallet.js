@@ -17,7 +17,7 @@ export const useWallet = () => {
         console.error("MetaMask connection rejected", err);
       }
     } else {
-      alert("Please install MetaMask");
+      console.warn("MetaMask not found");
     }
   };
 

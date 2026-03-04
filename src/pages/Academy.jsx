@@ -378,7 +378,7 @@ export default function Academy() {
   const handleStart = (m) => {
     const i = modules.findIndex(mod => mod.id === m.id)
     if (i > 0 && modules[i - 1].progress < 100) {
-      alert("Complete the previous module to unlock this one!")
+      console.warn("Prev module locked");
       return
     }
     setActiveModule(m)

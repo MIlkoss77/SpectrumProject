@@ -36,7 +36,6 @@ export default function Arbitrage() {
       // Optionally show a toast here
     } catch (err) {
       console.error(err);
-      alert(err.message);
     } finally {
       setExecuting(null);
     }
