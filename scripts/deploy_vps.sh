@@ -21,6 +21,10 @@ sudo apt install -y nginx
 # 4. Preparation
 WEB_ROOT="/var/www/spectrum"
 echo "📂 Setting up project in $WEB_ROOT..."
+
+# Ensure we are in the repo to get latest changes
+git config core.ignorecase false
+
 sudo mkdir -p $WEB_ROOT
 sudo cp -r ./* $WEB_ROOT
 cd $WEB_ROOT
@@ -34,11 +38,15 @@ sudo npm install --unsafe-perm
 echo "🏗️ Building Frontend..."
 sudo npm run build
 
+if [ ! -d "dist" ]; then
+    echo "❌ Build failed! 'dist' directory not found."
+    exit 1
+fi
+
 # 5. Start Backend with PM2
 echo "⚙️ Starting Backend Server..."
-pm2 stop spectr-api 2>/dev/null || true
 pm2 delete spectr-api 2>/dev/null || true
-pm2 start server/index.js --name "spectr-api"
+pm2 start "$WEB_ROOT/server/index.js" --name "spectr-api"
 
 # 6. Configure Nginx
 echo "🌐 Configuring Nginx..."
