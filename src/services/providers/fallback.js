@@ -4,10 +4,10 @@ export function getFallbackArbitrage() {
   return {
     ts: new Date(now).toISOString(),
     legs: [
-      { exchange: "Binance",  pair: "BTCUSDT", price: 68000.0 },
-      { exchange: "Bybit",    pair: "BTCUSDT", price: 68010.5 },
-      { exchange: "Kraken",   pair: "BTCUSDT", price: 67995.7 },
-      { exchange: "Coinbase", pair: "BTCUSD",  price: 68005.3 },
+      { exchange: "Binance", pair: "BTCUSDT", price: 68000.0 },
+      { exchange: "Bybit", pair: "BTCUSDT", price: 68010.5 },
+      { exchange: "Kraken", pair: "BTCUSDT", price: 67995.7 },
+      { exchange: "Coinbase", pair: "BTCUSD", price: 68005.3 },
     ],
     bestSpreadPct: 0.03,
     estNetAfterFeesPct: 0.02,
@@ -19,7 +19,7 @@ export function getFallbackArbitrage() {
 export function getFallbackSignals({ symbols = ["BTCUSDT", "ETHUSDT"], timeframes = ["15m", "1h"] } = {}) {
   const items = [];
   const now = Date.now();
-  
+
   for (const symbol of symbols) {
     for (const timeframe of timeframes) {
       // Генерируем синтетические сигналы с базовыми значениями
@@ -27,9 +27,9 @@ export function getFallbackSignals({ symbols = ["BTCUSDT", "ETHUSDT"], timeframe
         id: `${symbol}-${timeframe}`,
         symbol,
         timeframe,
-        price: symbol.startsWith('BTC') ? 65000 : symbol.startsWith('ETH') ? 3400 : 150,
-        change24h: (Math.random() - 0.5) * 4, // -2% до +2%
-        rsi: 50 + (Math.random() - 0.5) * 30, // 35-65
+        price: symbol.startsWith('BTC') ? 67200 : symbol.startsWith('ETH') ? 3450 : 150,
+        change24h: (Math.random() - 0.5) * 5, // -2.5% to +2.5%
+        rsi: 45 + (Math.random() - 0.5) * 40, // 25-65
         emaFast: null,
         emaSlow: null,
         macd: null,
@@ -44,7 +44,7 @@ export function getFallbackSignals({ symbols = ["BTCUSDT", "ETHUSDT"], timeframe
       });
     }
   }
-  
+
   return items;
 }
 
@@ -53,7 +53,7 @@ export function getFallbackPredictions({ symbols = ["BTCUSDT", "ETHUSDT"] } = {}
   const items = [];
   const now = Date.now();
   const horizons = ["4h", "12h", "24h"];
-  
+
   for (const symbol of symbols) {
     for (const horizon of horizons) {
       items.push({
@@ -68,6 +68,6 @@ export function getFallbackPredictions({ symbols = ["BTCUSDT", "ETHUSDT"] } = {}
       });
     }
   }
-  
+
   return items;
 }

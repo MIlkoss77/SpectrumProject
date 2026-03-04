@@ -174,7 +174,7 @@ async function buildSignal(symbol, timeframe) {
       ts: Date.now(),
     };
   } catch (err) {
-    console.warn("Signals snapshot fallback", symbol, timeframe, err?.message || err);
+    console.error(`[buildSignal] CRITICAL ERROR for ${symbol} ${timeframe}:`, err);
     return null;
   }
 }
