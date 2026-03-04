@@ -1,32 +1,86 @@
 {
-    "app": {
-        "title": "Spectr Trading",
-        "dashboard": "Обзор",
-        "signals": "Сигналы",
-        "news": "Новости",
-        "arbitrage": "Арбитраж",
-        "copySim": "Копитрейдинг (симуляция)",
-        "staking": "Стейкинг",
-        "academy": "Академия",
-        "settings": "Настройки",
-         "ta": "Аналитика" ,
-        "pricing": "Тарифы",
-        "notFound": "Страница не найдена"
-    },
+  "app": {
+    "title": "Spectr Trading",
+    "dashboard": "Обзор",
+    "portfolio": "Портфолио",
+    "signals": "Сигналы",
+    "alerts": "Оповещения",
+    "news": "Новости",
+    "calibration": "Калибровка",
+    "arbitrage": "Арбитраж",
+    "copySim": "Копитрейдинг (симуляция)",
+    "staking": "Стейкинг",
+    "academy": "Академия",
+    "settings": "Настройки",
+    "pricing": "Тарифы",
+    "backtest": "Бэктест",
+    "ta": "Аналитика",
+    "agent": "ИИ Агент",
+    "notFound": "Страница не найдена"
+  },
   "ui": {
+    "refresh": "Обновить",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
     "theme": "Тема",
     "light": "Светлая",
     "dark": "Тёмная",
-    "language": "Язык"
+    "language": "Язык",
+    "menu": "Меню",
+    "live_terminal": "ЖИВОЙ ТЕРМИНАЛ",
+    "open_positions": "Открытые позиции",
+    "active_positions": "Активные позиции",
+    "reset_simulation": "Сбросить симуляцию",
+    "simulation": "СИМУЛЯЦИЯ",
+    "execute": "ВЫПОЛНИТЬ",
+    "engine_active": "Движок активен",
+    "auto_pilot_msg": "ИИ Автопилот управляет вашим портфелем",
+    "ai_filtered": "ОТФИЛЬТРОВАНО ИИ",
+    "live": "LIVE",
+    "live_scanning": "ЖИВОЕ СКАНИРОВАНИЕ",
+    "ai_confidence": "Уверенность ИИ",
+    "analyze_setup": "АНАЛИЗИРОВАТЬ СЕТАП",
+    "timeframe": "Таймфрейм",
+    "ai_sentiment": "Сентимент ИИ",
+    "analyzing": "Анализируем...",
+    "price": "Цена",
+    "strategy_ichimoku": "Стратегия Облако Ишимоку",
+    "asset": "Актив",
+    "size": "Размер",
+    "avg_price": "Средняя цена",
+    "realtime_pnl": "PnL в реальном времени",
+    "action": "Действие",
+    "close": "ЗАКРЫТЬ",
+    "execution_history": "История исполнения",
+    "history_clear": "История пуста",
+    "api_integration": "Интеграция API",
+    "edit": "Правка",
+    "connect": "Подключить",
+    "save_keys": "Сохранить ключи",
+    "cancel": "Отмена",
+    "encrypted_active": "Зашифрованный ключ активен",
+    "security_warning": "Предупреждение по безопасности"
   },
   "pages": {
     "dashboard": {
-        "title": "Обзор",
-        "ta": { "title": "Аналитика" },
-        "pricing": { "title": "Тарифы" }
+      "title": "Обзор",
+      "confidence": "Уверенность",
+      "top_actions": "ТОП ДЕЙСТВИЙ СЕГОДНЯ",
+      "market_score": "РЫНОЧНЫЙ СКОР BTC"
     },
     "signals": {
-      "title": "Сигналы"
+      "title": "ИИ Сканер Сигналов",
+      "description": "Система анализа и прогнозирования рынка в реальном времени."
+    },
+    "portfolio": {
+      "paper_title": "Демо Портфель",
+      "live_title": "Реальные Активы",
+      "balance_label": "Общий оценочный баланс",
+      "api_help": "Подключите ключи биржи для торговли в реальном времени. Ключи шифруются и хранятся локально в вашем браузере.",
+      "security_msg": "Spectr никогда не передает ваши ключи на центральный сервер. Транзакции подписываются локально. Торговля на реальные средства сопряжена с риском. Всегда начинайте с небольших сумм."
+    },
+    "backtest": {
+      "title": "Бэктест"
     },
     "news": {
       "title": "Новости"
@@ -40,11 +94,28 @@
     "staking": {
       "title": "Пулы стейкинга"
     },
+    "calibration": {
+      "title": "Калибровка прогноза"
+    },
     "academy": {
       "title": "Академия Spectr"
     },
     "settings": {
-      "title": "Настройки"
+      "title": "Настройки",
+      "ai_config": "Конфигурация ИИ Агента",
+      "ai_provider": "Провайдер ИИ",
+      "api_key": "Ключ API",
+      "notifications_title": "Настройки уведомлений",
+      "push_notifications": "Push-уведомления",
+      "email_alerts": "Email-оповещения",
+      "telegram_bot": "Telegram-бот",
+      "test_notification": "Отправить тестовое уведомление"
+    },
+    "pricing": {
+      "title": "Тарифы"
+    },
+    "ta": {
+      "title": "Аналитика"
     }
   }
 }

@@ -1,25 +1,24 @@
-// src/services/http.js
-import axios from "axios";
+// src/services/api/http.js
+// Лёгкий HTTP-хелпер с таймаутом и дружелюбными ошибками.
 
-const host = import.meta.env.VITE_API_HOST; // приходит из render.yaml
-const base =
-  import.meta.env.VITE_API_BASE
-  || (host ? `https://${host}` : "http://localhost:8787"); // сборка полного URL
+export async function httpGet(url, { timeout = 10000, headers = {} } = {}) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), timeout);
+  let res, json;
 
-export const http = axios.create({
-  baseURL: base,
-  timeout: 10000,
-});
-
-http.interceptors.response.use(
-  r => r,
-  err => {
-    const e = {
-      status: err.response?.status || 0,
-      code: err.response?.data?.code || "ERR_HTTP",
-      message: err.response?.data?.message || err.message,
-      data: err.response?.data
-    };
-    return Promise.reject(e);
+  try {
+    res = await fetch(url, { signal: ctrl.signal, headers });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status} ${res.statusText} :: ${text.slice(0, 200)}`);
+    }
+    json = await res.json();
+    return json;
+  } catch (e) {
+    // Нормализуем ошибку
+    const msg = e?.message || 'Network error';
+    throw new Error(`[httpGet] ${url} :: ${msg}`);
+  } finally {
+    clearTimeout(id);
   }
-);
+}

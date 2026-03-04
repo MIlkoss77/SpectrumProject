@@ -1,0 +1,236 @@
+/* ========================================
+   MOBILE & PWA OPTIMIZATIONS
+   ======================================== */
+
+.dx-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 8px 16px calc(16px + env(safe-area-inset-bottom)) 16px;
+  justify-content: space-around;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dx-bot-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dx-bot-item.active {
+  color: var(--accent);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.dx-bot-item.active svg {
+  filter: drop-shadow(0 0 8px var(--accent-dim));
+}
+
+/* TOUCH TARGETS */
+button,
+.dx-nav-item,
+.dx-bot-item,
+.dx-btn {
+  touch-action: manipulation;
+  /* Disable double-tap zoom */
+}
+
+
+/* MEDIA QUERIES FOR MOBILE APP VIEW */
+@media (max-width: 768px) {
+
+  /* Hide SIDEBAR completely */
+  .dx-sidebar {
+    display: none !important;
+  }
+
+  /* Reset layout grid to single column */
+  .dx-root,
+  .dx-root.nav-collapsed {
+    grid-template-columns: 100% !important;
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: 80px;
+    /* Space for Bottom Nav */
+  }
+
+  /* Show BOTTOM NAV */
+  .dx-bottom-nav {
+    display: flex !important;
+  }
+
+  /* Adjust Toolbar */
+  .dx-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    padding: 12px 16px;
+    justify-content: space-between;
+    background: rgba(10, 10, 10, 0.8);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Hide burger menu on mobile since we have bottom nav */
+  .dx-burger {
+    display: none;
+  }
+
+  /* Optimize Controls for Mobile */
+  .dx-controls {
+    gap: 8px;
+    justify-content: space-between;
+    /* Spread Logo and Wallet */
+    width: 100%;
+  }
+
+  .mobile-logo-sm {
+    display: block;
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 18px;
+  }
+
+  .dx-controls label {
+    display: none;
+    /* Hide labels, keep selects/buttons if critical, or hide all */
+  }
+
+  /* Only show Wallet Connect button and maybe one critical selector */
+  .dx-controls .dx-btn {
+    margin-left: 0 !important;
+    min-width: auto !important;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  /* Stack Grids */
+  .premium-grid,
+  .stats-grid,
+  .dx-row,
+  .dx-metrics {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  /* Card padding adjustments */
+  .premium-card,
+  .dx-card {
+    padding: 16px;
+  }
+
+  /* Typography Adjustments */
+  .dx-title {
+    font-size: 24px;
+  }
+
+  .metric-value {
+    font-size: 28px;
+  }
+
+  .card {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .overview-hero {
+    padding: 16px !important;
+  }
+
+  .predictor-inner {
+    flex-direction: column !important;
+  }
+
+  .predictor-left {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    min-height: 160px;
+  }
+
+  .predictor-right {
+    max-width: 100% !important;
+  }
+}
+
+/* TA PAGE MOBILE FIXES */
+.ta-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.ta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ta-field label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.ta-field select,
+.ta-field input {
+  background: #0f1520;
+  border: 1px solid var(--border);
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.ta-checks {
+  grid-column: span 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.ta-checks label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #cfd6e2;
+}
+
+@media (max-width: 768px) {
+  .ta-controls-grid {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px;
+  }
+
+  .ta-controls-grid .dx-btn {
+    grid-column: span 2;
+  }
+
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+}

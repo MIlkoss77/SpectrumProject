@@ -1,79 +1,65 @@
 // src/services/api.js
-import { http } from "./http";
-import { fetchSignalsSnapshot } from "./providers/signals";
-import { fetchNewsFeed } from "./providers/news";
-import { fetchArbitrageOpportunities } from "./providers/arbitrage";
-import { fetchPredictionSnapshot } from "./providers/predictions";
+import axios from "axios";
 
-async function tryHttp(fn, fallback) {
-    if (!http) return fallback();
-    try {
-        return await fn();
-    } catch (err) {
-        console.warn("API fallback", err?.message || err);
-        return fallback(err);
-    }
-}
+// База для API (локально 8787, в проде подставим env)
+const host = import.meta.env.VITE_API_HOST;
+const base =
+  import.meta.env.VITE_API_BASE ||
+  (host ? `https://${host}` : "http://localhost:8787");
 
-// Сигналы
-export const SignalsAPI = {
-    
-    list: (params = {}) =>
-        tryHttp(
-            () => http.get("/signals", { params }).then(r => r.data),
-            () => fetchSignalsSnapshot(params)
-        ),
-};
+export const http = axios.create({
+  baseURL: base,
+  timeout: 10000,
+});
 
-// Новости
-export const NewsAPI = {
-    list: (params = {}) =>
-        tryHttp(
-            () => http.get("/news", { params }).then(r => r.data),
-            () => fetchNewsFeed(params)
-        ),
-};
-
-// Арбитраж
-export const ArbitrageAPI = {
-    
-    list: (params = {}) =>
-        tryHttp(
-            () => http.get("/arbitrage", { params }).then(r => r.data),
-            () => fetchArbitrageOpportunities(params)
-        ),
-};
-
-// ПРЕДСКАЗАНИЯ (Единственный экспорт с таким именем!)
 export const PredictionsAPI = {
-    
-    list: (params = {}) =>
-        tryHttp(
-            () => http.get("/predictions", { params }).then(r => r.data),
-            () => fetchPredictionSnapshot(params)
-        ),
+  list: (params = {}) => http.get("/predictions", { params }).then(r => r.data),
 };
 
-// Копитрейд (симуляция)
-export const CopySimAPI = {
-    simulate: (body) => http.post("/copy/simulate", body).then(r => r.data),
+// Разделы API сгруппированы в один объект
+export const API = {
+  me: () => http.get("/me").then(r => r.data),
+
+  // OHLC
+  ohlc: {
+    mock: (params = {}) => http.get("/ohlc", { params }).then(r => r.data),
+    binance: (params = {}) => http.get("/ohlc/binance", { params }).then(r => r.data),
+  },
+
+  // Backtest
+  backtest: {
+    run: (payload) => http.post("/backtest", payload).then(r => r.data),
+  },
+
+  // Recommendations / strategy
+  recs: {
+    strategy: (params = {}) => http.get("/recs/strategy", { params }).then(r => r.data),
+  },
+
+  // Gamification
+  gamification: {
+    badges: (userId) => http.get("/gamification/badges", { params: { userId } }).then(r => r.data),
+  },
+
+  // Billing (моки)
+  billing: {
+    mockCheckout: (plan = "Trader") =>
+      http.post("/billing/webhook/mock", {
+        type: "checkout.session.completed",
+        data: { plan },
+      }).then(r => r.data),
+  },
+
+  // Events & Metrics
+  events: () => http.get("/events").then(r => r.data),
+  metrics: () => http.get("/metrics").then(r => r.data),
 };
 
-// Стратегия / рекомендации
-export const StrategyAPI = {
-    get: () => http.get("/strategy").then(r => r.data),
-    set: (payload) => http.post("/strategy", payload).then(r => r.data),
-    recs: (params = {}) => http.get("/recs/strategy", { params }).then(r => r.data),
-};
+// При необходимости дефолтный экспорт
+export default API;
 
-// Геймификация
-export const GamificationAPI = {
-    badges: (params = {}) => http.get("/gamification/badges", { params }).then(r => r.data),
-};
-
-// Биллинг (мок)
-export const BillingAPI = {
-    me: () => http.get("/me").then(r => r.data),
-    mockCheckout: (plan) =>
-        http
-            .post("/billing/webhook/mock", {
+export async function httpGet(url, { timeout = 8000 } = {}) {
+  const ctrl = new AbortController(); const id = setTimeout(() => ctrl.abort(), timeout)
+  try { const r = await fetch(url, { signal: ctrl.signal }); if (!r.ok) throw new Error(r.statusText); return await r.json() }
+  finally { clearTimeout(id) }
+}

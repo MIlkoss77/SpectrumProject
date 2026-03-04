@@ -1,4 +1,4 @@
-import { http } from "./http";
+import { http } from "./api";
 import { fetchBinanceKlines } from "./providers/market";
 
 function formatKlines(klines = []) {
@@ -13,7 +13,7 @@ function formatKlines(klines = []) {
 }
 
 export const MarketAPI = {
-  
+
   ohlc: async (params = {}) => {
     const { source = "binance", symbol = "BTCUSDT", tf = "1h", limit = 200, ...rest } = params;
     const request = { symbol, tf, limit, ...rest };

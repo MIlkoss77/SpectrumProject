@@ -1,29 +1,13 @@
-# Node / Vite
+# Dependencies & build
 node_modules/
 dist/
 .vite/
-*.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.cache/
-.temp/
-coverage/
+node_modules/.vite/
 
-# Env
-.env
-.env.*
-!.env.example
+# Local env
+.env.local
+.env.*.local
 
-# OS / IDE
-.vs/
-.DS_Store
-Thumbs.db
-.vscode/*
-!.vscode/extensions.json
+# IDE
+.vscode/
 .idea/
-*.iml
-
-# Misc
-*.local

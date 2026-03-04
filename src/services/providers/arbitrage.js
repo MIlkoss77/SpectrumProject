@@ -1,76 +1,59 @@
-import { computeLatencyPenalty, defaultFee, fetchBinanceTicker, fetchBybitTicker, fetchCoinbaseTicker, fetchKrakenTicker, fetchOKXTicker } from "./market";
-import { getFallbackArbitrage } from "./fallbacks";
+// src/services/providers/arbitrage.js
+// Расчёт маршрута арбитража + совместимый мок для дашборда.
 
-const EXCHANGES = [
-  { id: "binance", label: "Binance", fetcher: fetchBinanceTicker },
-  { id: "okx", label: "OKX", fetcher: symbol => fetchOKXTicker(symbol.replace("USDT", "-USDT")) },
-  { id: "bybit", label: "Bybit", fetcher: fetchBybitTicker },
-  { id: "kraken", label: "Kraken", fetcher: fetchKrakenTicker },
-  { id: "coinbase", label: "Coinbase", fetcher: fetchCoinbaseTicker },
-];
+import { getMultiExchange, computeLatencyPenalty, computeNetSpread } from "./market";
+import { getFallbackArbitrage } from "./fallback";
 
-const DEFAULT_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "TONUSDT", "BNBUSDT"];
-
-function calcNet({ buy, sell }) {
-  const gross = ((sell.bid - buy.ask) / buy.ask) * 100;
-  const fees = defaultFee(buy.exchange) + defaultFee(sell.exchange);
-  const latency = computeLatencyPenalty(buy.exchange) + computeLatencyPenalty(sell.exchange);
-  const net = gross - fees - latency;
-  return { gross, fees, latency, net };
+function pct(a, b) {
+  return ((a - b) / b) * 100;
 }
 
-export async function fetchArbitrageOpportunities({ symbols = DEFAULT_SYMBOLS } = {}) {
-  const result = [];
-  for (const symbol of symbols) {
-    const quotes = await Promise.all(
-      EXCHANGES.map(async ex => {
-        try {
-          const ticker = await ex.fetcher(symbol);
-          return { ...ticker, id: ex.id };
-        } catch (err) {
-          console.warn("Arb ticker failed", ex.id, symbol, err.message);
-          return null;
-        }
-      })
-    );
-    const valid = quotes.filter(Boolean);
-    for (const buy of valid) {
-      for (const sell of valid) {
-        if (buy.exchange === sell.exchange) continue;
-        if (!buy.ask || !sell.bid) continue;
-        const { gross, fees, latency, net } = calcNet({ buy, sell });
-        if (!Number.isFinite(net)) continue;
-        result.push({
-          id: `${symbol}-${buy.exchange}-${sell.exchange}`,
-          symbol,
-          buy,
-          sell,
-          gross,
-          net,
-          fees,
-          latency,
-          ts: Date.now(),
-        });
-      }
+/**
+ * scanRoute — считает «лучший» маршрут buy->sell на основе котировок,
+ * применяет задержку/комиссии/слиппедж и возвращает показатели.
+ */
+export async function scanRoute(pair = "BTCUSDT", opts = {}) {
+  try {
+    const { quotes, errors } = await getMultiExchange(pair);
+    if (!quotes?.length) {
+      return { ok: false, fallback: true, data: getFallbackArbitrage(), errors };
     }
-  }
-  let opportunities = result
-    .filter(item => item.net > 0)
-    .sort((a, b) => b.net - a.net);
+    const sorted = [...quotes].sort((a, b) => a.price - b.price);
+    const bestBuy = sorted[0];
+    const bestSell = sorted[sorted.length - 1];
 
-  if (!opportunities.length) {
-    return getFallbackArbitrage({ symbols }).sort((a, b) => (b.net ?? 0) - (a.net ?? 0));
-  }
+    const grossSpreadPct = pct(bestSell.price, bestBuy.price);
+    const netSpreadPct = computeNetSpread(grossSpreadPct, opts);
 
-  const seen = new Set(opportunities.map(item => item.id));
-  const fallback = getFallbackArbitrage({ symbols });
-  for (const item of fallback) {
-    if ((item.net ?? 0) <= 0) continue;
-    if (!seen.has(item.id)) {
-      opportunities.push(item);
-      seen.add(item.id);
-    }
+    return {
+      ok: true,
+      pair,
+      quotes,
+      route: { buy: bestBuy, sell: bestSell },
+      metrics: {
+        grossSpreadPct,
+        netSpreadPct,
+        latencyPenalty: computeLatencyPenalty(opts.latencyMs ?? 300),
+        feesPct: opts.feesPct ?? 0.10,
+        slippageBps: opts.slippageBps ?? 5,
+      },
+      errors,
+    };
+  } catch (e) {
+    return { ok: false, fallback: true, data: getFallbackArbitrage(), error: String(e?.message || e) };
   }
-
-  return opportunities.sort((a, b) => (b.net ?? 0) - (a.net ?? 0)).slice(0, 30);
 }
+
+/** Совместимость: фейковый список «возможностей» для дашборда */
+export async function fetchArbitrageOpportunities() {
+  return [
+    { pair: "BTCUSDT", spread: 0.12, exchanges: ["Binance", "Kraken"] },
+    { pair: "ETHUSDT", spread: 0.09, exchanges: ["Binance", "Coinbase"] },
+    { pair: "TONUSDT", spread: 0.07, exchanges: ["OKX", "Binance"] },
+  ];
+}
+
+export default {
+  scanRoute,
+  fetchArbitrageOpportunities,
+};

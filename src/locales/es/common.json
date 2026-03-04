@@ -2,27 +2,85 @@
   "app": {
     "title": "Spectr Trading",
     "dashboard": "Resumen",
+    "portfolio": "Portafolio",
     "signals": "Señales",
+    "alerts": "Alertas",
     "news": "Noticias",
+    "calibration": "Calibración",
     "arbitrage": "Arbitraje",
     "copySim": "Copy (Sim)",
     "staking": "Staking",
     "academy": "Academia",
     "settings": "Ajustes",
+    "pricing": "Precios",
+    "backtest": "Backtest",
+    "ta": "Análisis",
+    "agent": "Agente de IA",
     "notFound": "Página no encontrada"
   },
   "ui": {
     "theme": "Tema",
     "light": "Claro",
     "dark": "Oscuro",
-    "language": "Idioma"
+    "language": "Idioma",
+    "refresh": "Actualizar",
+    "loading": "Cargando...",
+    "error": "Error",
+    "menu": "Menú",
+    "live_terminal": "TERMINAL EN VIVO",
+    "open_positions": "Posiciones Abiertas",
+    "active_positions": "Posiciones Activas",
+    "reset_simulation": "Reiniciar Simulación",
+    "simulation": "SIMULACIÓN",
+    "execute": "EJECUTAR",
+    "engine_active": "Motor Activo",
+    "auto_pilot_msg": "AI Auto-Pilot está gestionando su portafolio",
+    "ai_filtered": "FILTRADO POR IA",
+    "live": "EN VIVO",
+    "live_scanning": "ESCANEO EN VIVO",
+    "ai_confidence": "Confianza de IA",
+    "analyze_setup": "ANALIZAR SETUP",
+    "timeframe": "Temporalidad",
+    "ai_sentiment": "Sentimiento de IA",
+    "analyzing": "Analizando...",
+    "price": "Precio",
+    "strategy_ichimoku": "Estratégia de Nube de Ichimoku",
+    "asset": "Activo",
+    "size": "Tamaño",
+    "avg_price": "Precio Promedio",
+    "realtime_pnl": "PnL en Tiempo Real",
+    "action": "Acción",
+    "close": "CERRAR",
+    "execution_history": "Historial de Ejecución",
+    "history_clear": "Historial limpio",
+    "api_integration": "Integración de API",
+    "edit": "Editar",
+    "connect": "Conectar",
+    "save_keys": "Guardar Claves",
+    "cancel": "Cancelar",
+    "encrypted_active": "Clave Criptografada Activa",
+    "security_warning": "Aviso de Seguridad"
   },
   "pages": {
     "dashboard": {
-      "title": "Resumen"
+      "title": "Resumen",
+      "confidence": "Confianza",
+      "top_actions": "PRINCIPALES ACCIONES HOY",
+      "market_score": "PUNTUACIÓN DE MERCADO BTC"
     },
     "signals": {
-      "title": "Señales"
+      "title": "Escáner de Señales de IA",
+      "description": "Motor de análisis y predicción de mercado en tempo real."
+    },
+    "portfolio": {
+      "paper_title": "Portafolio Virtual",
+      "live_title": "Activos Reales",
+      "balance_label": "Saldo Total Estimado",
+      "api_help": "Conecta tus claves de exchange para activar el Trading en Vivo. Las claves están cifradas y se almacenan localmente en tu navegador.",
+      "security_msg": "Spectr nunca transmite sus claves a ningún servidor central. Las transacciones se firman localmente. Tenga en cuenta que cambiar al Trading en Vivo implica capital real. Comience siempre con cantidades pequeñas."
+    },
+    "backtest": {
+      "title": "Backtest"
     },
     "news": {
       "title": "Noticias"
@@ -36,11 +94,28 @@
     "staking": {
       "title": "Pools de Staking"
     },
+    "calibration": {
+      "title": "Calibración de Predicción"
+    },
     "academy": {
       "title": "Academia Spectr"
     },
     "settings": {
-      "title": "Ajustes"
+      "title": "Ajustes",
+      "ai_config": "Configuración del Agente de IA",
+      "ai_provider": "Proveedor de IA",
+      "api_key": "Clave de API",
+      "notifications_title": "Preferencias de Notificación",
+      "push_notifications": "Notificaciones Push",
+      "email_alerts": "Alertas por Correo",
+      "telegram_bot": "Bot de Telegram",
+      "test_notification": "Enviar Notificación de Prueba"
+    },
+    "pricing": {
+      "title": "Precios"
+    },
+    "ta": {
+      "title": "Análisis"
     }
   }
 }

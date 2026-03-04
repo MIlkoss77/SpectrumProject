@@ -1,4 +1,4 @@
-import { http } from "./http";
+import { http } from "./api";
 
 export const EventsAPI = {
   list: () => http.get("/events").then(r => r.data),
@@ -7,5 +7,5 @@ export const EventsAPI = {
   sendRebalance: (payload) => http.post("/integrations/n8n/rebalance", payload).then(r => r.data),
   sendGamification: (payload) => http.post("/integrations/n8n/gamification", payload).then(r => r.data),
   sendAlert: (payload) => http.post("/integrations/n8n/alert", payload).then(r => r.data),
-  mockCheckout: (plan) => http.post("/billing/webhook/mock", { type:"checkout.session.completed", data:{ plan } }).then(r=>r.data)
+  mockCheckout: (plan) => http.post("/billing/webhook/mock", { type: "checkout.session.completed", data: { plan } }).then(r => r.data)
 };

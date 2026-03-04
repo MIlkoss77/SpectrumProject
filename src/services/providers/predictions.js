@@ -1,34 +1,34 @@
-import { clamp, ema, macd, rsi } from "../indicators";
+import { clamp, ema, macd, rsi } from "../ta/indicators";
 import { fetchBinanceKlines } from "./market";
-import { getFallbackPredictions } from "./fallbacks";
+import { getFallbackPredictions } from "./fallback";
+import { getPredictor } from "../ml/ml_model";
 
 const DEFAULT_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "TONUSDT", "BNBUSDT"];
 const HORIZONS = { "4h": 4, "12h": 12, "24h": 24 };
 
-function computeScore(closes, emaFast, emaSlow, rsi14, macdHist, idx) {
-  const price = closes[idx];
-  const fast = emaFast[idx];
-  const slow = emaSlow[idx];
-  const rsiVal = rsi14[idx];
-  const hist = macdHist[idx];
-  if (!price || fast == null || slow == null || rsiVal == null || hist == null) return null;
-  let score = 0;
-  if (fast > slow) score += 1; else score -= 1;
-  if (rsiVal > 60) score += 1; else if (rsiVal < 40) score -= 1;
-  if (hist > 0) score += 1; else score -= 1;
-  return score; // -3..3
-}
+/**
+ * Feature Extraction & Normalization for ML
+ */
+function prepareMlData(closes, ema34, ema89, rsi14, hist) {
+  const features = [];
+  for (let i = 100; i < closes.length; i++) {
+    // 1. Normalized RSI (0-1)
+    const normRsi = (rsi14[i] ?? 50) / 100;
 
-function adjustProbability(base, score) {
-  const adjustment = (score || 0) * 0.06; // max ±0.18
-  return clamp(base + adjustment, 0.05, 0.95);
-}
+    // 2. Normalized MACD Hist (Approximate normalization)
+    const normMacd = clamp((hist[i] ?? 0) / (closes[i] * 0.002), -1, 1) * 0.5 + 0.5;
 
-function brierFromHistory(samples, base) {
-  if (!samples.length) return 0.25;
-  const prob = base;
-  const sum = samples.reduce((acc, s) => acc + Math.pow(prob - s.outcome, 2), 0);
-  return +(sum / samples.length).toFixed(3);
+    // 3. EMA Distance (Fast vs Slow)
+    const emaDiff = (ema34[i] - ema89[i]) / ema89[i];
+    const normEma = clamp(emaDiff / 0.02, -1, 1) * 0.5 + 0.5;
+
+    // 4. Price vs EMA (Trend)
+    const priceTrend = (closes[i] - ema34[i]) / ema34[i];
+    const normTrend = clamp(priceTrend / 0.01, -1, 1) * 0.5 + 0.5;
+
+    features.push([normRsi, normMacd, normEma, normTrend]);
+  }
+  return features;
 }
 
 async function buildPredictionsForSymbol(symbol, timeframe = "1h") {
@@ -39,6 +39,7 @@ async function buildPredictionsForSymbol(symbol, timeframe = "1h") {
     console.warn("Prediction fetch failed", symbol, err.message);
     return [];
   }
+
   const closes = klines.map(k => k.c);
   const ema34 = ema(closes, 34);
   const ema89 = ema(closes, 89);
@@ -46,43 +47,54 @@ async function buildPredictionsForSymbol(symbol, timeframe = "1h") {
   const macdFast = macd(closes, 12, 26, 9);
   const hist = macdFast.hist;
 
-  const latestIdx = closes.length - 1;
-  const latestScore = computeScore(closes, ema34, ema89, rsi14, hist, latestIdx) ?? 0;
-
   const results = [];
+
+  // Extract features for the entire history
+  const allFeatures = prepareMlData(closes, ema34, ema89, rsi14, hist);
+  const latestFeature = allFeatures[allFeatures.length - 1];
+
   for (const [label, horizon] of Object.entries(HORIZONS)) {
-    const samples = [];
-    for (let i = 200; i < closes.length - horizon; i++) {
-      const s = computeScore(closes, ema34, ema89, rsi14, hist, i);
-      if (s == null) continue;
-      const future = closes[i + horizon] - closes[i];
-      const outcome = future > 0 ? 1 : 0;
-      samples.push({ score: s, outcome });
+    const predictor = getPredictor(`${symbol}-${label}`);
+
+    // Prepare Training Set
+    const trainX = [];
+    const trainY = [];
+
+    // We start from index 100 (where prepareMlData started)
+    // i in klines corresponds to i-100 in allFeatures
+    for (let i = 100; i < closes.length - horizon; i++) {
+      const featIdx = i - 100;
+      const futurePrice = closes[i + horizon];
+      const outcome = futurePrice > closes[i] ? 1 : 0;
+
+      trainX.push(allFeatures[featIdx]);
+      trainY.push([outcome]);
     }
-    if (!samples.length) continue;
-    const wins = samples.filter(s => s.outcome === 1).length;
-    const base = wins / samples.length;
-    const probUp = adjustProbability(base, latestScore);
-    const brier = brierFromHistory(samples, base);
-    const rationale = [];
-    if (latestScore > 1) rationale.push("Momentum bullish vs EMA");
-    if (latestScore < -1) rationale.push("Momentum bearish vs EMA");
-    const lastRsi = rsi14[latestIdx];
-    if (lastRsi != null) {
-      if (lastRsi > 65) rationale.push("RSI overheated");
-      if (lastRsi < 35) rationale.push("RSI oversold");
+
+    // Train the model on the fly (limited epochs for speed)
+    if (trainX.length > 50) {
+      await predictor.train(trainX, trainY, 15);
     }
-    const lastHist = hist[latestIdx];
-    if (lastHist != null) rationale.push(`MACD hist ${lastHist > 0 ? "positive" : "negative"}`);
+
+    // Predict
+    const probUpRaw = await predictor.predict(latestFeature);
+
+    // Fallback/Safety: Mix with basic score for stability during early training
+    const baseScore = (ema34[closes.length - 1] > ema89[closes.length - 1] ? 1 : -1) +
+      (rsi14[closes.length - 1] > 50 ? 0.5 : -0.5);
+    const probUp = clamp(probUpRaw * 0.8 + (baseScore > 0 ? 0.1 : -0.1), 0.1, 0.9);
 
     results.push({
       id: `${symbol}-${label}`,
       symbol,
       horizon: label,
       probUp: +probUp.toFixed(3),
-      brier,
-      score: latestScore,
-      rationale,
+      score: baseScore,
+      rationale: [
+        probUp > 0.6 ? "Neural Network: Strong Upward Bias" :
+          probUp < 0.4 ? "Neural Network: Bearish Reversal Detected" : "ML: Neutral Sentiment",
+        `Technical weight: ${baseScore > 0 ? "Bullish" : "Bearish"}`
+      ],
       ts: Date.now(),
     });
   }

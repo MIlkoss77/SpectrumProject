@@ -2,7 +2,9 @@
     "app": {
         "title": "Spectr Trading",
         "dashboard": "Overview",
+        "portfolio": "Portfolio",
         "signals": "Signals",
+        "alerts": "Alerts",
         "news": "News",
         "calibration": "Calibration",
         "arbitrage": "Arbitrage",
@@ -13,26 +15,103 @@
         "pricing": "Pricing",
         "backtest": "Backtest",
         "ta": "Analytics",
+        "agent": "AI Agent",
         "notFound": "Page not found"
     },
     "ui": {
         "refresh": "Refresh",
-        "loading": "Loading…",
-        "error": "Error"
+        "loading": "Loading...",
+        "error": "Error",
+        "menu": "Menu",
+        "live_terminal": "LIVE TERMINAL",
+        "open_positions": "Open Positions",
+        "active_positions": "Active Positions",
+        "reset_simulation": "Reset Simulation",
+        "simulation": "SIMULATION",
+        "execute": "EXECUTE",
+        "engine_active": "Engine Active",
+        "auto_pilot_msg": "AI Auto-Pilot is managing your portfolio",
+        "ai_filtered": "AI FILTERED",
+        "live": "LIVE",
+        "live_scanning": "LIVE SCANNING",
+        "ai_confidence": "AI Confidence",
+        "analyze_setup": "ANALYZE SETUP",
+        "timeframe": "Timeframe",
+        "ai_sentiment": "AI Sentiment",
+        "analyzing": "Analyzing...",
+        "price": "Price",
+        "strategy_ichimoku": "Ichimoku Cloud Strategy",
+        "asset": "Asset",
+        "size": "Size",
+        "avg_price": "Avg Price",
+        "realtime_pnl": "Realtime PnL",
+        "action": "Action",
+        "close": "CLOSE",
+        "execution_history": "Execution History",
+        "history_clear": "History clear",
+        "api_integration": "API Integration",
+        "edit": "Edit",
+        "connect": "Connect",
+        "save_keys": "Save Keys",
+        "cancel": "Cancel",
+        "encrypted_active": "Encrypted Key Active",
+        "security_warning": "Security Warning"
     },
     "pages": {
-        "dashboard": { "title": "Overview" },
-        "signals": { "title": "Signals" },
-        "backtest": { "title": "Backtest" },
-        "news": { "title": "News" },
-        "arbitrage": { "title": "Arbitrage" },
-        "copysim": { "title": "Copy Trading (Simulation)" },
-        "staking": { "title": "Staking Pools" },
-        "copysim": { "title": "Copy Trading (Simulation)" },
-        "calibration": { "title": "Prediction Calibration" },
-        "academy": { "title": "Spectr Academy" },
-        "settings": { "title": "Settings" },
-        "pricing": { "title": "Pricing" },
-        "ta": { "title": "Analytics" }
+        "dashboard": {
+            "title": "Overview",
+            "confidence": "Confidence",
+            "top_actions": "TOP ACTIONS TODAY",
+            "market_score": "BTC MARKET SCORE"
+        },
+        "signals": {
+            "title": "AI Signal Scanner",
+            "description": "Real-time market analysis and prediction engine."
+        },
+        "portfolio": {
+            "paper_title": "Paper Portfolio",
+            "live_title": "Live Assets",
+            "balance_label": "Total Estimated Balance",
+            "api_help": "Connect your exchange keys to enable Live Trading. Keys are encrypted and stored locally in your browser.",
+            "security_msg": "Spectr never transmits your keys to any central server. Transactions are signed locally. Note that switching to Live Trading involves real capital. Always start with small amounts."
+        },
+        "backtest": {
+            "title": "Backtest"
+        },
+        "news": {
+            "title": "News"
+        },
+        "arbitrage": {
+            "title": "Arbitrage"
+        },
+        "copysim": {
+            "title": "Copy Trading (Simulation)"
+        },
+        "staking": {
+            "title": "Staking Pools"
+        },
+        "calibration": {
+            "title": "Prediction Calibration"
+        },
+        "academy": {
+            "title": "Spectr Academy"
+        },
+        "settings": {
+            "title": "Settings",
+            "ai_config": "AI Agent Configuration",
+            "ai_provider": "AI Provider",
+            "api_key": "API Key",
+            "notifications_title": "Notification Preferences",
+            "push_notifications": "Push Notifications",
+            "email_alerts": "Email Alerts",
+            "telegram_bot": "Telegram Bot",
+            "test_notification": "Send Test Notification"
+        },
+        "pricing": {
+            "title": "Pricing"
+        },
+        "ta": {
+            "title": "Analytics"
+        }
     }
 }

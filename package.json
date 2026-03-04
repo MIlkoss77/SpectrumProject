@@ -4,23 +4,36 @@
     "version": "0.1.0",
     "type": "module",
     "scripts": {
-        "dev": "vite --host",
+        "dev": "concurrently \"npm run frontend\" \"npm run server\"",
+        "frontend": "vite --host",
         "build": "vite build",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "server": "node server/index.js"
     },
     "dependencies": {
-        "axios": "^1.11.0",
+        "@tensorflow/tfjs": "^4.22.0",
+        "axios": "^1.13.4",
+        "ccxt": "^4.2.82",
+        "cors": "^2.8.6",
+        "dotenv": "^17.2.4",
+        "ethers": "^6.16.0",
+        "express": "^5.2.1",
+        "framer-motion": "^12.34.3",
         "i18next": "^25.4.2",
         "i18next-browser-languagedetector": "^8.2.0",
+        "lightweight-charts": "^5.0.9",
         "lucide-react": "^0.444.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-i18next": "^15.7.3",
-        "react-router-dom": "^7.8.2",
-        "recharts": "^2.15.4"
+        "react-router-dom": "^7.9.4",
+        "recharts": "^2.15.4",
+        "technicalindicators": "^3.1.0",
+        "vite-plugin-pwa": "^1.2.0"
     },
     "devDependencies": {
         "@vitejs/plugin-react": "^4.7.0",
+        "concurrently": "^9.2.1",
         "vite": "^7.1.4"
     }
 }
