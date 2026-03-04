@@ -75,35 +75,37 @@ server {
     }
 
     # Binance Proxy
-    location /binance-api/ {
+    location /binance-api {
         proxy_pass https://api.binance.com/;
         proxy_ssl_server_name on;
         proxy_set_header Host api.binance.com;
+        proxy_set_header X-Real-IP \$remote_addr;
     }
 
     # Bybit Proxy
-    location /bybit-api/ {
+    location /bybit-api {
         proxy_pass https://api.bybit.com/;
         proxy_ssl_server_name on;
         proxy_set_header Host api.bybit.com;
+        proxy_set_header X-Real-IP \$remote_addr;
     }
 
     # Etherscan Proxy
-    location /etherscan-api/ {
+    location /etherscan-api {
         proxy_pass https://api.etherscan.io/;
         proxy_ssl_server_name on;
         proxy_set_header Host api.etherscan.io;
     }
 
     # Solscan Proxy
-    location /solscan-api/ {
+    location /solscan-api {
         proxy_pass https://api.solscan.io/;
         proxy_ssl_server_name on;
         proxy_set_header Host api.solscan.io;
     }
 
     # ChainGPT RSS Proxy
-    location /chaingpt-rss/ {
+    location /chaingpt-rss {
         proxy_pass https://news.chaingpt.org/rss/;
         proxy_ssl_server_name on;
         proxy_set_header Host news.chaingpt.org;

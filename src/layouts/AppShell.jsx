@@ -9,6 +9,7 @@ import { capitalShield } from '@/services/trading/capitalShield'
 import { useTrading } from '@/context/TradingContext.jsx'
 import '@/pages/dashboard.css'
 import '@/pages/mobile.css'
+import logoImg from '@/assets/logo.png'
 
 export default function AppShell() {
   const { t } = useTranslation()
@@ -59,7 +60,7 @@ export default function AppShell() {
       <aside className="dx-sidebar">
         <div className="dx-brand" style={{ gap: '12px', marginBottom: '40px' }}>
           <div style={{ width: '32px', height: '32px', flexShrink: 0, backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src="/logo.png" alt="Spectr Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            <img src={logoImg} alt="Spectr Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           {navOpen && (
             <span style={{ fontWeight: 800, fontSize: '20px', letterSpacing: '-0.5px', display: 'flex', alignItems: 'center' }}>
