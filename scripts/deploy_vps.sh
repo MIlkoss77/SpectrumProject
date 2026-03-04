@@ -19,15 +19,20 @@ sudo npm install -g pm2
 sudo apt install -y nginx
 
 # 4. Preparation
-# Assuming the script is run from the project root
+WEB_ROOT="/var/www/spectrum"
+echo "📂 Setting up project in $WEB_ROOT..."
+sudo mkdir -p $WEB_ROOT
+sudo cp -r ./* $WEB_ROOT
+cd $WEB_ROOT
+
 echo "🔨 Installing Dependencies..."
 npm install
-
 echo "🏗️ Building Frontend..."
 npm run build
 
 # 5. Start Backend with PM2
 echo "⚙️ Starting Backend Server..."
+pm2 stop spectr-api 2>/dev/null || true
 pm2 start server/index.js --name "spectr-api"
 
 # 6. Configure Nginx
@@ -35,9 +40,9 @@ echo "🌐 Configuring Nginx..."
 cat <<EOF | sudo tee /etc/nginx/sites-available/spectr
 server {
     listen 80;
-    server_name _; # Change this to your domain or IP
+    server_name _;
 
-    root $(pwd)/dist;
+    root $WEB_ROOT/dist;
     index index.html;
 
     location / {
@@ -56,6 +61,8 @@ server {
 EOF
 
 sudo ln -sf /etc/nginx/sites-available/spectr /etc/nginx/sites-enabled/
+sudo chown -R www-data:www-data $WEB_ROOT
+sudo chmod -R 755 $WEB_ROOT
 sudo nginx -t && sudo systemctl restart nginx
 
 echo "✅ Deployment Complete!"
