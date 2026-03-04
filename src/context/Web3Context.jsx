@@ -16,7 +16,7 @@ export function Web3Provider({ children }) {
 
     const connectWallet = async () => {
         if (!window.ethereum) {
-            alert('MetaMask not installed!')
+            console.warn('MetaMask not detected. Web3 features will be disabled.')
             return
         }
 

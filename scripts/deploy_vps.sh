@@ -50,10 +50,12 @@ pm2 start "$WEB_ROOT/server/index.js" --name "spectr-api"
 
 # 6. Configure Nginx
 echo "🌐 Configuring Nginx..."
+# Try to get the public IP for server_name, fallback to _
+IP_ADDR=$(hostname -I | awk '{print $1}')
 cat <<EOF | sudo tee /etc/nginx/sites-available/spectr
 server {
     listen 80;
-    server_name _;
+    server_name $IP_ADDR _; # Specific IP + fallback
 
     root $WEB_ROOT/dist;
     index index.html;
@@ -62,6 +64,7 @@ server {
         try_files \$uri \$uri/ /index.html;
     }
 
+    # API Backend
     location /api {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -69,6 +72,41 @@ server {
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
+    }
+
+    # Binance Proxy
+    location /binance-api/ {
+        proxy_pass https://api.binance.com/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.binance.com;
+    }
+
+    # Bybit Proxy
+    location /bybit-api/ {
+        proxy_pass https://api.bybit.com/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.bybit.com;
+    }
+
+    # Etherscan Proxy
+    location /etherscan-api/ {
+        proxy_pass https://api.etherscan.io/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.etherscan.io;
+    }
+
+    # Solscan Proxy
+    location /solscan-api/ {
+        proxy_pass https://api.solscan.io/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.solscan.io;
+    }
+
+    # ChainGPT RSS Proxy
+    location /chaingpt-rss/ {
+        proxy_pass https://news.chaingpt.org/rss/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host news.chaingpt.org;
     }
 }
 EOF
