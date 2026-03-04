@@ -25,14 +25,19 @@ sudo mkdir -p $WEB_ROOT
 sudo cp -r ./* $WEB_ROOT
 cd $WEB_ROOT
 
-echo "🔨 Installing Dependencies..."
-npm install
+echo "🧹 Cleaning up old dependencies and build..."
+sudo rm -rf node_modules package-lock.json dist
+
+echo "🔨 Installing Dependencies (this may take a minute)..."
+sudo npm install --unsafe-perm
+
 echo "🏗️ Building Frontend..."
-npm run build
+sudo npm run build
 
 # 5. Start Backend with PM2
 echo "⚙️ Starting Backend Server..."
 pm2 stop spectr-api 2>/dev/null || true
+pm2 delete spectr-api 2>/dev/null || true
 pm2 start server/index.js --name "spectr-api"
 
 # 6. Configure Nginx
@@ -61,6 +66,7 @@ server {
 EOF
 
 sudo ln -sf /etc/nginx/sites-available/spectr /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
 sudo chown -R www-data:www-data $WEB_ROOT
 sudo chmod -R 755 $WEB_ROOT
 sudo nginx -t && sudo systemctl restart nginx
