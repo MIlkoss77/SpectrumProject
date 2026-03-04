@@ -22,7 +22,7 @@ async function httpGet(url, { timeout = 10000, headers = {} } = {}) {
 
 /* ---------- Bybit constants ---------- */
 // В Vite import.meta.env доступен всегда — дополнительная защита не нужна.
-const BASE = '/bybit-api';
+const BASE = '/api/proxy/bybit';
 const CATEGORY = 'linear'; // USDT perpetual
 const TF_MAP = { '1m': '1', '5m': '5', '15m': '15', '1h': '60' };
 

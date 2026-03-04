@@ -64,52 +64,16 @@ server {
         try_files \$uri \$uri/ /index.html;
     }
 
-    # API Backend
+    # API Backend (Includes all proxies now)
     location /api {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host \$host;
         proxy_cache_bypass \$http_upgrade;
-    }
-
-    # Binance Proxy
-    location /binance-api/ {
-        proxy_pass https://api.binance.com/;
-        proxy_ssl_server_name on;
-        proxy_set_header Host api.binance.com;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-    }
-
-    # Bybit Proxy
-    location /bybit-api/ {
-        proxy_pass https://api.bybit.com/;
-        proxy_ssl_server_name on;
-        proxy_set_header Host api.bybit.com;
-        proxy_set_header X-Real-IP \$remote_addr;
-    }
-
-    # Etherscan Proxy
-    location /etherscan-api/ {
-        proxy_pass https://api.etherscan.io/;
-        proxy_ssl_server_name on;
-        proxy_set_header Host api.etherscan.io;
-    }
-
-    # Solscan Proxy
-    location /solscan-api/ {
-        proxy_pass https://api.solscan.io/;
-        proxy_ssl_server_name on;
-        proxy_set_header Host api.solscan.io;
-    }
-
-    # ChainGPT RSS Proxy
-    location /chaingpt-rss/ {
-        proxy_pass https://news.chaingpt.org/rss/;
-        proxy_ssl_server_name on;
-        proxy_set_header Host news.chaingpt.org;
     }
 }
 EOF

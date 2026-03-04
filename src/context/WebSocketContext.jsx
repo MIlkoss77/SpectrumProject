@@ -136,7 +136,7 @@ export const WebSocketProvider = ({ children }) => {
                     if (symbols.length === 0) return;
 
                     // Fetch latest prices for all subscribed symbols via Binance REST (using proxy)
-                    const resp = await fetch(`/binance-api/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`);
+                    const resp = await fetch(`/api/proxy/binance/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`);
                     const data = await resp.json();
 
                     if (Array.isArray(data)) {

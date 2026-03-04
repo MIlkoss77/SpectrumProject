@@ -1,6 +1,7 @@
 import { analyzeSentiment } from '../ai/groq.js'
 
-const API_BASE = '/api'; // Proxied through Vite/Server
+const BASE = '/api/news';
+// Proxied through Vite/Server
 
 /**
  * Fetch news from real CryptoPanic API via local backend

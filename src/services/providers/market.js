@@ -1,7 +1,7 @@
 // src/services/providers/market.js
 // --- Binance API helper ------------------------------------------------------
 // Получение свечей с Binance API (через Vite proxy)
-const BINANCE_BASE = '/binance-api'; // Nginx redirects /binance-api/ to api.binance.com/
+const BINANCE_BASE = '/api/proxy/binance'; // Routed through backend Node.js
 const TF_MAP = { '1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h', '1d': '1d' };
 
 export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) {
