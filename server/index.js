@@ -435,32 +435,9 @@ app.post('/api/portfolio/balance', async (req, res) => {
         console.error('Portfolio API Error:', error.message);
         res.status(500).json({ ok: false, error: error.message || 'Failed to connect to exchange' });
     }
-});
-
-// --- Binance Proxy (Server-side) ---
-app.get('/api/proxy/binance/*', async (req, res) => {
-    try {
-        const path = req.params[0];
-        const query = req.query;
-        const queryString = new URLSearchParams(query).toString();
-        const url = `https://api.binance.com/${path}${queryString ? '?' + queryString : ''}`;
-
-        const response = await axios.get(url, {
-            timeout: 5000,
-            headers: { 'User-Agent': 'Spectr-Trading-Bot/1.0' }
-        });
-
-        res.json(response.data);
-    } catch (error) {
-        console.error(`Binance Proxy Error [${req.params[0]}]:`, error.message);
-        res.status(error.response?.status || 500).json({
-            ok: false,
-            error: error.message,
-            fallback: true
-        });
-    }
-});
-
-app.listen(PORT, '0.0.0.0', () => {
+    // --- Start the Server ---
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
+    });
     console.log(`Server running on port ${PORT}`);
 });
