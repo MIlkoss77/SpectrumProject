@@ -277,28 +277,28 @@ app.get('/api', (req, res) => {
 });
 
 // --- Binance Proxy (Server-side) ---
-app.get('/api/proxy/binance/:path*', async (req, res) => {
+app.use('/api/proxy/binance', async (req, res) => {
     try {
-        const path = req.params.path;
-        const query = req.query;
-        let queryString = "";
-        if (Object.keys(query).length > 0) {
-            queryString = "?" + new URLSearchParams(query).toString();
-        }
-        const url = `https://api.binance.com/${path}${queryString}`;
+        // req.url contains the remaining path and query string (e.g., /api/v3/klines?symbol=BTCUSDT)
+        // Ensure we handle edge cases where req.url might be just "/" or empty
+        const forwardPath = req.url === '/' ? '' : req.url;
+        const url = `https://api.binance.com${forwardPath}`;
 
         console.log(`[Binance Proxy] Requesting: ${url}`);
 
-        const response = await axios.get(url, {
+        const response = await axios({
+            method: req.method,
+            url: url,
+            data: req.method !== 'GET' ? req.body : undefined,
             timeout: 8000,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         });
 
-        res.json(response.data);
+        res.status(response.status).json(response.data);
     } catch (error) {
-        console.error(`Binance Proxy Error [${req.params[0]}]:`, error.response?.data || error.message);
+        console.error(`Binance Proxy Error [${req.url}]:`, error.response?.data || error.message);
         res.status(error.response?.status || 500).json({
             ok: false,
             error: error.message,
@@ -308,28 +308,26 @@ app.get('/api/proxy/binance/:path*', async (req, res) => {
 });
 
 // --- Bybit Proxy (Server-side) ---
-app.get('/api/proxy/bybit/:path*', async (req, res) => {
+app.use('/api/proxy/bybit', async (req, res) => {
     try {
-        const path = req.params.path;
-        const query = req.query;
-        let queryString = "";
-        if (Object.keys(query).length > 0) {
-            queryString = "?" + new URLSearchParams(query).toString();
-        }
-        const url = `https://api.bybit.com/${path}${queryString}`;
+        const forwardPath = req.url === '/' ? '' : req.url;
+        const url = `https://api.bybit.com${forwardPath}`;
 
         console.log(`[Bybit Proxy] Requesting: ${url}`);
 
-        const response = await axios.get(url, {
+        const response = await axios({
+            method: req.method,
+            url: url,
+            data: req.method !== 'GET' ? req.body : undefined,
             timeout: 8000,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             }
         });
 
-        res.json(response.data);
+        res.status(response.status).json(response.data);
     } catch (error) {
-        console.error(`Bybit Proxy Error [${req.params[0]}]:`, error.response?.data || error.message);
+        console.error(`Bybit Proxy Error [${req.url}]:`, error.response?.data || error.message);
         res.status(error.response?.status || 500).json({
             ok: false,
             error: error.message,
