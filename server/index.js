@@ -277,7 +277,7 @@ app.get('/api', (req, res) => {
 });
 
 // --- Binance Proxy (Server-side) ---
-app.get('/api/proxy/binance/:path(.*)', async (req, res) => {
+app.get('/api/proxy/binance/:path*', async (req, res) => {
     try {
         const path = req.params.path;
         const query = req.query;
@@ -308,7 +308,7 @@ app.get('/api/proxy/binance/:path(.*)', async (req, res) => {
 });
 
 // --- Bybit Proxy (Server-side) ---
-app.get('/api/proxy/bybit/:path(.*)', async (req, res) => {
+app.get('/api/proxy/bybit/:path*', async (req, res) => {
     try {
         const path = req.params.path;
         const query = req.query;
