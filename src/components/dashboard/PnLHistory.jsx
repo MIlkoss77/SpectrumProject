@@ -64,7 +64,7 @@ export default function PnLHistory() {
 
             {/* Metrics */}
             <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px',
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: '12px',
                 marginTop: '16px', paddingTop: '14px', borderTop: '1px solid rgba(255,255,255,0.05)'
             }}>
                 {[

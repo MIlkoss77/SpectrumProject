@@ -17,6 +17,15 @@ export function Web3Provider({ children }) {
     const connectWallet = async () => {
         if (!window.ethereum) {
             console.warn('MetaMask not detected. Web3 features will be disabled.')
+
+            // Handle mobile Deep Linking for MetaMask
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                const dappUrl = window.location.href.split('//')[1]; // Remove http:// or https://
+                window.location.href = `https://metamask.app.link/dapp/${dappUrl}`;
+            } else {
+                alert("Please install the MetaMask extension to connect.");
+            }
             return
         }
 

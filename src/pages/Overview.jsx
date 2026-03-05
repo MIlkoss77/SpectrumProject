@@ -390,39 +390,39 @@ export default function Overview() {
               style={{
                 position: 'fixed', top: '50%', left: '50%',
                 transform: 'translate(-50%, -50%)',
-                zIndex: 9999, maxWidth: 500, width: '90%',
+                zIndex: 9999, maxWidth: 500, width: '92%',
+                maxHeight: '85vh', overflowY: 'auto',
                 background: 'linear-gradient(135deg, #0d0d0d 0%, #111118 100%)',
                 border: '1px solid rgba(0,255,255,0.2)',
-                borderRadius: 24, padding: 32,
+                borderRadius: 24, padding: '24px 20px',
                 boxShadow: '0 0 80px rgba(0,255,255,0.1)'
               }}
             >
-              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
                 <div style={{
-                  width: 64, height: 64, margin: '0 auto 16px',
-                  background: 'rgba(0,255,255,0.08)', borderRadius: 16,
+                  width: 48, height: 48, margin: '0 auto 12px',
+                  background: 'rgba(0,255,255,0.08)', borderRadius: 12,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   border: '1px solid rgba(0,255,255,0.2)'
                 }}>
-                  <img src={logoImg} alt="Spectr" style={{ width: 40, height: 40, objectFit: 'contain' }} />
+                  <img src={logoImg} alt="Spectr" style={{ width: 28, height: 28, objectFit: 'contain' }} />
                 </div>
-                <h2 style={{ fontSize: 24, fontWeight: 900, margin: '0 0 8px', letterSpacing: -0.5 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 900, margin: '0 0 6px', letterSpacing: -0.5 }}>
                   Welcome to <span style={{ color: '#00FFFF' }}>Spectr Trading</span> 🚀
                 </h2>
-                <p style={{ color: 'var(--muted)', fontSize: 14, lineHeight: 1.6, margin: 0 }}>
+                <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5, margin: 0 }}>
                   Your AI-powered crypto intelligence terminal is ready.
-                  Get real-time signals, whale tracking, and market scores — all in one place.
                 </p>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
                 {[
-                  { icon: '🧠', text: 'AI Predictor — ML-powered directional signals' },
-                  { icon: '🐋', text: 'Whale Radar — Track big money on-chain' },
-                  { icon: '📊', text: 'Technical Brief — Live Binance data, RSI, MACD' },
-                  { icon: '💼', text: 'Portfolio — Connect your exchange keys' },
+                  { icon: '🧠', text: 'AI Predictor — ML directional signals' },
+                  { icon: '🐋', text: 'Whale Radar — Track big money' },
+                  { icon: '📊', text: 'Technical Brief — Live Binance data' },
+                  { icon: '💼', text: 'Portfolio — Connect your keys' },
                 ].map(({ icon, text }) => (
-                  <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)', fontSize: 13 }}>
-                    <span style={{ fontSize: 20 }}>{icon}</span>
+                  <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', fontSize: 12 }}>
+                    <span style={{ fontSize: 18 }}>{icon}</span>
                     <span style={{ color: 'rgba(255,255,255,0.7)' }}>{text}</span>
                   </div>
                 ))}

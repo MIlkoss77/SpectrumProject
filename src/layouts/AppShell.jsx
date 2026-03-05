@@ -119,8 +119,16 @@ export default function AppShell() {
             {navOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <div className="dx-controls">
-            {/* Capital Shield Indicator */}
+          <div className="dx-controls w-full flex justify-between items-center md:justify-end border-0">
+            {/* Mobile Logo replacing Capital Shield */}
+            <div className="md:hidden flex items-center gap-2 flex-1 justify-center mr-auto">
+              <img src={logoImg} alt="Spectr Logo" className="w-[18px] h-[18px] object-contain" />
+              <span className="font-extrabold text-[13px] tracking-tight text-white flex items-center">
+                SPECTR<span className="text-cyan-400 ml-1">Trading</span>
+              </span>
+            </div>
+
+            {/* Capital Shield Indicator Desktop */}
             <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md mr-4">
               <div className="relative">
                 <Shield size={16} className="text-cyan-400" />
@@ -132,18 +140,20 @@ export default function AppShell() {
               </div>
             </div>
 
-            <button className="dx-icon-btn badge-btn" aria-label="Notifications" onClick={() => setShowMore(!showMore)}>
-              <Bell size={20} />
-              <div className="badge">3</div>
-            </button>
+            <div className="flex gap-2 items-center">
+              <button className="dx-icon-btn badge-btn" aria-label="Notifications" onClick={() => setShowMore(!showMore)}>
+                <Bell size={20} />
+                <div className="badge">3</div>
+              </button>
 
-            <div className="dx-user-profile" onClick={connectWallet}>
-              <div className="dx-user-info">
-                <span className="dx-username">{account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'Connect Wallet'}</span>
-                <span className="dx-user-rank">{account || isPro ? 'Pro Holder' : 'Guest'}</span>
-              </div>
-              <div className="dx-avatar">
-                {(account || isPro) ? <Shield size={20} color="#00FFFF" /> : <ShieldAlert size={20} color="#8899A6" />}
+              <div className="dx-user-profile" onClick={connectWallet}>
+                <div className="dx-user-info hidden sm:flex">
+                  <span className="dx-username">{account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'Connect Wallet'}</span>
+                  <span className="dx-user-rank">{account || isPro ? 'Pro Holder' : 'Guest'}</span>
+                </div>
+                <div className="dx-avatar">
+                  {(account || isPro) ? <Shield size={20} color="#00FFFF" /> : <Wallet size={20} color="#8899A6" />}
+                </div>
               </div>
             </div>
           </div>

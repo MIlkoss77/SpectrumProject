@@ -52,7 +52,7 @@ export default function LeverageCalculator() {
             </div>
 
             {/* Controls Row */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+            <div className="flex flex-col md:grid md:grid-cols-3 gap-3 mb-4">
                 {/* Asset selector */}
                 <div>
                     <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Asset</label>
@@ -156,47 +156,49 @@ export default function LeverageCalculator() {
             </div>
 
             {/* PnL Table */}
-            <div style={{ borderRadius: '14px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}>
-                {/* Header Row */}
-                <div style={{
-                    display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-                    padding: '10px 14px',
-                    background: 'rgba(255,255,255,0.03)',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                }}>
-                    {['Leverage', 'Position', 'PnL', 'ROI', 'Liquidation'].map(h => (
-                        <span key={h} style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</span>
+            <div className="overflow-x-auto" style={{ borderRadius: '14px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ minWidth: '420px' }}>
+                    {/* Header Row */}
+                    <div style={{
+                        display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+                        padding: '10px 14px',
+                        background: 'rgba(255,255,255,0.03)',
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    }}>
+                        {['Leverage', 'Position', 'PnL', 'ROI', 'Liquidation'].map(h => (
+                            <span key={h} style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</span>
+                        ))}
+                    </div>
+
+                    {/* Data Rows */}
+                    {scenarios.map((s, i) => (
+                        <div
+                            key={s.leverage}
+                            style={{
+                                display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
+                                padding: '10px 14px',
+                                borderBottom: i < scenarios.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                                background: s.pnl > 0 ? `rgba(0,227,150,${0.02 + i * 0.01})` : `rgba(255,69,96,${0.02 + i * 0.01})`,
+                                transition: 'background 0.3s',
+                            }}
+                        >
+                            <span className="font-mono" style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>{s.leverage}x</span>
+                            <span className="font-mono" style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>${s.positionSize.toLocaleString()}</span>
+                            <span className="font-mono" style={{ fontSize: '13px', fontWeight: 800, color: s.pnl >= 0 ? '#00E396' : '#FF4560' }}>
+                                {s.pnl >= 0 ? '+' : ''}${s.pnl.toLocaleString()}
+                            </span>
+                            <span className="font-mono" style={{ fontSize: '11px', fontWeight: 700, color: s.pnlPercent >= 0 ? '#00E396' : '#FF4560' }}>
+                                {s.pnlPercent >= 0 ? '+' : ''}{s.pnlPercent}%
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span className="font-mono" style={{ fontSize: '11px', fontWeight: 600, color: getRiskColor(s.risk) }}>
+                                    ${s.liquidationPrice.toLocaleString()}
+                                </span>
+                                {(s.risk === 'HIGH' || s.risk === 'EXTREME') && <AlertTriangle size={10} color={getRiskColor(s.risk)} />}
+                            </div>
+                        </div>
                     ))}
                 </div>
-
-                {/* Data Rows */}
-                {scenarios.map((s, i) => (
-                    <div
-                        key={s.leverage}
-                        style={{
-                            display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr',
-                            padding: '10px 14px',
-                            borderBottom: i < scenarios.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-                            background: s.pnl > 0 ? `rgba(0,227,150,${0.02 + i * 0.01})` : `rgba(255,69,96,${0.02 + i * 0.01})`,
-                            transition: 'background 0.3s',
-                        }}
-                    >
-                        <span className="font-mono" style={{ fontSize: '13px', fontWeight: 800, color: '#fff' }}>{s.leverage}x</span>
-                        <span className="font-mono" style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>${s.positionSize.toLocaleString()}</span>
-                        <span className="font-mono" style={{ fontSize: '13px', fontWeight: 800, color: s.pnl >= 0 ? '#00E396' : '#FF4560' }}>
-                            {s.pnl >= 0 ? '+' : ''}${s.pnl.toLocaleString()}
-                        </span>
-                        <span className="font-mono" style={{ fontSize: '11px', fontWeight: 700, color: s.pnlPercent >= 0 ? '#00E396' : '#FF4560' }}>
-                            {s.pnlPercent >= 0 ? '+' : ''}{s.pnlPercent}%
-                        </span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <span className="font-mono" style={{ fontSize: '11px', fontWeight: 600, color: getRiskColor(s.risk) }}>
-                                ${s.liquidationPrice.toLocaleString()}
-                            </span>
-                            {(s.risk === 'HIGH' || s.risk === 'EXTREME') && <AlertTriangle size={10} color={getRiskColor(s.risk)} />}
-                        </div>
-                    </div>
-                ))}
             </div>
 
             {/* Risk Warning */}

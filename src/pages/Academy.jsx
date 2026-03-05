@@ -209,22 +209,22 @@ function CourseViewer({ module, onClose, onComplete }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      className="p-2 md:p-6"
       style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
         background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)',
-        zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: 24
+        zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}
     >
       <motion.div
         initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 20 }}
-        className="dx-card"
-        style={{ width: '100%', maxWidth: 1000, height: '85vh', display: 'flex', overflow: 'hidden', padding: 0 }}
+        className="dx-card flex flex-col md:flex-row"
+        style={{ width: '100%', maxWidth: 1000, height: '85vh', overflow: 'hidden', padding: 0 }}
       >
         {/* Sidebar */}
-        <div style={{ width: 280, background: 'var(--surface-1)', borderRight: '1px solid var(--line)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+        <div className="w-full md:w-[280px] h-[35%] md:h-full border-b md:border-r border-white/10 shrink-0" style={{ background: 'var(--surface-1)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--line)' }}>
             <h3 style={{ margin: 0, fontSize: 16 }}>{module.title}</h3>
             <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
@@ -262,7 +262,7 @@ function CourseViewer({ module, onClose, onComplete }) {
         </div>
 
         {/* Main Content */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Header */}
           <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
