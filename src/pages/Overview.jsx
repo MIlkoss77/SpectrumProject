@@ -386,7 +386,11 @@ export default function Overview() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => { setShowWelcome(false); localStorage.setItem('spectr_welcomed', '1') }}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9998, backdropFilter: 'blur(8px)', cursor: 'pointer' }}
+              style={{
+                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+                zIndex: 9998, backdropFilter: 'blur(8px)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
+              }}
             />
             <motion.div
               initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -394,14 +398,14 @@ export default function Overview() {
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: 'spring', damping: 22, stiffness: 300 }}
               style={{
-                position: 'fixed', top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
+                position: 'relative',
                 zIndex: 9999, maxWidth: 500, width: '92%',
-                maxHeight: '85vh', overflowY: 'auto',
+                maxHeight: '90vh', overflowY: 'auto',
                 background: 'linear-gradient(135deg, #0d0d0d 0%, #111118 100%)',
                 border: '1px solid rgba(0,255,255,0.2)',
                 borderRadius: 24, padding: '24px 20px',
-                boxShadow: '0 0 80px rgba(0,255,255,0.1)'
+                boxShadow: '0 0 80px rgba(0,255,255,0.1)',
+                margin: 'auto'
               }}
             >
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
