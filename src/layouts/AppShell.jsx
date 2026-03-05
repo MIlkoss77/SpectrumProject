@@ -227,7 +227,7 @@ export default function AppShell() {
               style={{
                 position: 'fixed', left: 0, right: 0, bottom: 0,
                 background: 'var(--bg)', borderTop: '1px solid var(--border)',
-                padding: '24px', z_index: 1002, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+                padding: '24px', zIndex: 1002, borderTopLeftRadius: 20, borderTopRightRadius: 20,
                 maxHeight: '70vh', overflowY: 'auto',
                 willChange: 'transform'
               }}
