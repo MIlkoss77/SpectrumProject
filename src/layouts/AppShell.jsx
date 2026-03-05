@@ -223,12 +223,13 @@ export default function AppShell() {
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              transition={{ type: 'tween', duration: 0.3, ease: 'easeOut' }}
               style={{
                 position: 'fixed', left: 0, right: 0, bottom: 0,
                 background: 'var(--bg)', borderTop: '1px solid var(--border)',
-                padding: '24px', zIndex: 1002, borderTopLeftRadius: 20, borderTopRightRadius: 20,
-                maxHeight: '70vh', overflowY: 'auto'
+                padding: '24px', z_index: 1002, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+                maxHeight: '70vh', overflowY: 'auto',
+                willChange: 'transform'
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>

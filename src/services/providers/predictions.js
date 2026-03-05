@@ -76,7 +76,7 @@ async function buildPredictionsForSymbol(symbol, timeframe = "1h") {
 
     // Train the model on the fly (limited epochs for speed)
     if (trainX.length > 50) {
-      await predictor.train(trainX, trainY, 15);
+      await predictor.train(trainX, trainY, 5);
     }
 
     // Predict
