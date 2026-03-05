@@ -175,6 +175,12 @@ function CourseViewer({ module, onClose, onComplete }) {
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [showResult, setShowResult] = useState(false)
 
+  // Block body scroll when modal is open
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = 'auto' }
+  }, [])
+
   if (!module) return null
 
   const lesson = module.lessons[currentLesson]
@@ -212,8 +218,8 @@ function CourseViewer({ module, onClose, onComplete }) {
       className="p-2 md:p-6"
       style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-        background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)',
-        zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+        background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(10px)',
+        zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'
       }}
     >
       <motion.div
@@ -221,7 +227,12 @@ function CourseViewer({ module, onClose, onComplete }) {
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 20 }}
         className="dx-card flex flex-col md:flex-row"
-        style={{ width: '100%', maxWidth: 1000, height: '94vh', maxHeight: '94vh', padding: 0, overflow: 'hidden', position: 'relative' }}
+        style={{
+          width: '100%', maxWidth: 1000,
+          height: '100dvh', maxHeight: '100dvh', // Use dvh for mobile chrome compatibility
+          padding: 0, overflow: 'hidden', position: 'relative',
+          borderRadius: 0, border: 'none' // Full screen feel on mobile
+        }}
       >
         {/* Sidebar */}
         <div className="w-full md:w-[280px] h-[35%] md:h-full border-b md:border-r border-white/10 shrink-0" style={{ background: 'var(--surface-1)', display: 'flex', flexDirection: 'column' }}>

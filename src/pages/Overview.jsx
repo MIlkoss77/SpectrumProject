@@ -107,8 +107,16 @@ export default function Overview() {
   const [loading, setLoading] = useState(true)
   const [topActions, setTopActions] = useState([])
   const [mainScore, setMainScore] = useState(null)
-  const [snapshot, setSnapshot] = useState(null)
-  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem('spectr_welcomed'))
+  const [activeTrade, setActiveTrade] = useState(null)
+  const [showWelcome, setShowWelcome] = useState(false)
+
+  React.useEffect(() => {
+    if (showWelcome) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+  }, [showWelcome])
 
   const { tickers, isConnected, subscribe, unsubscribe } = useWebSocket()
   const [chartData, setChartData] = useState([])
@@ -387,9 +395,16 @@ export default function Overview() {
               exit={{ opacity: 0 }}
               onClick={() => { setShowWelcome(false); localStorage.setItem('spectr_welcomed', '1') }}
               style={{
-                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
-                zIndex: 9998, backdropFilter: 'blur(8px)', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
+                position: 'fixed',
+                top: 0, left: 0, bottom: 0, right: 0,
+                background: 'rgba(0,0,0,0.9)',
+                zIndex: 10000,
+                backdropFilter: 'blur(12px)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '16px'
               }}
             />
             <motion.div
@@ -399,12 +414,16 @@ export default function Overview() {
               transition={{ type: 'spring', damping: 22, stiffness: 300 }}
               style={{
                 position: 'relative',
-                zIndex: 9999, maxWidth: 500, width: '92%',
-                maxHeight: '90vh', overflowY: 'auto',
+                zIndex: 10001,
+                maxWidth: 480,
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
                 background: 'linear-gradient(135deg, #0d0d0d 0%, #111118 100%)',
                 border: '1px solid rgba(0,255,255,0.2)',
-                borderRadius: 24, padding: '24px 20px',
-                boxShadow: '0 0 80px rgba(0,255,255,0.1)',
+                borderRadius: 24,
+                padding: '32px 24px',
+                boxShadow: '0 0 100px rgba(0,255,255,0.15)',
                 margin: 'auto'
               }}
             >
