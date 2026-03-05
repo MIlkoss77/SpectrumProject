@@ -221,7 +221,7 @@ function CourseViewer({ module, onClose, onComplete }) {
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 20 }}
         className="dx-card flex flex-col md:flex-row"
-        style={{ width: '100%', maxWidth: 1000, height: '85vh', overflow: 'hidden', padding: 0 }}
+        style={{ width: '100%', maxWidth: 1000, height: '94vh', maxHeight: '94vh', padding: 0, overflow: 'hidden' }}
       >
         {/* Sidebar */}
         <div className="w-full md:w-[280px] h-[35%] md:h-full border-b md:border-r border-white/10 shrink-0" style={{ background: 'var(--surface-1)', display: 'flex', flexDirection: 'column' }}>
@@ -262,7 +262,7 @@ function CourseViewer({ module, onClose, onComplete }) {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
           {/* Header */}
           <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
