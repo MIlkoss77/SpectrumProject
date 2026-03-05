@@ -16,28 +16,28 @@ const MODULES = [
         title: 'What is Blockchain?',
         duration: '5 min read',
         completed: true,
-        content: `A blockchain is a distributed, immutable ledger that records transactions across a network of computers. Each "block" contains a batch of transactions and a cryptographic hash of the previous block, forming a chain.\n\n**Key properties:**\n• **Decentralized** — no single authority controls the data\n• **Immutable** — once written, records cannot be altered\n• **Transparent** — anyone can verify the transaction history\n• **Consensus-driven** — network participants agree on the state`,
+        content: `A blockchain is a distributed, immutable ledger that records transactions across a network of computers. Each "block" contains a batch of transactions and a cryptographic hash of the previous block, forming a chain.\n\nKey properties:\n• Decentralized — no single authority controls the data\n• Immutable — once written, records cannot be altered\n• Transparent — anyone can verify the transaction history\n• Consensus-driven — network participants agree on the state`,
         quiz: { q: 'What makes blockchain immutable?', options: ['Fast servers', 'Cryptographic hashing of blocks', 'Government regulation'], answer: 1 }
       },
       {
         title: 'Setting up MetaMask',
         duration: '8 min read',
         completed: true,
-        content: `MetaMask is a browser extension and mobile app that serves as your crypto wallet and gateway to decentralized applications.\n\n**Setup Steps:**\n1. Install MetaMask from metamask.io (browser extension)\n2. Click "Create a New Wallet"\n3. Set a strong password\n4. **Write down your 12-word seed phrase** on paper — never share it!\n5. Confirm the seed phrase\n6. Your wallet is ready — you'll see your ETH address (0x...)\n\n⚠️ **Critical:** Your seed phrase is the master key. If you lose it, you lose access to your funds forever. Never store it digitally.`,
+        content: `MetaMask is a browser extension and mobile app that serves as your crypto wallet and gateway to decentralized applications.\n\nSetup Steps:\n1. Install MetaMask from metamask.io (browser extension)\n2. Click "Create a New Wallet"\n3. Set a strong password\n4. Write down your 12-word seed phrase on paper — never share it!\n5. Confirm the seed phrase\n6. Your wallet is ready — you'll see your ETH address (0x...)\n\n⚠️ Critical: Your seed phrase is the master key. If you lose it, you lose access to your funds forever. Never store it digitally.`,
         quiz: { q: 'Where should you store your seed phrase?', options: ['In a notes app', 'On physical paper in a safe place', 'Screenshot on phone'], answer: 1 }
       },
       {
         title: 'Your First Transaction',
         duration: '6 min read',
         completed: true,
-        content: `Sending crypto is like sending an email — you need the recipient's address and enough balance to cover the amount + gas fee.\n\n**Anatomy of a transaction:**\n• **From:** your wallet address\n• **To:** recipient's address (0x... for ETH, or ENS like vitalik.eth)\n• **Amount:** how much to send\n• **Gas Fee:** payment to miners/validators for processing\n\n**Gas tips:**\n• Gas price fluctuates with network demand\n• Use etherscan.io/gastracker for current prices\n• Transactions during off-peak hours (weekends, late night UTC) are cheaper`,
+        content: `Sending crypto is like sending an email — you need the recipient's address and enough balance to cover the amount + gas fee.\n\nAnatomy of a transaction:\n• From: your wallet address\n• To: recipient's address (0x... for ETH, or ENS like vitalik.eth)\n• Amount: how much to send\n• Gas Fee: payment to miners/validators for processing\n\nGas tips:\n• Gas price fluctuates with network demand\n• Use etherscan.io/gastracker for current prices\n• Transactions during off-peak hours (weekends, late night UTC) are cheaper`,
         quiz: { q: 'What is a gas fee?', options: ['A penalty for slow transactions', 'Payment to network validators for processing', 'A subscription fee'], answer: 1 }
       },
       {
         title: 'Security Best Practices',
         duration: '12 min read',
         completed: true,
-        content: `Protecting your crypto requires a different mindset than traditional banking. You are your own bank.\n\n**Essential practices:**\n1. **Use a hardware wallet** (Ledger, Trezor) for large holdings\n2. **Enable 2FA** on all exchange accounts (use Authenticator app, not SMS)\n3. **Never share your seed phrase** — no legitimate service will ask for it\n4. **Verify URLs** before connecting your wallet — phishing sites look identical\n5. **Use separate wallets** — a "hot" wallet for daily use, "cold" for storage\n6. **Revoke unused approvals** — check revoke.cash regularly\n\n🔴 **Red flags:** DMs offering free tokens, "support" asking for your keys, too-good-to-be-true APYs`,
+        content: `Protecting your crypto requires a different mindset than traditional banking. You are your own bank.\n\nEssential practices:\n1. Use a hardware wallet (Ledger, Trezor) for large holdings\n2. Enable 2FA on all exchange accounts (use Authenticator app, not SMS)\n3. Never share your seed phrase — no legitimate service will ask for it\n4. Verify URLs before connecting your wallet — phishing sites look identical\n5. Use separate wallets — a "hot" wallet for daily use, "cold" for storage\n6. Revoke unused approvals — check revoke.cash regularly\n\n🔴 Red flags: DMs offering free tokens, "support" asking for your keys, too-good-to-be-true APYs`,
         quiz: { q: 'What should you NEVER share?', options: ['Your wallet address', 'Your seed phrase', 'Your transaction history'], answer: 1 }
       },
     ]
@@ -54,42 +54,42 @@ const MODULES = [
         title: 'Reading a Candle',
         duration: '4 min read',
         completed: true,
-        content: `Each candlestick shows four data points for a time period: Open, High, Low, Close (OHLC).\n\n**Anatomy:**\n• **Green candle** (bullish) — close > open → price went up\n• **Red candle** (bearish) — close < open → price went down\n• **Body** — the thick part between open and close\n• **Wick/Shadow** — the thin lines showing the high and low\n\n**What candles tell you:**\n• Long body = strong conviction (buyers or sellers dominated)\n• Long wick = rejection (price tested a level but was pushed back)\n• Small body = indecision (neither side won)`,
+        content: `Each candlestick shows four data points for a time period: Open, High, Low, Close (OHLC).\n\nAnatomy:\n• Green candle (bullish) — close > open → price went up\n• Red candle (bearish) — close < open → price went down\n• Body — the thick part between open and close\n• Wick/Shadow — the thin lines showing the high and low\n\nWhat candles tell you:\n• Long body = strong conviction (buyers or sellers dominated)\n• Long wick = rejection (price tested a level but was pushed back)\n• Small body = indecision (neither side won)`,
         quiz: { q: 'A green candle means:', options: ['Price went down', 'Price went up (close > open)', 'Volume increased'], answer: 1 }
       },
       {
         title: 'Doji & Hammers',
         duration: '7 min read',
         completed: true,
-        content: `Special candlestick patterns signal potential reversals.\n\n**Doji** — open ≈ close (tiny body, equal wicks)\n• Signals indecision; often appears before a trend change\n• More significant after a strong trend\n\n**Hammer** — small body at top, long lower wick (2x body)\n• Appears at the bottom of downtrends\n• Shows sellers pushed price down but buyers fought back\n• Bullish reversal signal\n\n**Inverted Hammer** — small body at bottom, long upper wick\n• Also bullish if confirmed by next candle closing higher\n\n**Shooting Star** — like inverted hammer but at top of uptrend\n• Bearish reversal signal`,
+        content: `Special candlestick patterns signal potential reversals.\n\nDoji — open ≈ close (tiny body, equal wicks)\n• Signals indecision; often appears before a trend change\n• More significant after a strong trend\n\nHammer — small body at top, long lower wick (2x body)\n• Appears at the bottom of downtrends\n• Shows sellers pushed price down but buyers fought back\n• Bullish reversal signal\n\nInverted Hammer — small body at bottom, long upper wick\n• Also bullish if confirmed by next candle closing higher\n\nShooting Star — like inverted hammer but at top of uptrend\n• Bearish reversal signal`,
         quiz: { q: 'A hammer pattern at the bottom of a downtrend signals:', options: ['Continue selling', 'Potential bullish reversal', 'No useful information'], answer: 1 }
       },
       {
         title: 'Trend Reversals',
         duration: '10 min read',
         completed: false,
-        content: `Recognizing when a trend is about to reverse is one of the most valuable skills in trading.\n\n**Reversal signals:**\n• **Higher highs → lower high** = uptrend weakening\n• **Lower lows → higher low** = downtrend weakening\n• **Volume divergence** — price makes new high but volume decreases\n• **RSI divergence** — price makes new high but RSI makes lower high\n\n**Common reversal patterns:**\n1. **Double Top/Bottom** — price tests same level twice and fails\n2. **Head & Shoulders** — three peaks, middle highest\n3. **Engulfing candle** — large candle completely covers previous\n\n⚠️ Never trade a reversal without confirmation. Wait for the next candle.`,
+        content: `Recognizing when a trend is about to reverse is one of the most valuable skills in trading.\n\nReversal signals:\n• Higher highs → lower high = uptrend weakening\n• Lower lows → higher low = downtrend weakening\n• Volume divergence — price makes new high but volume decreases\n• RSI divergence — price makes new high but RSI makes lower high\n\nCommon reversal patterns:\n1. Double Top/Bottom — price tests same level twice and fails\n2. Head & Shoulders — three peaks, middle highest\n3. Engulfing candle — large candle completely covers previous\n\n⚠️ Never trade a reversal without confirmation. Wait for the next candle.`,
         quiz: { q: 'What confirms a trend reversal?', options: ['A single red candle', 'Price making a lower high after higher highs', 'High volume alone'], answer: 1 }
       },
       {
         title: 'Volume Analysis',
         duration: '8 min read',
         completed: false,
-        content: `Volume shows how many units were traded. It's the fuel behind price moves.\n\n**Rules of volume:**\n• **Rising price + rising volume** = strong uptrend (healthy)\n• **Rising price + falling volume** = weak rally (likely to reverse)\n• **Spike volume** = climactic move, often near reversals\n• **Low volume** = no interest, choppy price action\n\n**Using volume in practice:**\n1. Confirm breakouts — a breakout on high volume is more reliable\n2. Spot exhaustion — huge volume spike after a long trend = potential top/bottom\n3. Volume profile — shows which price levels have the most activity (support/resistance)`,
+        content: `Volume shows how many units were traded. It's the fuel behind price moves.\n\nRules of volume:\n• Rising price + rising volume = strong uptrend (healthy)\n• Rising price + falling volume = weak rally (likely to reverse)\n• Spike volume = climactic move, often near reversals\n• Low volume = no interest, choppy price action\n\nUsing volume in practice:\n1. Confirm breakouts — a breakout on high volume is more reliable\n2. Spot exhaustion — huge volume spike after a long trend = potential top/bottom\n3. Volume profile — shows which price levels have the most activity (support/resistance)`,
         quiz: { q: 'Rising price with falling volume suggests:', options: ['Strong trend continuation', 'Weak rally that may reverse', 'Increased demand'], answer: 1 }
       },
       {
         title: 'Support & Resistance',
         duration: '15 min read',
         completed: false,
-        content: `Support and resistance are price levels where buying or selling pressure concentrates.\n\n**Support** — a price level where demand prevents further decline\n• Think of it as a floor\n• More touches = stronger support\n• When broken, often becomes resistance\n\n**Resistance** — a price level where selling prevents further rise\n• Think of it as a ceiling\n• Breakout above resistance on high volume = bullish signal\n\n**How to identify:**\n1. Previous highs and lows\n2. Round numbers ($50k, $100k for BTC)\n3. Moving averages (EMA 50, 200)\n4. Volume clusters`,
+        content: `Support and resistance are price levels where buying or selling pressure concentrates.\n\nSupport — a price level where demand prevents further decline\n• Think of it as a floor\n• More touches = stronger support\n• When broken, often becomes resistance\n\nResistance — a price level where selling prevents further rise\n• Think of it as a ceiling\n• Breakout above resistance on high volume = bullish signal\n\nHow to identify:\n1. Previous highs and lows\n2. Round numbers ($50k, $100k for BTC)\n3. Moving averages (EMA 50, 200)\n4. Volume clusters`,
         quiz: { q: 'When support is broken, it often becomes:', options: ['Stronger support', 'Resistance', 'Irrelevant'], answer: 1 }
       },
       {
         title: 'Chart Patterns',
         duration: '12 min read',
         completed: false,
-        content: `Chart patterns are visual formations that predict future price direction.\n\n**Continuation patterns (trend continues):**\n• **Flag/Pennant** — brief consolidation after sharp move\n• **Triangle** — price compresses before breakout\n• **Rectangle** — price bounces between two levels\n\n**Reversal patterns (trend changes):**\n• **Double Top (M shape)** — bearish reversal\n• **Double Bottom (W shape)** — bullish reversal\n• **Head & Shoulders** — three peaks pattern\n\n**Key rules:**\n1. Patterns need context — a flag in an uptrend is bullish\n2. Volume confirms — breakout on low volume often fails\n3. Measure the target — height of pattern = expected move`,
+        content: `Chart patterns are visual formations that predict future price direction.\n\nContinuation patterns (trend continues):\n• Flag/Pennant — brief consolidation after sharp move\n• Triangle — price compresses before breakout\n• Rectangle — price bounces between two levels\n\nReversal patterns (trend changes):\n• Double Top (M shape) — bearish reversal\n• Double Bottom (W shape) — bullish reversal\n• Head & Shoulders — three peaks pattern\n\nKey rules:\n1. Patterns need context — a flag in an uptrend is bullish\n2. Volume confirms — breakout on low volume often fails\n3. Measure the target — height of pattern = expected move`,
         quiz: { q: 'A "flag" pattern in an uptrend indicates:', options: ['Trend reversal', 'Trend continuation after brief consolidation', 'No signal'], answer: 1 }
       },
     ]
@@ -106,28 +106,28 @@ const MODULES = [
         title: 'What is Arbitrage?',
         duration: '6 min read',
         completed: false,
-        content: `Arbitrage is the simultaneous purchase and sale of the same asset on different markets to profit from price differences.\n\n**How it works:**\nBTC on Binance: $97,500\nBTC on Bybit: $97,650\nDifference: $150 per BTC (0.15%)\n\n**Types of crypto arbitrage:**\n1. **Cross-exchange** — same asset, different exchanges\n2. **Triangular** — three pairs on the same exchange (BTC→ETH→USDT→BTC)\n3. **DEX vs CEX** — decentralized vs centralized exchange pricing\n\n**Why it works:**\n• Different exchanges have different liquidity and user bases\n• Price differences exist for seconds to minutes\n• Bots dominate — manual arb is rare but possible on smaller pairs`,
+        content: `Arbitrage is the simultaneous purchase and sale of the same asset on different markets to profit from price differences.\n\nHow it works:\nBTC on Binance: $97,500\nBTC on Bybit: $97,650\nDifference: $150 per BTC (0.15%)\n\nTypes of crypto arbitrage:\n1. Cross-exchange — same asset, different exchanges\n2. Triangular — three pairs on the same exchange (BTC→ETH→USDT→BTC)\n3. DEX vs CEX — decentralized vs centralized exchange pricing\n\nWhy it works:\n• Different exchanges have different liquidity and user bases\n• Price differences exist for seconds to minutes\n• Bots dominate — manual arb is rare but possible on smaller pairs`,
         quiz: { q: 'Arbitrage profits come from:', options: ['Predicting price direction', 'Price differences between markets', 'Holding assets long-term'], answer: 1 }
       },
       {
         title: 'CEX vs DEX Spreads',
         duration: '9 min read',
         completed: false,
-        content: `Centralized exchanges (Binance, Bybit) and decentralized exchanges (Uniswap, Raydium) often have significant price differences.\n\n**Why spreads exist:**\n• CEX has order books with tight spreads for popular pairs\n• DEX uses Automated Market Makers (AMMs) — price depends on pool balance\n• Low-liquidity DEX pools can have 1-5% spreads\n\n**Finding CEX/DEX spreads:**\n1. Compare Binance spot price with Uniswap/Jupiter price\n2. Factor in gas fees (ETH) or priority fees (SOL)\n3. Account for slippage — large orders move DEX price\n\n**Spectr Scanner** shows you these spreads in real-time on the Smart Ops page.`,
+        content: `Centralized exchanges (Binance, Bybit) and decentralized exchanges (Uniswap, Raydium) often have significant price differences.\n\nWhy spreads exist:\n• CEX has order books with tight spreads for popular pairs\n• DEX uses Automated Market Makers (AMMs) — price depends on pool balance\n• Low-liquidity DEX pools can have 1-5% spreads\n\nFinding CEX/DEX spreads:\n1. Compare Binance spot price with Uniswap/Jupiter price\n2. Factor in gas fees (ETH) or priority fees (SOL)\n3. Account for slippage — large orders move DEX price\n\nSpectr Scanner shows you these spreads in real-time on the Smart Ops page.`,
         quiz: { q: 'Why do DEX prices often differ from CEX?', options: ['Government regulation', 'AMM pricing depends on pool balance', 'DEX is always more expensive'], answer: 1 }
       },
       {
         title: 'Execution Latency',
         duration: '11 min read',
         completed: false,
-        content: `Speed is critical in arbitrage. The faster you execute, the more likely the opportunity still exists.\n\n**Latency factors:**\n• **Network latency** — distance to exchange servers\n• **Blockchain confirmation** — ETH ~12s per block, SOL ~0.4s\n• **Withdrawal processing** — some exchanges delay withdrawals\n\n**Reducing latency:**\n1. Pre-fund both exchanges (no transfer needed)\n2. Use API trading instead of manual UI\n3. Choose SOL/L2 chains for faster confirmation\n4. Run bots on cloud servers near exchange data centers\n\n**Realistic expectations:**\n• Cross-exchange arb: 0.1-0.5% per trade (after fees)\n• DEX/CEX arb: 0.5-2% on low-cap tokens\n• Frequency: 5-20 opportunities per day for major pairs`,
+        content: `Speed is critical in arbitrage. The faster you execute, the more likely the opportunity still exists.\n\nLatency factors:\n• Network latency — distance to exchange servers\n• Blockchain confirmation — ETH ~12s per block, SOL ~0.4s\n• Withdrawal processing — some exchanges delay withdrawals\n\nReducing latency:\n1. Pre-fund both exchanges (no transfer needed)\n2. Use API trading instead of manual UI\n3. Choose SOL/L2 chains for faster confirmation\n4. Run bots on cloud servers near exchange data centers\n\nRealistic expectations:\n• Cross-exchange arb: 0.1-0.5% per trade (after fees)\n• DEX/CEX arb: 0.5-2% on low-cap tokens\n• Frequency: 5-20 opportunities per day for major pairs`,
         quiz: { q: 'How to reduce execution latency?', options: ['Trade manually', 'Pre-fund both exchanges', 'Only trade on weekends'], answer: 1 }
       },
       {
         title: 'Using Spectr Scanner',
         duration: '8 min read',
         completed: false,
-        content: `Spectr's Smart Ops page is your real-time arbitrage dashboard.\n\n**Features:**\n• **Live spreads** — Binance vs Bybit prices updated every 5 seconds\n• **Net profit %** — accounts for trading fees automatically\n• **Symbol scanner** — monitors BTC, ETH, SOL, and more\n\n**How to use it:**\n1. Navigate to Smart Ops in the sidebar\n2. Watch for green profit percentages\n3. When spread > 0.1%, check both exchanges\n4. Execute buy on cheaper exchange, sell on expensive one\n5. Profit is the spread minus fees\n\n**Pro tips:**\n• Spreads widen during high volatility (news events)\n• Weekend spreads tend to be wider (lower liquidity)\n• Always check withdrawal fees before executing`,
+        content: `Spectr's Smart Ops page is your real-time arbitrage dashboard.\n\nFeatures:\n• Live spreads — Binance vs Bybit prices updated every 5 seconds\n• Net profit % — accounts for trading fees automatically\n• Symbol scanner — monitors BTC, ETH, SOL, and more\n\nHow to use it:\n1. Navigate to Smart Ops in the sidebar\n2. Watch for green profit percentages\n3. When spread > 0.1%, check both exchanges\n4. Execute buy on cheaper exchange, sell on expensive one\n5. Profit is the spread minus fees\n\nPro tips:\n• Spreads widen during high volatility (news events)\n• Weekend spreads tend to be wider (lower liquidity)\n• Always check withdrawal fees before executing`,
         quiz: { q: 'When do arbitrage spreads typically widen?', options: ['During low volatility', 'During high volatility and news events', 'On Mondays'], answer: 1 }
       },
     ]
@@ -144,21 +144,21 @@ const MODULES = [
         title: 'Liquidity Pools',
         duration: '10 min read',
         completed: false,
-        content: `Liquidity pools power decentralized exchanges. You deposit token pairs and earn fees from trades.\n\n**How it works:**\n1. You deposit equal value of two tokens (e.g., $500 ETH + $500 USDC)\n2. Traders swap between these tokens using your liquidity\n3. You earn a share of trading fees (typically 0.3% per trade)\n\n**Popular platforms:**\n• Uniswap (Ethereum) — largest DEX by volume\n• Raydium (Solana) — fast and cheap\n• PancakeSwap (BSC) — high APYs for exotic pairs\n\n**Risks:**\n• Impermanent loss (next lesson)\n• Smart contract bugs\n• Rug pulls on unverified tokens`,
+        content: `Liquidity pools power decentralized exchanges. You deposit token pairs and earn fees from trades.\n\nHow it works:\n1. You deposit equal value of two tokens (e.g., $500 ETH + $500 USDC)\n2. Traders swap between these tokens using your liquidity\n3. You earn a share of trading fees (typically 0.3% per trade)\n\nPopular platforms:\n• Uniswap (Ethereum) — largest DEX by volume\n• Raydium (Solana) — fast and cheap\n• PancakeSwap (BSC) — high APYs for exotic pairs\n\nRisks:\n• Impermanent loss (next lesson)\n• Smart contract bugs\n• Rug pulls on unverified tokens`,
         quiz: { q: 'How do liquidity providers earn money?', options: ['From staking rewards', 'From a share of trading fees', 'From token price appreciation'], answer: 1 }
       },
       {
         title: 'Impermanent Loss',
         duration: '14 min read',
         completed: false,
-        content: `Impermanent Loss (IL) occurs when the price ratio of your deposited tokens changes compared to when you deposited them.\n\n**Example:**\nYou deposit 1 ETH ($2000) + 2000 USDC\nETH price doubles to $4000\n• If you just held: 1 ETH ($4000) + 2000 USDC = $6000\n• In the pool: ~0.707 ETH + ~2828 USDC = $5656\n• Impermanent loss: $344 (5.7%)\n\n**Mitigating IL:**\n1. **Stablecoin pairs** (USDC/USDT) — near-zero IL\n2. **Correlated pairs** (ETH/stETH) — minimal price divergence\n3. **High fee pools** — fees can offset IL\n4. **Concentrated liquidity** — provide in specific price ranges for higher fees`,
+        content: `Impermanent Loss (IL) occurs when the price ratio of your deposited tokens changes compared to when you deposited them.\n\nExample:\nYou deposit 1 ETH ($2000) + 2000 USDC\nETH price doubles to $4000\n• If you just held: 1 ETH ($4000) + 2000 USDC = $6000\n• In the pool: ~0.707 ETH + ~2828 USDC = $5656\n• Impermanent loss: $344 (5.7%)\n\nMitigating IL:\n1. Stablecoin pairs (USDC/USDT) — near-zero IL\n2. Correlated pairs (ETH/stETH) — minimal price divergence\n3. High fee pools — fees can offset IL\n4. Concentrated liquidity — provide in specific price ranges for higher fees`,
         quiz: { q: 'Which pool has the lowest impermanent loss?', options: ['ETH/DOGE', 'USDC/USDT', 'BTC/MEME'], answer: 1 }
       },
       {
         title: 'Yield Farming 101',
         duration: '12 min read',
         completed: false,
-        content: `Yield farming is the practice of moving crypto between protocols to maximize returns.\n\n**Common strategies:**\n1. **Stake LP tokens** — provide liquidity, then stake the LP token for extra rewards\n2. **Lending + borrowing** — deposit collateral, borrow stablecoins, deploy elsewhere\n3. **Auto-compounding** — protocols like Beefy automatically reinvest your rewards\n\n**Evaluating APY:**\n• APY = Annual Percentage Yield (includes compounding)\n• APR = Annual Percentage Rate (simple interest)\n• TVL = Total Value Locked (higher TVL = more trust)\n\n**Red flags:**\n🔴 APY > 1000% — usually unsustainable\n🔴 Anonymous team + no audit\n🔴 Locked withdrawals\n🔴 Token has no utility beyond farming\n\n✅ Realistic sustainable yields: 5-20% APY for blue chip pairs`,
+        content: `Yield farming is the practice of moving crypto between protocols to maximize returns.\n\nCommon strategies:\n1. Stake LP tokens — provide liquidity, then stake the LP token for extra rewards\n2. Lending + borrowing — deposit collateral, borrow stablecoins, deploy elsewhere\n3. Auto-compounding — protocols like Beefy automatically reinvest your rewards\n\nEvaluating APY:\n• APY = Annual Percentage Yield (includes compounding)\n• APR = Annual Percentage Rate (simple interest)\n• TVL = Total Value Locked (higher TVL = more trust)\n\nRed flags:\n🔴 APY > 1000% — usually unsustainable\n🔴 Anonymous team + no audit\n🔴 Locked withdrawals\n🔴 Token has no utility beyond farming\n\n✅ Realistic sustainable yields: 5-20% APY for blue chip pairs`,
         quiz: { q: 'An APY above 1000% is usually:', options: ['A great opportunity', 'Unsustainable and risky', 'Guaranteed profit'], answer: 1 }
       },
     ]
