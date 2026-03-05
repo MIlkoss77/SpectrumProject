@@ -116,6 +116,37 @@ app.post('/api/backtest', async (req, res) => {
     }
 });
 
+// --- OHLC Proxy (Unified for charts/briefs) ---
+app.get(['/api/ohlc', '/api/ohlc/binance'], async (req, res) => {
+    try {
+        const { symbol, tf, limit } = req.query;
+        const binSymbol = (symbol || 'BTCUSDT').replace('/', '');
+        const url = `https://api.binance.com/api/v3/klines?symbol=${binSymbol}&interval=${tf || '1h'}&limit=${limit || 500}`;
+        const response = await axios.get(url);
+        const formatted = response.data.map(k => ({
+            t: k[0], o: parseFloat(k[1]), h: parseFloat(k[2]), l: parseFloat(k[3]), c: parseFloat(k[4]), v: parseFloat(k[5]),
+            openTime: k[0], volume: parseFloat(k[5])
+        }));
+        res.json(formatted);
+    } catch (error) {
+        console.error('OHLC Proxy Error:', error.message);
+        res.status(500).json([]);
+    }
+});
+
+// --- Solana RPC Proxy ---
+app.post('/api/solana/signatures', async (req, res) => {
+    try {
+        const response = await axios.post('https://api.mainnet-beta.solana.com', req.body, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 5000
+        });
+        res.json(response.data);
+    } catch (error) {
+        res.status(error.response?.status || 500).json({ error: true });
+    }
+});
+
 // --- News Proxy (Robust RSS) ---
 app.get('/api/news', async (req, res) => {
     // ... rest of the file
