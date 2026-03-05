@@ -13,6 +13,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Log all requests
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
+
 // --- Backtest Engine Logic ---
 function runSimulation(klines, strategy) {
     const closes = klines.map(k => k.c);
@@ -271,7 +277,7 @@ app.get('/api', (req, res) => {
 });
 
 // --- Binance Proxy (Server-side) ---
-app.get('/api/proxy/binance/*', async (req, res) => {
+app.get('/api/proxy/binance/(.*)', async (req, res) => {
     try {
         const path = req.params[0];
         const query = req.query;
@@ -302,7 +308,7 @@ app.get('/api/proxy/binance/*', async (req, res) => {
 });
 
 // --- Bybit Proxy (Server-side) ---
-app.get('/api/proxy/bybit/*', async (req, res) => {
+app.get('/api/proxy/bybit/(.*)', async (req, res) => {
     try {
         const path = req.params[0];
         const query = req.query;
