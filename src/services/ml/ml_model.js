@@ -61,7 +61,7 @@ export class PricePredictor {
             await this.model.save(`indexeddb://spectrum-model-${id}`);
             // console.log(`Model ${id} saved to IndexedDB`);
         } catch (e) {
-            console.warn('Model persistence failed:', e);
+            // console.warn('Model persistence failed:', e);
         }
     }
 
@@ -118,7 +118,7 @@ export class PricePredictor {
                 }
             });
         } catch (err) {
-            console.error('TF Training Error:', err);
+            // console.error('TF Training Error:', err);
         } finally {
             xTrain.dispose();
             yTrain.dispose();

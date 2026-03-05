@@ -55,7 +55,7 @@ export async function fetchBinanceTicker(symbol) {
     return parseFloat(data.price);
   } catch (e) {
     clearTimeout(timeoutId);
-    console.warn(`Binance fetch failed/timeout for ${symbol}`);
+    // Silent fallback
     return null;
   }
 }
@@ -73,7 +73,7 @@ export async function fetchBybitTicker(symbol) {
     return data.ok ? data.price : null;
   } catch (e) {
     clearTimeout(timeoutId);
-    console.warn(`Bybit proxy fetch failed/timeout for ${symbol}`);
+    // Silent fallback
     return null;
   }
 }
@@ -133,7 +133,7 @@ export async function getMarkets() {
 
     return { items, ts: Date.now() }
   } catch (e) {
-    console.error("getMarkets failed, using partial fallback", e);
+    // console.error("getMarkets failed, using partial fallback", e);
     return { items: [], ts: Date.now() };
   }
 }
@@ -213,7 +213,7 @@ export async function getRealArbitrage(minNetPct = 0.1) {
   if (failedCount >= ARB_SYMBOLS.length / 2) {
     globalMarketBlock = true;
     blockExpires = Date.now() + 60000;
-    console.warn("Global network block detected. Switching to local simulation for 60s.");
+    // console.warn("Global network block detected. Switching to local simulation for 60s.");
   }
 
   return { items: items.sort((a, b) => b.netPct - a.netPct), ts: now }
