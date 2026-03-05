@@ -91,7 +91,7 @@ async function fetchSignatures(address) {
 
         if (isRpcBlocked) return [];
 
-        const response = await fetch(SOLANA_RPC, {
+        const response = await fetch('/api/solana/signatures', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
@@ -110,7 +110,6 @@ async function fetchSignatures(address) {
         return data.result || [];
     } catch (e) {
         clearTimeout(timeoutId);
-        // Silent catch for all RPC errors including 403 and timeouts
         return [];
     }
 }
