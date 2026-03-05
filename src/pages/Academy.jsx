@@ -216,159 +216,160 @@ function CourseViewer({ module, onClose, onComplete }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="p-2 md:p-6"
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      style={{
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
         background: 'rgba(0,0,0,0.98)', backdropFilter: 'blur(15px)',
-          zIndex: 9999, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
-            display: 'block', padding: 'env(safe-area-inset-top) 0 env(safe-area-inset-bottom)'
-}}
+        zIndex: 9999, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
+        display: 'block', padding: 'env(safe-area-inset-top) 0 env(safe-area-inset-bottom)'
+      }}
     >
-  <motion.div
-    initial={{ scale: 0.95, y: 20 }}
-    animate={{ scale: 1, y: 0 }}
-    exit={{ scale: 0.95, y: 20 }}
-    className="dx-card flex flex-col md:flex-row"
-    style={{
-      width: '100%', maxWidth: 1000,
-      minHeight: '100dvh', // Use minHeight instead of height
-      margin: '0 auto',
-      padding: 0, overflow: 'visible', position: 'relative',
-      borderRadius: 0, border: 'none'
-    }}
-  >
-    {/* Sidebar */}
-    <div className="w-full md:w-[280px] h-[35%] md:h-full border-b md:border-r border-white/10 shrink-0" style={{ background: 'var(--surface-1)', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--line)' }}>
-        <h3 style={{ margin: 0, fontSize: 16 }}>{module.title}</h3>
-        <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
-          {module.lessons.filter(l => l.completed).length}/{module.lessons.length} Lessons
-        </div>
-      </div>
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        {module.lessons.map((l, i) => (
-          <button
-            key={i}
-            onClick={() => { setCurrentLesson(i); setQuizAnswer(null); setShowResult(false) }}
-            style={{
-              width: '100%', textAlign: 'left', padding: '14px 20px',
-              background: currentLesson === i ? 'rgba(0, 255, 255, 0.05)' : 'transparent',
-              border: 'none', borderBottom: '1px solid var(--line)',
-              color: currentLesson === i ? '#fff' : 'var(--muted)',
-              cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center'
-            }}
-          >
-            <div style={{
-              width: 24, height: 24, borderRadius: '50%',
-              background: l.completed ? '#4caf50' : currentLesson === i ? 'var(--accent)' : 'var(--surface-2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#000',
-              flexShrink: 0
-            }}>
-              {l.completed ? <CheckCircle size={14} color="#fff" /> : i + 1}
+      <motion.div
+        initial={{ scale: 0.95, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.95, y: 20 }}
+        className="dx-card flex flex-col md:flex-row"
+        style={{
+          width: '100%', maxWidth: 1000,
+          minHeight: '100dvh', // Use minHeight instead of height
+          margin: '0 auto',
+          padding: 0, overflow: 'visible', position: 'relative',
+          borderRadius: 0, border: 'none'
+        }}
+      >
+        {/* Sidebar */}
+        <div className="w-full md:w-[280px] h-[35%] md:h-full border-b md:border-r border-white/10 shrink-0" style={{ background: 'var(--surface-1)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid var(--line)' }}>
+            <h3 style={{ margin: 0, fontSize: 16 }}>{module.title}</h3>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>
+              {module.lessons.filter(l => l.completed).length}/{module.lessons.length} Lessons
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: currentLesson === i ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.title}</div>
-              <div style={{ fontSize: 10, opacity: 0.6 }}>{l.duration}</div>
+          </div>
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            {module.lessons.map((l, i) => (
+              <button
+                key={i}
+                onClick={() => { setCurrentLesson(i); setQuizAnswer(null); setShowResult(false) }}
+                style={{
+                  width: '100%', textAlign: 'left', padding: '14px 20px',
+                  background: currentLesson === i ? 'rgba(0, 255, 255, 0.05)' : 'transparent',
+                  border: 'none', borderBottom: '1px solid var(--line)',
+                  color: currentLesson === i ? '#fff' : 'var(--muted)',
+                  cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center'
+                }}
+              >
+                <div style={{
+                  width: 24, height: 24, borderRadius: '50%',
+                  background: l.completed ? '#4caf50' : currentLesson === i ? 'var(--accent)' : 'var(--surface-2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#000',
+                  flexShrink: 0
+                }}>
+                  {l.completed ? <CheckCircle size={14} color="#fff" /> : i + 1}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: currentLesson === i ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.title}</div>
+                  <div style={{ fontSize: 10, opacity: 0.6 }}>{l.duration}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+          {/* Header */}
+          <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 20 }}>{lesson.title}</h2>
+              <span style={{ fontSize: 12, color: 'var(--muted)' }}>Lesson {currentLesson + 1} of {module.lessons.length} • {lesson.duration}</span>
             </div>
-          </button>
-        ))}
-      </div>
-    </div>
-
-    {/* Main Content */}
-    <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
-      {/* Header */}
-      <div style={{ padding: '20px 28px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 style={{ margin: 0, fontSize: 20 }}>{lesson.title}</h2>
-          <span style={{ fontSize: 12, color: 'var(--muted)' }}>Lesson {currentLesson + 1} of {module.lessons.length} • {lesson.duration}</span>
-        </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff',
-            width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}
-        >
-          <X size={18} />
-        </button>
-      </div>
-
-      {/* Scrollable content */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch',
-        padding: '28px 28px 20px',
-        minHeight: 0 // Crucial for nested flex scrolling
-      }}>
-        {/* Lesson text */}
-        <div style={{ fontSize: 15, lineHeight: 1.8, color: 'rgba(255,255,255,0.85)', whiteSpace: 'pre-line', marginBottom: 32 }}>
-          {lesson.content}
-        </div>
-
-        {/* Quiz */}
-        <div style={{
-          background: 'rgba(0, 255, 255, 0.04)',
-          border: '1px solid rgba(0, 255, 255, 0.1)',
-          borderRadius: 16, padding: 24
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>
-            <Sparkles size={16} /> KNOWLEDGE CHECK
-          </div>
-          <p style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600 }}>{lesson.quiz.q}</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {lesson.quiz.options.map((opt, idx) => {
-              let bg = 'rgba(255,255,255,0.04)'
-              let borderC = 'rgba(255,255,255,0.08)'
-              if (showResult && idx === lesson.quiz.answer) { bg = 'rgba(76, 175, 80, 0.15)'; borderC = '#4caf50' }
-              else if (showResult && idx === quizAnswer && !isCorrect) { bg = 'rgba(255, 59, 48, 0.15)'; borderC = '#ff3b30' }
-
-              return (
-                <button
-                  key={idx}
-                  onClick={() => !showResult && handleAnswer(idx)}
-                  disabled={showResult}
-                  style={{
-                    textAlign: 'left', padding: '12px 16px', borderRadius: 10,
-                    background: bg, border: `1px solid ${borderC}`,
-                    color: '#fff', cursor: showResult ? 'default' : 'pointer',
-                    fontSize: 14, transition: 'all 0.2s',
-                    opacity: showResult && idx !== quizAnswer && idx !== lesson.quiz.answer ? 0.4 : 1,
-                    fontFamily: 'inherit'
-                  }}
-                >
-                  {opt}
-                </button>
-              )
-            })}
-          </div>
-          {showResult && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+            <button
+              onClick={onClose}
               style={{
-                marginTop: 16, padding: '10px 14px', borderRadius: 8,
-                background: isCorrect ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 59, 48, 0.1)',
-                fontSize: 13, color: isCorrect ? '#4caf50' : '#ff3b30', fontWeight: 600
+                background: 'rgba(255,255,255,0.05)', border: 'none', color: '#fff',
+                width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}
             >
-              {isCorrect ? '✅ Correct! Lesson marked as complete.' : '❌ Not quite. Try the next lesson and come back!'}
-            </motion.div>
-          )}
-        </div>
-      </div>
+              <X size={18} />
+            </button>
+          </div>
 
-      {/* Bottom nav */}
-      <div style={{ padding: '16px 28px', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between' }}>
-        <button className="dx-btn secondary" onClick={goPrev} disabled={currentLesson === 0} style={{ gap: 6 }}>
-          <ChevronLeft size={16} /> Previous
-        </button>
-        <button className="dx-btn primary" onClick={goNext} disabled={currentLesson === module.lessons.length - 1} style={{ gap: 6 }}>
-          Next Lesson <ChevronRight size={16} />
-        </button>
-      </div>
-    </div>
-  </motion.div>
+          {/* Scrollable content */}
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            padding: '28px 28px 20px',
+            minHeight: 0 // Crucial for nested flex scrolling
+          }}>
+            {/* Lesson text */}
+            <div style={{ fontSize: 15, lineHeight: 1.8, color: 'rgba(255,255,255,0.85)', whiteSpace: 'pre-line', marginBottom: 32 }}>
+              {lesson.content}
+            </div>
+
+            {/* Quiz */}
+            <div style={{
+              background: 'rgba(0, 255, 255, 0.04)',
+              border: '1px solid rgba(0, 255, 255, 0.1)',
+              borderRadius: 16, padding: 24
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, fontSize: 13, fontWeight: 700, color: 'var(--accent)' }}>
+                <Sparkles size={16} /> KNOWLEDGE CHECK
+              </div>
+              <p style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600 }}>{lesson.quiz.q}</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {lesson.quiz.options.map((opt, idx) => {
+                  let bg = 'rgba(255,255,255,0.04)'
+                  let borderC = 'rgba(255,255,255,0.08)'
+                  if (showResult && idx === lesson.quiz.answer) { bg = 'rgba(76, 175, 80, 0.15)'; borderC = '#4caf50' }
+                  else if (showResult && idx === quizAnswer && !isCorrect) { bg = 'rgba(255, 59, 48, 0.15)'; borderC = '#ff3b30' }
+
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => !showResult && handleAnswer(idx)}
+                      disabled={showResult}
+                      style={{
+                        textAlign: 'left', padding: '12px 16px', borderRadius: 10,
+                        background: bg, border: `1px solid ${borderC}`,
+                        color: '#fff', cursor: showResult ? 'default' : 'pointer',
+                        fontSize: 14, transition: 'all 0.2s',
+                        opacity: showResult && idx !== quizAnswer && idx !== lesson.quiz.answer ? 0.4 : 1,
+                        fontFamily: 'inherit'
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  )
+                })}
+              </div>
+              {showResult && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{
+                    marginTop: 16, padding: '10px 14px', borderRadius: 8,
+                    background: isCorrect ? 'rgba(76, 175, 80, 0.1)' : 'rgba(255, 59, 48, 0.1)',
+                    fontSize: 13, color: isCorrect ? '#4caf50' : '#ff3b30', fontWeight: 600
+                  }}
+                >
+                  {isCorrect ? '✅ Correct! Lesson marked as complete.' : '❌ Not quite. Try the next lesson and come back!'}
+                </motion.div>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom nav */}
+          <div style={{ padding: '16px 28px', borderTop: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between' }}>
+            <button className="dx-btn secondary" onClick={goPrev} disabled={currentLesson === 0} style={{ gap: 6 }}>
+              <ChevronLeft size={16} /> Previous
+            </button>
+            <button className="dx-btn primary" onClick={goNext} disabled={currentLesson === module.lessons.length - 1} style={{ gap: 6 }}>
+              Next Lesson <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      </motion.div>
     </motion.div >
   )
 }
