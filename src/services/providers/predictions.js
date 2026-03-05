@@ -26,7 +26,10 @@ function prepareMlData(closes, ema34, ema89, rsi14, hist) {
     const priceTrend = (closes[i] - ema34[i]) / ema34[i];
     const normTrend = clamp(priceTrend / 0.01, -1, 1) * 0.5 + 0.5;
 
-    features.push([normRsi, normMacd, normEma, normTrend]);
+    // 5. OBI (Order Book Imbalance) - Fallback to 0.5 as we don't have deep book in klines
+    const normObi = 0.5;
+
+    features.push([normRsi, normMacd, normEma, normTrend, normObi]);
   }
   return features;
 }

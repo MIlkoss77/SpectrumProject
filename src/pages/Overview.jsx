@@ -302,7 +302,12 @@ export default function Overview() {
                     style={{ transition: 'stroke-dasharray 1s ease' }}
                   />
                 </svg>
-                <div className="score-center" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="score-center" style={{
+                  position: 'absolute', top: '50%', left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  width: '100%', textAlign: 'center'
+                }}>
                   <span className="score-num text-white" style={{ fontSize: '32px', fontWeight: 900, lineHeight: 1 }}>{mainScore?.score || '--'}</span>
                   <span className="score-label text-cyan-400/60" style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>{mainScore?.status || 'ANALYZING'}</span>
                 </div>
