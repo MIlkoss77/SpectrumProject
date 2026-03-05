@@ -113,46 +113,71 @@ export default function AppShell() {
         </div>
       </aside>
 
-      <main className="dx-main">
-        <header className="dx-toolbar">
-          <button className="dx-burger" aria-label="Toggle menu" onClick={() => setNavOpen(v => !v)}>
-            {navOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-
-          <div className="dx-controls w-full flex justify-between items-center md:justify-end border-0">
-            {/* Mobile Logo replacing Capital Shield */}
-            <div className="md:hidden flex items-center gap-2 flex-1 justify-center mr-auto">
-              <img src={logoImg} alt="Spectr Logo" className="w-[18px] h-[18px] object-contain" />
-              <span className="font-extrabold text-[13px] tracking-tight text-white flex items-center">
-                SPECTR<span className="text-cyan-400 ml-1">Trading</span>
+      <main className="dx-main" style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        background: 'radial-gradient(circle at 50% 0%, #111 0%, var(--bg-dark) 100%)',
+        minHeight: '100vh'
+      }}>
+        <header className="dx-toolbar" style={{
+          height: '70px',
+          padding: '0 16px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1000,
+          background: 'rgba(5, 5, 5, 0.85)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,0.08)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              onClick={() => setNavOpen(v => !v)}
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff',
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              {navOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+            <div className="mobile-logo-only" style={{ alignItems: 'center', gap: '8px' }}>
+              <img src={logoImg} alt="Spectr" style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
+              <span style={{ fontWeight: 900, fontSize: '16px', color: '#fff', letterSpacing: '-0.3px', lineHeight: 1 }}>
+                SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
               </span>
             </div>
+          </div>
 
-            {/* Capital Shield Indicator Desktop */}
-            <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl border border-white/5 bg-white/5 backdrop-blur-md mr-4">
-              <div className="relative">
-                <Shield size={16} className="text-cyan-400" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-green-500 border border-black animate-pulse" />
-              </div>
-              <div className="flex flex-col text-left">
-                <span className="text-[9px] font-black text-cyan-400 uppercase leading-none mb-0.5">Capital Shield</span>
-                <span className="text-[10px] font-bold text-white/50 leading-none">PROTECTED</span>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px' }}>
+            <div className="desktop-shield-only" style={{ alignItems: 'center', gap: '10px', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
+              <Shield size={16} color="#00FFFF" />
+              <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
+                <span style={{ fontSize: '8px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', lineHeight: 1 }}>Capital Shield</span>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', lineHeight: 1 }}>PROTECTED</span>
               </div>
             </div>
 
-            <div className="flex gap-2 items-center">
-              <button className="dx-icon-btn badge-btn" aria-label="Notifications" onClick={() => setShowMore(!showMore)}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', position: 'relative' }} onClick={() => setShowMore(!showMore)}>
                 <Bell size={20} />
-                <div className="badge">3</div>
+                <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</div>
               </button>
 
-              <div className="dx-user-profile" onClick={connectWallet}>
-                <div className="dx-user-info hidden sm:flex">
-                  <span className="dx-username">{account ? `${account.slice(0, 6)}...${account.slice(-4)}` : 'Connect Wallet'}</span>
-                  <span className="dx-user-rank">{account || isPro ? 'Pro Holder' : 'Guest'}</span>
-                </div>
-                <div className="dx-avatar">
-                  {(account || isPro) ? <Shield size={20} color="#00FFFF" /> : <Wallet size={20} color="#8899A6" />}
+              <div onClick={connectWallet} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  {(account || isPro) ? <Shield size={18} color="#00FFFF" /> : <Wallet size={18} color="#8899A6" />}
                 </div>
               </div>
             </div>
@@ -164,7 +189,6 @@ export default function AppShell() {
             <Outlet />
           </PageTransition>
         </AnimatePresence>
-
       </main>
 
       {/* Mobile Bottom Navigation */}

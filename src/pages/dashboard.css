@@ -112,8 +112,8 @@
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden !important;
-  max-width: 100vw !important;
+  overflow-x: hidden;
+  min-height: 100vh;
 }
 
 :root {
@@ -151,6 +151,7 @@ body {
   letter-spacing: -0.01em;
   margin: 0;
   overflow-x: hidden;
+  overflow-y: visible;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -646,6 +647,26 @@ input[type=range]::-webkit-slider-runnable-track {
 .dx-sidebar::-webkit-scrollbar,
 .dx-nav::-webkit-scrollbar {
   display: none !important;
+}
+
+.mobile-logo-only {
+  display: flex !important;
+}
+
+.desktop-shield-only {
+  display: flex !important;
+}
+
+@media (min-width: 1024px) {
+  .mobile-logo-only {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .desktop-shield-only {
+    display: none !important;
+  }
 }
 
 .dx-sidebar,

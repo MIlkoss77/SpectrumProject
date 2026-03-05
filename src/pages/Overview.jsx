@@ -42,7 +42,7 @@ function ActionCard({ action, loading, openTrade, t }) {
 
       <div className="action-main relative z-10">
         <div className="action-symbol flex items-center gap-2">
-          <span className={`w-1.h-1.5 rounded-full ${isPositive ? 'bg-cyan-400' : 'bg-red-500'}`} />
+          <span className={`w-1.5 h-1.5 rounded-full ${isPositive ? 'bg-cyan-400' : 'bg-red-500'}`} />
           {action.symbol.replace('USDT', '')}
         </div>
         <div className="action-status font-bold tracking-wider text-xs px-2 py-0.5 rounded bg-black/40 border border-white/5"
@@ -261,7 +261,7 @@ export default function Overview() {
             <Skeleton className="h-40" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {topActions.map((action, i) => (
               <ActionCard key={i} action={action} loading={false} openTrade={openTrade} t={t} />
             ))}
@@ -274,16 +274,16 @@ export default function Overview() {
 
         {/* Left Column: Core Analytics */}
         <div className="analytics-col">
-          <div className="dx-card score-card-premium relative overflow-hidden border-cyan-500/20">
+          <div className="dx-card score-card-premium relative overflow-hidden border-cyan-500/20" style={{ padding: '24px' }}>
             <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/5 blur-[80px] rounded-full pointer-events-none" />
 
-            <div className="card-header relative z-10">
-              <h3 className="text-cyan-400/80">{t('pages.dashboard.market_score') || 'BTC MARKET SCORE'}</h3>
+            <div className="card-header relative z-10" style={{ marginBottom: '20px' }}>
+              <h3 className="text-cyan-400/80" style={{ fontSize: '14px', margin: 0 }}>{t('pages.dashboard.market_score') || 'BTC MARKET SCORE'}</h3>
               <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-cyan-900/20 border border-cyan-500/20 text-[10px] font-bold text-cyan-400"><span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00FFFF]"></span> {t('ui.live') || 'LIVE'}</div>
             </div>
-            <div className="score-main relative z-10">
-              <div className="score-gauge-lg">
-                <svg viewBox="0 0 100 100">
+            <div className="score-main relative z-10" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+              <div className="score-gauge-lg" style={{ width: '130px', height: '130px', position: 'relative', flexShrink: 0 }}>
+                <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
                   <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="6" />
                   <circle
                     cx="50" cy="50" r="45" fill="none"
@@ -291,26 +291,32 @@ export default function Overview() {
                     strokeWidth="6"
                     strokeDasharray={`${((mainScore?.score || 50) / 100) * 283} 283`}
                     strokeLinecap="round"
-                    style={{ transition: 'stroke-dasharray 1s ease', filter: 'drop-shadow(0 0 4px rgba(0,255,255,0.5))' }}
+                    style={{ transition: 'stroke-dasharray 1s ease' }}
                   />
                 </svg>
-                <div className="score-center">
-                  <span className="score-num text-white">{mainScore?.score || '--'}</span>
-                  <span className="score-label text-cyan-400/60">{mainScore?.status || 'ANALYZING'}</span>
+                <div className="score-center" style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="score-num text-white" style={{ fontSize: '32px', fontWeight: 900, lineHeight: 1 }}>{mainScore?.score || '--'}</span>
+                  <span className="score-label text-cyan-400/60" style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>{mainScore?.status || 'ANALYZING'}</span>
                 </div>
               </div>
-              <div className="score-breakdown">
+              <div className="score-breakdown" style={{ flex: 1, minWidth: '150px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div className="breakdown-item">
-                  <span className="text-xs uppercase font-bold text-white/30">Sentiment</span>
-                  <div className="h-1 bg-white/5 rounded-full overflow-hidden w-full mt-1"><div className="h-full bg-cyan-500/50" style={{ width: `${mainScore?.details?.sentiment || 50}% ` }} /></div>
+                  <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>Sentiment</span>
+                  <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '100%', marginTop: '4px' }}>
+                    <div style={{ height: '100%', background: 'rgba(0,255,255,0.5)', borderRadius: '2px', width: `${mainScore?.details?.sentiment || 50}%` }} />
+                  </div>
                 </div>
                 <div className="breakdown-item">
-                  <span className="text-xs uppercase font-bold text-white/30">Whales</span>
-                  <div className="h-1 bg-white/5 rounded-full overflow-hidden w-full mt-1"><div className="h-full bg-cyan-500/50" style={{ width: `${mainScore?.details?.whales || 50}% ` }} /></div>
+                  <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>Whales</span>
+                  <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '100%', marginTop: '4px' }}>
+                    <div style={{ height: '100%', background: 'rgba(0,255,255,0.5)', borderRadius: '2px', width: `${mainScore?.details?.whales || 50}%` }} />
+                  </div>
                 </div>
                 <div className="breakdown-item">
-                  <span className="text-xs uppercase font-bold text-white/30">Technical</span>
-                  <div className="h-1 bg-white/5 rounded-full overflow-hidden w-full mt-1"><div className="h-full bg-cyan-500/50" style={{ width: `${mainScore?.details?.ta || 50}% ` }} /></div>
+                  <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>Technical</span>
+                  <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '100%', marginTop: '4px' }}>
+                    <div style={{ height: '100%', background: 'rgba(0,255,255,0.5)', borderRadius: '2px', width: `${mainScore?.details?.ta || 50}%` }} />
+                  </div>
                 </div>
               </div>
             </div>
