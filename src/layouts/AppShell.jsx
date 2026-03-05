@@ -136,6 +136,7 @@ export default function AppShell() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
+              className="dx-burger"
               onClick={() => setNavOpen(v => !v)}
               style={{
                 background: 'rgba(255, 255, 255, 0.05)',
