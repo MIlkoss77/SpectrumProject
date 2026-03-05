@@ -435,9 +435,9 @@ app.post('/api/portfolio/balance', async (req, res) => {
         console.error('Portfolio API Error:', error.message);
         res.status(500).json({ ok: false, error: error.message || 'Failed to connect to exchange' });
     }
-    // --- Start the Server ---
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+});
+
+// --- Start the Server ---
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
