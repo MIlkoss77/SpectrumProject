@@ -5,7 +5,7 @@ import axios from "axios";
 const host = import.meta.env.VITE_API_HOST;
 const base =
   import.meta.env.VITE_API_BASE ||
-  (host ? `https://${host}` : "http://localhost:8787");
+  (host ? `https://${host}` : "/api");
 
 export const http = axios.create({
   baseURL: base,

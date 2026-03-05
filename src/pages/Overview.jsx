@@ -132,7 +132,7 @@ export default function Overview() {
       ])
       setTopActions(actions)
       setMainScore(score)
-      setSnapshot(markets)
+      setMainScore(score)
     } catch (e) {
       console.error(e)
     } finally {

@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
-  (import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : "http://localhost:8787");
+  (import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : "/api");
 
 // ---------- TA helpers ----------
 const EMA = (values, period) => {
