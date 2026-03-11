@@ -56,7 +56,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Catch-all for Frontend Routing
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
     if (!req.url.startsWith('/api')) {
         res.sendFile(path.join(distPath, 'index.html'));
     } else {
