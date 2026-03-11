@@ -4,9 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useWebSocket } from "@/context/WebSocketContext";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  (import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : "/api");
+const API_BASE = "/api";
 
 // ---------- TA helpers ----------
 const EMA = (values, period) => {

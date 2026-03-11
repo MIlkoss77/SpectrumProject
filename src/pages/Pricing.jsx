@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Check, Zap, Crown, ArrowRight, Mail, CheckCircle, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import './dashboard.css'
 
@@ -59,6 +60,7 @@ const PLANS = [
 ]
 
 export default function Pricing() {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState({})
   const [activePlan, setActivePlan] = useState(null)
@@ -87,7 +89,7 @@ export default function Pricing() {
     <div className="dx-panels">
       <header style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 12, padding: '4px 12px', borderRadius: 20, background: 'rgba(0,255,255,0.06)', border: '1px solid rgba(0,255,255,0.15)' }}>
-          <Sparkles size={12} /> Transparent Pricing
+          <Sparkles size={12} /> {t('ui.transparent_pricing') || 'Transparent Pricing'}
         </div>
         <h1 style={{
           fontSize: 'clamp(28px, 6vw, 42px)', fontWeight: 900, margin: '0 0 12px',
@@ -95,10 +97,10 @@ export default function Pricing() {
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           letterSpacing: -1
         }}>
-          Choose Your Edge
+          {t('pages.pricing.headline') || 'Choose Your Edge'}
         </h1>
         <p style={{ maxWidth: 440, margin: '0 auto', color: 'var(--muted)', fontSize: 15, lineHeight: 1.7 }}>
-          No hidden fees. No lock-in. Cancel anytime.
+          {t('pages.pricing.subline') || 'No hidden fees. No lock-in. Cancel anytime.'}
         </p>
       </header>
 
@@ -243,10 +245,10 @@ export default function Pricing() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
           <Zap size={14} color='var(--accent)' />
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: 1, textTransform: 'uppercase' }}>Secure & Private</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: 1, textTransform: 'uppercase' }}>{t('ui.secure_private') || 'Secure & Private'}</span>
         </div>
         <p style={{ margin: 0, color: 'var(--muted)', fontSize: 13, lineHeight: 1.6 }}>
-          🔒 Payments processed via Stripe &mdash; encrypted and PCI-compliant.<br />
+          🔒 {t('pages.pricing.secure_desc') || 'Payments processed via Stripe — encrypted and PCI-compliant.'}<br />
           Questions? <a href="mailto:hello@spectr.trade" style={{ color: 'var(--accent)', textDecoration: 'none' }}>hello@spectr.trade</a>
         </p>
       </div>

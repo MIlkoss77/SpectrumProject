@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Bell, Mail, MessageCircle, Moon, Sun, Globe, Shield, ShieldAlert, Zap, Brain } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useTrading } from '@/context/TradingContext.jsx'
+import axios from 'axios'
 import './dashboard.css'
 
 export default function Settings() {
@@ -17,8 +18,9 @@ export default function Settings() {
 
   // AI Configuration
   const [aiProvider, setAiProvider] = useState(() => localStorage.getItem('ai_provider') || 'openai')
-  const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openai_api_key') || '')
-  const [anthropicKey, setAnthropicKey] = useState(() => localStorage.getItem('anthropic_api_key') || '')
+  const [openaiKey, setOpenaiKey] = useState('••••••••••••')
+  const [anthropicKey, setAnthropicKey] = useState('••••••••••••')
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     if (lang !== i18n.language) {
@@ -28,8 +30,26 @@ export default function Settings() {
 
   useEffect(() => localStorage.setItem('ui.theme', theme), [theme])
   useEffect(() => localStorage.setItem('ai_provider', aiProvider), [aiProvider])
-  useEffect(() => localStorage.setItem('openai_api_key', openaiKey), [openaiKey])
-  useEffect(() => localStorage.setItem('anthropic_api_key', anthropicKey), [anthropicKey])
+
+  const handleSaveAIKey = async (provider, key) => {
+    if (!key || key.includes('•')) return;
+    setIsSaving(true)
+    try {
+      const token = localStorage.getItem('token')
+      await axios.post('/api/exchange/keys', {
+        exchange: provider,
+        apiKey: key,
+        secret: 'AI_PROVIDER_KEY' // Secret not needed for LLMs but required by API
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      alert(`${provider.toUpperCase()} key updated and encrypted on server.`)
+    } catch (err) {
+      alert(`Failed to save key: ${err.message}`)
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const handleTestNotification = () => {
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -138,11 +158,13 @@ export default function Settings() {
               type="password"
               value={aiProvider === 'openai' ? openaiKey : anthropicKey}
               onChange={e => aiProvider === 'openai' ? setOpenaiKey(e.target.value) : setAnthropicKey(e.target.value)}
+              onBlur={e => handleSaveAIKey(aiProvider, e.target.value)}
+              disabled={isSaving}
               placeholder={`Enter your ${aiProvider === 'openai' ? 'OpenAI' : 'Anthropic'} API Key`}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)' }}
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)', opacity: isSaving ? 0.5 : 1 }}
             />
             <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
-              Keys are stored securely in your browser's local storage and are only sent directly to the official provider APIs.
+              Keys are encrypted and stored in the secure server-side database. They are never exposed to the client after saving.
             </p>
           </div>
         </div>

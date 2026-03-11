@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { getNews } from '@/services/providers/news'
 import { Globe, Zap, TrendingUp, TrendingDown, Minus, Clock, ExternalLink, Newspaper, Twitter, MessageCircle, Loader2 } from 'lucide-react'
+import Skeleton from '@/components/ui/Skeleton'
 import './dashboard.css'
 
 function SentimentIcon({ sentiment }) {
@@ -176,9 +177,21 @@ export default function News() {
       </div>
 
       {loading && (
-        <div className="flex flex-col items-center justify-center p-20 gap-4 opacity-40">
-          <Loader2 size={32} className="animate-spin text-cyan-400" />
-          <div className="text-xs font-bold uppercase tracking-widest">Compiling Pulse...</div>
+        <div className="dx-grid-premium">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="action-card" style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', minHeight: '180px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="flex gap-2">
+                <Skeleton style={{ width: '40px', height: '10px' }} />
+                <Skeleton style={{ width: '30px', height: '10px' }} />
+              </div>
+              <Skeleton style={{ width: '100%', height: '20px' }} />
+              <Skeleton style={{ width: '80%', height: '20px' }} />
+              <div className="mt-auto pt-3 border-t border-white/5 flex justify-between">
+                <Skeleton style={{ width: '60px', height: '18px' }} />
+                <Skeleton style={{ width: '24px', height: '24px', borderRadius: '8px' }} />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

@@ -9,7 +9,7 @@ const BASE = '/api/news';
 async function fetchRSSNews() {
   try {
     // Try to reach our local backend proxy
-    const res = await fetch(`${API_BASE}/news?filter=hot`);
+    const res = await fetch(`${BASE}?filter=hot`);
     if (!res.ok) throw new Error('Backend unavailable');
 
     const data = await res.json();

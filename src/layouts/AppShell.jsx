@@ -10,6 +10,8 @@ import { useTrading } from '@/context/TradingContext.jsx'
 import '@/pages/dashboard.css'
 import '@/pages/mobile.css'
 import logoImg from '@/assets/logo.png'
+import OnboardingModal from '@/components/onboarding/OnboardingModal'
+import axios from 'axios'
 
 export default function AppShell() {
   const { t } = useTranslation()
@@ -19,6 +21,8 @@ export default function AppShell() {
   const [isPro, setIsPro] = useState(() => localStorage.getItem('spectr_pro_status') === 'true')
   const { account, connectWallet, isConnecting } = useWeb3()
   const { tradingMode, toggleMode } = useTrading()
+  const [notifications, setNotifications] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
   const location = useLocation()
 
   const NAV = [
@@ -40,6 +44,28 @@ export default function AppShell() {
     const handleProChange = () => setIsPro(localStorage.getItem('spectr_pro_status') === 'true')
     window.addEventListener('proStatusChanged', handleProChange)
     return () => window.removeEventListener('proStatusChanged', handleProChange)
+  }, [])
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) return
+        const response = await axios.get('/api/notifications', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (response.data.ok) {
+          setNotifications(response.data.notifications)
+          setUnreadCount(response.data.notifications.filter(n => !n.isRead).length)
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err)
+      }
+    }
+
+    fetchNotifications()
+    const interval = setInterval(fetchNotifications, 60000) // Poll every min
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
@@ -172,7 +198,11 @@ export default function AppShell() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', position: 'relative' }} onClick={() => setShowMore(!showMore)}>
                 <Bell size={20} />
-                <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</div>
+                {unreadCount > 0 && (
+                  <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {unreadCount}
+                  </div>
+                )}
               </button>
 
               <div onClick={connectWallet} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
@@ -248,6 +278,8 @@ export default function AppShell() {
           </>
         )}
       </AnimatePresence>
+      
+      <OnboardingModal />
     </div >
   )
 }

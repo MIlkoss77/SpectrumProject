@@ -2,10 +2,7 @@
 import axios from "axios";
 
 // База для API (локально 8787, в проде подставим env)
-const host = import.meta.env.VITE_API_HOST;
-const base =
-  import.meta.env.VITE_API_BASE ||
-  (host ? `https://${host}` : "/api");
+const base = "/api";
 
 export const http = axios.create({
   baseURL: base,

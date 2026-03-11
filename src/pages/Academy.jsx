@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { BookOpen, CheckCircle, Award, Lock, PlayCircle, X, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import './dashboard.css'
 
@@ -375,6 +376,7 @@ function CourseViewer({ module, onClose, onComplete }) {
 }
 
 export default function Academy() {
+  const { t } = useTranslation()
   const [modules, setModules] = useState(MODULES)
   const [activeModule, setActiveModule] = useState(null)
 
@@ -411,18 +413,18 @@ export default function Academy() {
 
       <div className="dx-card ta-head">
         <div>
-          <h2 style={{ margin: 0 }}>Spectr Academy</h2>
+          <h2 style={{ margin: 0 }}>{t('pages.academy.title') || 'Spectr Academy'}</h2>
           <p style={{ margin: 0, color: 'var(--muted)', fontSize: 14 }}>
-            Master crypto trading and unlock exclusive scanner features.
+            {t('pages.academy.subtitle') || 'Master crypto trading and unlock exclusive scanner features.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <div style={{ padding: '8px 12px', background: 'rgba(255, 152, 0, 0.1)', borderRadius: 8, textAlign: 'center' }}>
-            <div style={{ fontSize: 12, color: '#ff9800' }}>XP LEVEL</div>
+            <div style={{ fontSize: 12, color: '#ff9800' }}>{t('pages.academy.xp_level') || 'XP LEVEL'}</div>
             <div style={{ fontWeight: 700 }}>LVL {1 + modules.filter(m => m.progress === 100).length}</div>
           </div>
           <div style={{ padding: '8px 12px', background: 'rgba(26, 242, 255, 0.1)', borderRadius: 8, textAlign: 'center' }}>
-            <div style={{ fontSize: 12, color: 'var(--accent)' }}>COMPLETED</div>
+            <div style={{ fontSize: 12, color: 'var(--accent)' }}>{t('ui.completed') || 'COMPLETED'}</div>
             <div style={{ fontWeight: 700 }}>
               {modules.reduce((acc, m) => acc + m.lessons.filter(l => l.completed).length, 0)}/{modules.reduce((acc, m) => acc + m.lessons.length, 0)}
             </div>
@@ -459,7 +461,7 @@ export default function Academy() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, marginTop: 8 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent)', fontSize: 12, fontWeight: 700 }}>
-                  <BookOpen size={16} /> MODULE 0{m.id}
+                  <BookOpen size={16} /> {t('pages.academy.module') || 'MODULE'} 0{m.id}
                 </div>
                 {isLocked && <Lock size={18} color="var(--muted)" />}
               </div>

@@ -55,7 +55,22 @@
         "save_keys": "Save Keys",
         "cancel": "Cancel",
         "encrypted_active": "Encrypted Key Active",
-        "security_warning": "Security Warning"
+        "security_warning": "Security Warning",
+        "transparent_pricing": "Transparent Pricing",
+        "secure_private": "Secure & Private",
+        "completed": "COMPLETED",
+        "leverage_calc": "Leverage PnL Calculator",
+        "pro_tool": "PRO TOOL",
+        "asset_label": "Asset",
+        "direction_label": "Direction",
+        "investment_label": "Investment ($)",
+        "target_move": "Target Move",
+        "leverage": "Leverage",
+        "position": "Position",
+        "pnl": "PnL",
+        "roi": "ROI",
+        "liquidation": "Liquidation",
+        "leverage_warning": "High leverage amplifies both gains and losses. Never risk more than you can afford to lose."
     },
     "pages": {
         "dashboard": {
@@ -94,7 +109,10 @@
             "title": "Prediction Calibration"
         },
         "academy": {
-            "title": "Spectr Academy"
+            "title": "Spectr Academy",
+            "subtitle": "Master crypto trading and unlock exclusive scanner features.",
+            "xp_level": "XP LEVEL",
+            "module": "MODULE"
         },
         "settings": {
             "title": "Settings",
@@ -108,7 +126,10 @@
             "test_notification": "Send Test Notification"
         },
         "pricing": {
-            "title": "Pricing"
+            "title": "Pricing",
+            "headline": "Choose Your Edge",
+            "subline": "No hidden fees. No lock-in. Cancel anytime.",
+            "secure_desc": "Payments processed via Stripe — encrypted and PCI-compliant."
         },
         "ta": {
             "title": "Analytics"

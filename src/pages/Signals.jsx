@@ -5,6 +5,7 @@ import { ema, rsi, macd } from '@/services/ta/indicators'
 import { IchimokuCloud } from 'technicalindicators'
 import { fetchSignalsSnapshot } from '@/services/providers/signals'
 import { ArrowLeft, TrendingUp, TrendingDown, Activity, Zap, Eye, Loader2 } from 'lucide-react'
+import Skeleton from '@/components/ui/Skeleton'
 import './dashboard.css'
 
 function MiniSparkline({ data, color = '#1AF2FF', height = 40 }) {
@@ -117,12 +118,34 @@ function ScannerView({ onSelect }) {
   }, [])
 
   if (loading) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="relative">
-        <div className="w-12 h-12 rounded-full border-2 border-cyan-500/20 border-t-cyan-500 animate-spin" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Zap size={14} className="text-cyan-400 animate-pulse" />
+    <div className="w-full animate-in">
+      <div className="overview-hero">
+        <div className="hero-header">
+          <Skeleton style={{ width: '150px', height: '24px' }} />
+          <Skeleton style={{ width: '80px', height: '24px' }} />
         </div>
+        <Skeleton style={{ width: '100%', height: '16px', marginTop: '8px' }} />
+      </div>
+      <div className="dx-grid-premium">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="action-card" style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', minHeight: '220px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="flex justify-between">
+              <div className="flex gap-2">
+                <Skeleton variant="circle" style={{ width: '40px', height: '40px' }} />
+                <div className="flex flex-col gap-1">
+                  <Skeleton style={{ width: '60px', height: '16px' }} />
+                  <Skeleton style={{ width: '40px', height: '10px' }} />
+                </div>
+              </div>
+              <Skeleton style={{ width: '40px', height: '16px' }} />
+            </div>
+            <Skeleton style={{ width: '100px', height: '28px' }} />
+            <Skeleton style={{ width: '100%', height: '20px', marginTop: '4px' }} />
+            <div className="mt-auto pt-4 border-t border-white/5">
+              <Skeleton style={{ width: '100%', height: '36px', borderRadius: '8px' }} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -229,15 +252,27 @@ function ScannerView({ onSelect }) {
 
 function DetailView({ symbol, tf, onBack }) {
   const { t } = useTranslation()
-  const candles = useMemo(() => {
-    let start = 30000
-    if (symbol.startsWith('BTC')) start = 67200
-    else if (symbol.startsWith('ETH')) start = 3450
-    else if (symbol.startsWith('SOL')) start = 145
-    else if (symbol.startsWith('BNB')) start = 590
-    else if (symbol.startsWith('TON')) start = 5.2
-    return genCandles(420, start)
-  }, [symbol])
+  const [candles, setCandles] = useState([])
+  const [chartLoading, setChartLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadCandles() {
+      setChartLoading(true)
+      try {
+        const { fetchBinanceKlines } = await import('@/services/providers/market')
+        const data = await fetchBinanceKlines(symbol, tf, 240)
+        setCandles(data)
+      } catch (e) {
+        console.error("Chart fetch failed, using fallback", e)
+        const start = symbol.startsWith('BTC') ? 67200 : (symbol.startsWith('ETH') ? 3450 : 150)
+        const mock = genCandles(240, start)
+        setCandles(mock)
+      } finally {
+        setChartLoading(false)
+      }
+    }
+    loadCandles()
+  }, [symbol, tf])
 
   const highs = useMemo(() => candles.map(c => c.h), [candles])
   const lows = useMemo(() => candles.map(c => c.l), [candles])
@@ -310,6 +345,27 @@ function DetailView({ symbol, tf, onBack }) {
     }
     loadAi()
   }, [symbol])
+
+  if (chartLoading) return (
+    <div className="dx-panels premium-dashboard">
+      <div className="dx-card" style={{ marginBottom: 16 }}>
+        <div className="flex items-center gap-4">
+          <Skeleton style={{ width: '40px', height: '40px', borderRadius: '10px' }} />
+          <div className="flex flex-col gap-2">
+            <Skeleton style={{ width: '120px', height: '24px' }} />
+            <Skeleton style={{ width: '80px', height: '14px' }} />
+          </div>
+        </div>
+      </div>
+      <div className="dx-card main-chart" style={{ height: '320px' }}>
+        <Skeleton style={{ width: '100%', height: '100%' }} />
+      </div>
+      <div className="premium-grid">
+         <Skeleton style={{ width: '100%', height: '120px', borderRadius: '16px' }} />
+         <Skeleton style={{ width: '100%', height: '120px', borderRadius: '16px' }} />
+      </div>
+    </div>
+  )
 
   return (
     <div className="dx-panels premium-dashboard">
