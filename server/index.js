@@ -15,6 +15,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Resolve absolute path to dist once
+const distPath = path.resolve(__dirname, '../dist');
+console.log(`[Server] Static files directory: ${distPath}`);
+
 // Security: Restricted CORS
 const ALLOWED_ORIGINS = [
     'http://localhost:5173',
@@ -47,7 +51,6 @@ app.use((req, res, next) => {
 app.use('/api', apiRoutes);
 
 // Serve Static Files (Frontend)
-const distPath = path.join(__dirname, '../dist');
 app.use(express.static(distPath));
 
 // Health Check
@@ -56,13 +59,40 @@ app.get('/api/health', (req, res) => {
 });
 
 // Catch-all for Frontend Routing (React Router)
-app.use((req, res) => {
-    // Only serve index.html for non-API routes
-    if (!req.url.startsWith('/api')) {
-        res.sendFile(path.join(distPath, 'index.html'));
-    } else {
-        res.status(404).json({ error: 'API route not found' });
+app.use((req, res, next) => {
+    // 1. Skip API routes (handled by router or 404 later)
+    if (req.url.startsWith('/api')) {
+        return next();
     }
+
+    // 2. Skip files with extensions (likely missing assets)
+    // This prevents serving index.html as a .js/.css file (MIME error)
+    if (req.url.includes('.') && !req.url.endsWith('.html')) {
+        return res.status(404).send('Asset not found');
+    }
+
+    // 3. Serve index.html for everything else (SPA routes)
+    res.sendFile(path.join(distPath, 'index.html'), (err) => {
+        if (err) {
+            console.error(`[Server] Error sending index.html: ${err.message}`);
+            res.status(500).send('Frontend build not found. Please run npm run build.');
+        }
+    });
+});
+
+// Final API 404 handler
+app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'API endpoint not found' });
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error(`[Server] Global Error: ${err.message}`);
+    res.status(500).json({ 
+        error: 'Internal Server Error', 
+        message: err.message,
+        path: req.url 
+    });
 });
 
 // Start the Server
