@@ -55,8 +55,9 @@ app.get('/api/health', (req, res) => {
     res.json({ ok: true, status: 'Spectr API Running', ts: Date.now() });
 });
 
-// Catch-all for Frontend Routing
-app.get('/*', (req, res) => {
+// Catch-all for Frontend Routing (React Router)
+app.use((req, res) => {
+    // Only serve index.html for non-API routes
     if (!req.url.startsWith('/api')) {
         res.sendFile(path.join(distPath, 'index.html'));
     } else {
