@@ -33,6 +33,7 @@ sudo npm install -g pm2
 2. Create and configure your `.env` file:
    ```bash
    cp .env.example .env
+   # Ensure DATABASE_URL="file:./dev.db" is present in your .env
    nano .env
    ```
 3. Give execution permissions to the deployment script:
