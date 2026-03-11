@@ -1,11 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import apiRoutes from './routes/apiRoutes.js';
 import limiter from './middleware/rateLimiter.js';
 import { prisma } from './config/database.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -41,9 +46,22 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api', apiRoutes);
 
+// Serve Static Files (Frontend)
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath));
+
 // Health Check
-app.get('/api', (req, res) => {
+app.get('/api/health', (req, res) => {
     res.json({ ok: true, status: 'Spectr API Running', ts: Date.now() });
+});
+
+// Catch-all for Frontend Routing
+app.get('*', (req, res) => {
+    if (!req.url.startsWith('/api')) {
+        res.sendFile(path.join(distPath, 'index.html'));
+    } else {
+        res.status(404).json({ error: 'API route not found' });
+    }
 });
 
 // Start the Server
