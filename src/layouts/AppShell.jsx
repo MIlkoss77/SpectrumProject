@@ -11,6 +11,7 @@ import '@/pages/dashboard.css'
 import '@/pages/mobile.css'
 import logoImg from '@/assets/logo.png'
 import OnboardingModal from '@/components/onboarding/OnboardingModal'
+import NotificationDropdown from '@/components/NotificationDropdown'
 import axios from 'axios'
 
 export default function AppShell() {
@@ -23,6 +24,7 @@ export default function AppShell() {
   const { tradingMode, toggleMode } = useTrading()
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
+  const [showNotifications, setShowNotifications] = useState(false)
   const location = useLocation()
 
   const NAV = [
@@ -70,7 +72,38 @@ export default function AppShell() {
 
   useEffect(() => {
     setShowMore(false)
+    setShowNotifications(false)
   }, [location.pathname])
+
+  const markNotificationRead = async (id) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.patch(`/api/notifications/${id}/read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (response.data.ok) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n))
+        setUnreadCount(prev => Math.max(0, prev - 1))
+      }
+    } catch (err) {
+      console.error('Failed to mark notification as read:', err)
+    }
+  }
+
+  const markAllNotificationsRead = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.post('/api/notifications/read-all', {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (response.data.ok) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+        setUnreadCount(0)
+      }
+    } catch (err) {
+      console.error('Failed to mark all notifications as read:', err)
+    }
+  }
 
   const mainMobileNav = [
     { label: t('app.dashboard'), to: '/', icon: LayoutDashboard },
@@ -196,14 +229,34 @@ export default function AppShell() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', position: 'relative' }} onClick={() => setShowMore(!showMore)}>
-                <Bell size={20} />
-                {unreadCount > 0 && (
-                  <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {unreadCount}
-                  </div>
-                )}
-              </button>
+              <div style={{ position: 'relative' }}>
+                <button 
+                  style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', position: 'relative' }} 
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    setShowMore(false);
+                  }}
+                >
+                  <Bell size={20} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
+                  {unreadCount > 0 && (
+                    <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {unreadCount}
+                    </div>
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {showNotifications && (
+                    <NotificationDropdown 
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      onMarkRead={markNotificationRead}
+                      onMarkAllRead={markAllNotificationsRead}
+                      onClose={() => setShowNotifications(false)}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
 
               <div onClick={connectWallet} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
