@@ -16,12 +16,21 @@ export default defineConfig({
       manifest: {
         name: 'Spectr Trading',
         short_name: 'Spectr',
-        description: 'AI-Powered Crypto Trading Assistant',
-        theme_color: '#00FFFF',
+        description: 'AI-Powered Crypto Trading Assistant — Real-time signals, whale tracking, and portfolio management.',
+        theme_color: '#0A0A0A',
         background_color: '#0A0A0A',
         display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
         orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
+        categories: ['finance', 'productivity'],
         icons: [
+          {
+            src: 'logo.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
           {
             src: 'logo.png',
             sizes: '512x512',
@@ -36,6 +45,7 @@ export default defineConfig({
     alias: { '@': path.resolve(__dirname, 'src') }
   },
   server: {
+    port: 5174,
     proxy: {
       // Binance WebSocket (already working)
       '/binance-api': {

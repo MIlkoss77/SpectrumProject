@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
-import { Check, Zap, Crown, ArrowRight, Mail, CheckCircle, Sparkles } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Check, Zap, Crown, ArrowRight, Shield, CheckCircle, Sparkles, Copy, ExternalLink, X, Wallet, Coins } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
+import axios from 'axios'
 import './dashboard.css'
 
 const PLANS = [
@@ -59,30 +60,344 @@ const PLANS = [
   }
 ]
 
+const CRYPTO_OPTIONS = [
+  { id: 'USDT', label: 'USDT (TRC-20)', icon: Coins, color: '#26A17B' },
+  { id: 'SOL', label: 'Solana (SOL)', icon: Zap, color: '#9945FF' },
+  { id: 'ETH', label: 'Ethereum (ETH)', icon: Wallet, color: '#627EEA' },
+]
+
+function DepositModal({ plan, onClose, onSuccess }) {
+  const { t } = useTranslation()
+  const [step, setStep] = useState('select') // select | deposit | txid | success
+  const [selectedCrypto, setSelectedCrypto] = useState(null)
+  const [depositData, setDepositData] = useState(null)
+  const [txId, setTxId] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [copied, setCopied] = useState(false)
+
+  const handleSelectCrypto = async (crypto) => {
+    setSelectedCrypto(crypto)
+    setLoading(true)
+    setError(null)
+    try {
+      const token = localStorage.getItem('token')
+      const res = await axios.post('/api/payments/deposit', {
+        currency: crypto.id,
+        planId: plan.id,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.data.ok) {
+        setDepositData(res.data.payment)
+        setStep('deposit')
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to create deposit. Please log in.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(depositData.depositAddress)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const handleSubmitTxId = async () => {
+    if (!txId.trim()) return
+    setLoading(true)
+    setError(null)
+    try {
+      const token = localStorage.getItem('token')
+      const res = await axios.post('/api/payments/verify', {
+        paymentId: depositData.id,
+        txId: txId.trim(),
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.data.ok) {
+        setStep('success')
+        // Update global Pro status
+        localStorage.setItem('spectr_pro_status', 'true')
+        window.dispatchEvent(new Event('proStatusChanged'))
+        onSuccess?.()
+      }
+    } catch (err) {
+      setError(err.response?.data?.error || 'Verification failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 10000,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(16px)',
+        }}
+      />
+
+      {/* Modal */}
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+        transition={{ type: 'spring', damping: 22, stiffness: 300 }}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 10001,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '16px', pointerEvents: 'none',
+        }}
+      >
+        <div style={{
+          maxWidth: 480, width: '100%', pointerEvents: 'all',
+          background: 'rgba(17, 17, 17, 0.95)',
+          border: '1px solid rgba(0,255,255,0.15)',
+          borderRadius: 20, padding: '28px 24px',
+          boxShadow: '0 0 60px rgba(0,255,255,0.1), 0 25px 50px rgba(0,0,0,0.5)',
+          backdropFilter: 'blur(30px)',
+        }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>
+                {step === 'success' ? 'Welcome to Pro!' : `Upgrade to ${plan.name}`}
+              </h3>
+              <p style={{ margin: '4px 0 0', color: '#8899A6', fontSize: 13 }}>
+                {step === 'select' && 'Choose your payment method'}
+                {step === 'deposit' && `Send exactly $${depositData?.amount} in ${selectedCrypto?.label}`}
+                {step === 'txid' && 'Paste your transaction hash'}
+                {step === 'success' && 'All Pro features are now unlocked'}
+              </p>
+            </div>
+            <button onClick={onClose} style={{
+              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 10, width: 36, height: 36, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
+            }}>
+              <X size={16} />
+            </button>
+          </div>
+
+          {error && (
+            <div style={{
+              padding: '10px 14px', marginBottom: 16, borderRadius: 10,
+              background: 'rgba(255,69,96,0.1)', border: '1px solid rgba(255,69,96,0.2)',
+              color: '#FF4560', fontSize: 13,
+            }}>
+              {error}
+            </div>
+          )}
+
+          {/* Step: Select Crypto */}
+          {step === 'select' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {CRYPTO_OPTIONS.map(crypto => {
+                const Icon = crypto.icon
+                return (
+                  <button
+                    key={crypto.id}
+                    onClick={() => handleSelectCrypto(crypto)}
+                    disabled={loading}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 14,
+                      padding: '14px 16px', borderRadius: 14,
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(255,255,255,0.03)',
+                      color: '#fff', cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      opacity: loading ? 0.5 : 1,
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = `${crypto.color}40`
+                      e.currentTarget.style.background = `${crypto.color}10`
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+                    }}
+                  >
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 12,
+                      background: `${crypto.color}15`, border: `1px solid ${crypto.color}30`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Icon size={20} color={crypto.color} />
+                    </div>
+                    <div style={{ flex: 1, textAlign: 'left' }}>
+                      <div style={{ fontWeight: 700, fontSize: 14 }}>{crypto.label}</div>
+                      <div style={{ fontSize: 12, color: '#8899A6' }}>${plan.price}</div>
+                    </div>
+                    <ArrowRight size={16} color="#8899A6" />
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Step: Deposit Address */}
+          {step === 'deposit' && depositData && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{
+                padding: '16px', borderRadius: 14,
+                background: 'rgba(0,255,255,0.03)', border: '1px solid rgba(0,255,255,0.1)',
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10 }}>
+                  Deposit Address
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <code style={{
+                    flex: 1, fontSize: 12, padding: '10px 12px', borderRadius: 8,
+                    background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)',
+                    fontFamily: 'var(--font-mono)', wordBreak: 'break-all', color: '#fff',
+                  }}>
+                    {depositData.depositAddress}
+                  </code>
+                  <button onClick={handleCopyAddress} style={{
+                    background: copied ? 'rgba(0,227,150,0.1)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${copied ? 'rgba(0,227,150,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                    borderRadius: 10, width: 40, height: 40, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: copied ? '#00E396' : '#fff', transition: 'all 0.2s',
+                  }}>
+                    {copied ? <Check size={16} /> : <Copy size={16} />}
+                  </button>
+                </div>
+                <div style={{ fontSize: 12, color: '#8899A6' }}>
+                  Send exactly <span style={{ fontWeight: 700, color: '#00FFFF' }}>${depositData.amount}</span> in {selectedCrypto.label}
+                </div>
+              </div>
+
+              <button
+                onClick={() => setStep('txid')}
+                className="dx-btn"
+                style={{
+                  width: '100%', justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(0,255,255,0.1) 0%, rgba(79,70,229,0.1) 100%)',
+                  border: '1px solid rgba(0,255,255,0.25)', color: '#00FFFF',
+                }}
+              >
+                <Shield size={16} /> I've sent the payment
+              </button>
+            </div>
+          )}
+
+          {/* Step: Enter TxID */}
+          {step === 'txid' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#8899A6', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Transaction Hash (TxID)
+                </label>
+                <input
+                  type="text"
+                  value={txId}
+                  onChange={e => setTxId(e.target.value)}
+                  placeholder="0x... or paste your transaction hash"
+                  autoFocus
+                  style={{
+                    width: '100%', padding: '12px 14px', borderRadius: 12,
+                    border: '1px solid rgba(0,255,255,0.15)',
+                    background: 'rgba(255,255,255,0.03)',
+                    color: '#fff', fontSize: 13, fontFamily: 'var(--font-mono)',
+                    outline: 'none',
+                  }}
+                  onKeyDown={e => e.key === 'Enter' && handleSubmitTxId()}
+                />
+              </div>
+
+              <button
+                onClick={handleSubmitTxId}
+                disabled={!txId.trim() || loading}
+                className="dx-btn"
+                style={{
+                  width: '100%', justifyContent: 'center',
+                  background: '#00FFFF', color: '#000', fontWeight: 800,
+                  opacity: (!txId.trim() || loading) ? 0.5 : 1,
+                }}
+              >
+                {loading ? 'Verifying...' : 'Verify Payment'}
+              </button>
+            </div>
+          )}
+
+          {/* Step: Success */}
+          {step === 'success' && (
+            <div style={{ textAlign: 'center', padding: '16px 0' }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: 16, margin: '0 auto 16px',
+                background: 'rgba(0,227,150,0.1)', border: '1px solid rgba(0,227,150,0.3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <CheckCircle size={32} color="#00E396" />
+              </div>
+              <h3 style={{ margin: '0 0 8px', fontSize: 20, fontWeight: 800 }}>
+                You're <span style={{ color: '#00FFFF' }}>Pro</span> now!
+              </h3>
+              <p style={{ color: '#8899A6', fontSize: 14, lineHeight: 1.6, margin: '0 0 20px' }}>
+                All premium features have been unlocked. Welcome to the inner circle.
+              </p>
+              <button
+                onClick={onClose}
+                className="dx-btn"
+                style={{
+                  width: '100%', justifyContent: 'center',
+                  background: '#00FFFF', color: '#000', fontWeight: 800,
+                }}
+              >
+                Start Trading <ArrowRight size={16} />
+              </button>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </>
+  )
+}
+
 export default function Pricing() {
   const { t } = useTranslation()
-  const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState({})
-  const [activePlan, setActivePlan] = useState(null)
+  const [depositPlan, setDepositPlan] = useState(null)
+  const [isPro, setIsPro] = useState(() => localStorage.getItem('spectr_pro_status') === 'true')
 
-  const handleUpgrade = (planId) => {
-    if (planId === 'free') return
-    if (!email || !email.includes('@')) {
-      setActivePlan(planId)
-      return
+  useEffect(() => {
+    const handleProChange = () => setIsPro(localStorage.getItem('spectr_pro_status') === 'true')
+    window.addEventListener('proStatusChanged', handleProChange)
+    return () => window.removeEventListener('proStatusChanged', handleProChange)
+  }, [])
+
+  // Check Pro status from backend on mount
+  useEffect(() => {
+    const checkProStatus = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) return
+        const res = await axios.get('/api/payments/status', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (res.data.ok && res.data.isPro) {
+          localStorage.setItem('spectr_pro_status', 'true')
+          setIsPro(true)
+        }
+      } catch {
+        // Silent — fallback to localStorage
+      }
     }
-    // Save to localStorage as waitlist
-    const waitlist = JSON.parse(localStorage.getItem('waitlist') || '[]')
-    waitlist.push({ email, plan: planId, ts: Date.now() })
-    localStorage.setItem('waitlist', JSON.stringify(waitlist))
+    checkProStatus()
+  }, [])
 
-    // Simulate Premium Unlock
-    localStorage.setItem('spectr_pro_status', 'true')
-    window.dispatchEvent(new Event('proStatusChanged'))
-
-    setSubmitted(prev => ({ ...prev, [planId]: true }))
-    setEmail('')
-    setActivePlan(null)
+  const handleUpgrade = (plan) => {
+    if (plan.id === 'free') return
+    setDepositPlan(plan)
   }
 
   return (
@@ -100,7 +415,7 @@ export default function Pricing() {
           {t('pages.pricing.headline') || 'Choose Your Edge'}
         </h1>
         <p style={{ maxWidth: 440, margin: '0 auto', color: 'var(--muted)', fontSize: 15, lineHeight: 1.7 }}>
-          {t('pages.pricing.subline') || 'No hidden fees. No lock-in. Cancel anytime.'}
+          {t('pages.pricing.subline') || 'Pay with crypto. No hidden fees. Instant activation.'}
         </p>
       </header>
 
@@ -170,66 +485,26 @@ export default function Pricing() {
               ))}
             </ul>
 
-            {/* Waitlist email input */}
-            <AnimatePresence>
-              {(activePlan === plan.id || submitted[plan.id]) && plan.id !== 'free' && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  style={{ marginBottom: 16, overflow: 'hidden' }}
-                >
-                  {submitted[plan.id] ? (
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '12px 16px', borderRadius: 10,
-                      background: 'rgba(76, 175, 80, 0.1)',
-                      color: '#4caf50', fontSize: 13, fontWeight: 600
-                    }}>
-                      <CheckCircle size={16} /> You're on the waitlist! We'll notify you.
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        autoFocus
-                        style={{
-                          flex: 1, padding: '10px 14px', borderRadius: 10,
-                          border: '1px solid rgba(0, 255, 255, 0.2)',
-                          background: 'rgba(255,255,255,0.04)',
-                          color: 'var(--text)', fontSize: 14,
-                          outline: 'none', fontFamily: 'inherit'
-                        }}
-                        onKeyDown={e => e.key === 'Enter' && handleUpgrade(plan.id)}
-                      />
-                      <button
-                        onClick={() => handleUpgrade(plan.id)}
-                        style={{
-                          padding: '10px 16px', borderRadius: 10, border: 'none',
-                          background: 'var(--accent)', color: '#000',
-                          fontWeight: 700, cursor: 'pointer', fontSize: 13,
-                          fontFamily: 'inherit'
-                        }}
-                      >
-                        <Mail size={14} />
-                      </button>
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Pro status indicator */}
+            {isPro && plan.id !== 'free' && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '10px 14px', borderRadius: 12, marginBottom: 12,
+                background: 'rgba(0,227,150,0.08)', border: '1px solid rgba(0,227,150,0.2)',
+                color: '#00E396', fontSize: 13, fontWeight: 600,
+              }}>
+                <CheckCircle size={16} /> Active
+              </div>
+            )}
 
             <button
               className={`dx-btn ${plan.popular ? '' : 'secondary'}`}
-              style={{ width: '100%', justifyContent: 'center' }}
-              onClick={() => handleUpgrade(plan.id)}
-              disabled={plan.id === 'free' || submitted[plan.id]}
+              style={{ width: '100%', justifyContent: 'center', cursor: plan.id === 'free' ? 'default' : 'pointer' }}
+              onClick={() => handleUpgrade(plan)}
+              disabled={plan.id === 'free' || isPro}
             >
-              {submitted[plan.id] ? (
-                <><CheckCircle size={16} /> On Waitlist</>
+              {isPro && plan.id !== 'free' ? (
+                <><Shield size={16} /> Pro Active</>
               ) : (
                 <>{plan.cta} {plan.id !== 'free' && <ArrowRight size={16} />}</>
               )}
@@ -244,14 +519,26 @@ export default function Pricing() {
         background: 'rgba(255,255,255,0.02)', maxWidth: 500, margin: '48px auto 0'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
-          <Zap size={14} color='var(--accent)' />
+          <Shield size={14} color='var(--accent)' />
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--accent)', letterSpacing: 1, textTransform: 'uppercase' }}>{t('ui.secure_private') || 'Secure & Private'}</span>
         </div>
         <p style={{ margin: 0, color: 'var(--muted)', fontSize: 13, lineHeight: 1.6 }}>
-          🔒 {t('pages.pricing.secure_desc') || 'Payments processed via Stripe — encrypted and PCI-compliant.'}<br />
+          <Shield size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+          {t('pages.pricing.secure_desc') || 'Payments processed via blockchain — transparent and verifiable.'}<br />
           Questions? <a href="mailto:hello@spectr.trade" style={{ color: 'var(--accent)', textDecoration: 'none' }}>hello@spectr.trade</a>
         </p>
       </div>
+
+      {/* Deposit Modal */}
+      <AnimatePresence>
+        {depositPlan && (
+          <DepositModal
+            plan={depositPlan}
+            onClose={() => setDepositPlan(null)}
+            onSuccess={() => setIsPro(true)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

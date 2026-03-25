@@ -2,16 +2,46 @@ import axios from 'axios';
 import { fetchNews, getMockNews } from '../services/newsService.js';
 import { fetchBybitTicker } from '../services/exchangeService.js';
 
+// Simple In-memory Cache
+const cache = {
+    ohlc: new Map(),
+    ticker: new Map(),
+};
+
+const CACHE_TTL = {
+    OHLC: 10000, // 10 seconds
+    TICKER: 5000, // 5 seconds
+};
+
+function getFromCache(type, key) {
+    const entry = cache[type].get(key);
+    if (entry && Date.now() - entry.ts < CACHE_TTL[type.toUpperCase()]) {
+        return entry.data;
+    }
+    return null;
+}
+
+function setToCache(type, key, data) {
+    cache[type].set(key, { data, ts: Date.now() });
+}
+
 export const getOHLC = async (req, res) => {
     try {
         const { symbol, tf, limit } = req.query;
         const binSymbol = (symbol || 'BTCUSDT').replace('/', '');
+        const cacheKey = `${binSymbol}-${tf}-${limit}`;
+        
+        const cachedData = getFromCache('ohlc', cacheKey);
+        if (cachedData) return res.json(cachedData);
+
         const url = `https://api.binance.com/api/v3/klines?symbol=${binSymbol}&interval=${tf || '1h'}&limit=${limit || 500}`;
         const response = await axios.get(url);
         const formatted = response.data.map(k => ({
             t: k[0], o: parseFloat(k[1]), h: parseFloat(k[2]), l: parseFloat(k[3]), c: parseFloat(k[4]), v: parseFloat(k[5]),
             openTime: k[0], volume: parseFloat(k[5])
         }));
+
+        setToCache('ohlc', cacheKey, formatted);
         res.json(formatted);
     } catch (error) {
         console.error('OHLC Proxy Error:', error.message);
@@ -77,9 +107,14 @@ export const getWhaleTransactions = async (req, res) => {
 export const getBybitTickerPrice = async (req, res) => {
     try {
         const { symbol } = req.params;
+        const cachedData = getFromCache('ticker', symbol);
+        if (cachedData) return res.json(cachedData);
+
         try {
             const price = await fetchBybitTicker(symbol);
-            return res.json({ ok: true, price });
+            const result = { ok: true, price };
+            setToCache('ticker', symbol, result);
+            return res.json(result);
         } catch (fetchErr) {
             console.warn(`Bybit Proxy Timeout for ${symbol}. Using smart simulation.`);
             const bResp = await axios.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`).catch(() => null);
@@ -92,7 +127,9 @@ export const getBybitTickerPrice = async (req, res) => {
             }
 
             const simulatedPrice = basePrice * (1 + (Math.random() * 0.006 - 0.003));
-            return res.json({ ok: true, price: simulatedPrice, simulated: true });
+            const result = { ok: true, price: simulatedPrice, simulated: true };
+            // Don't cache simulated data for long, or at all
+            return res.json(result);
         }
     } catch (error) {
         console.error('Fatal Bybit Proxy Error:', error.message);

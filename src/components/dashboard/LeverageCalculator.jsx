@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Calculator, TrendingUp, TrendingDown, AlertTriangle, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { calculateLeveragePnL } from '@/services/ai/opportunityEngine';
 
 const PRESETS = [
@@ -9,6 +10,7 @@ const PRESETS = [
 ];
 
 export default function LeverageCalculator() {
+    const { t } = useTranslation();
     const [investment, setInvestment] = useState(1000);
     const [selectedPreset, setSelectedPreset] = useState(0);
     const [direction, setDirection] = useState('LONG');
@@ -41,21 +43,21 @@ export default function LeverageCalculator() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Calculator size={18} color="#00FFFF" />
-                    <h3 style={{ fontWeight: 700, fontSize: '14px', margin: 0, fontFamily: "'Inter', sans-serif" }}>Leverage PnL Calculator</h3>
+                    <h3 style={{ fontWeight: 700, fontSize: '14px', margin: 0, fontFamily: "'Inter', sans-serif" }}>{t('ui.leverage_calc') || 'Leverage PnL Calculator'}</h3>
                 </div>
                 <span style={{
                     fontSize: '9px', fontWeight: 700, padding: '3px 10px', borderRadius: '6px',
                     background: 'rgba(0,255,255,0.08)', color: '#00FFFF',
                     border: '1px solid rgba(0,255,255,0.2)',
                     textTransform: 'uppercase', letterSpacing: '0.5px'
-                }}>PRO TOOL</span>
+                }}>{t('ui.pro_tool') || 'PRO TOOL'}</span>
             </div>
 
             {/* Controls Row */}
             <div className="flex flex-col md:grid md:grid-cols-3 gap-3 mb-4">
                 {/* Asset selector */}
                 <div>
-                    <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Asset</label>
+                    <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>{t('ui.asset_label') || 'Asset'}</label>
                     <div style={{ display: 'flex', gap: '4px' }}>
                         {PRESETS.map((p, i) => (
                             <button
@@ -81,7 +83,7 @@ export default function LeverageCalculator() {
 
                 {/* Direction */}
                 <div>
-                    <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Direction</label>
+                    <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>{t('ui.direction_label') || 'Direction'}</label>
                     <div style={{ display: 'flex', gap: '4px' }}>
                         {['LONG', 'SHORT'].map(d => (
                             <button
@@ -111,7 +113,7 @@ export default function LeverageCalculator() {
 
                 {/* Investment */}
                 <div>
-                    <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>Investment ($)</label>
+                    <label style={{ display: 'block', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>{t('ui.investment_label') || 'Investment ($)'}</label>
                     <input
                         type="number"
                         value={investment}
@@ -135,7 +137,7 @@ export default function LeverageCalculator() {
             {/* Target Move Slider */}
             <div style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Target Move</span>
+                    <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('ui.target_move') || 'Target Move'}</span>
                     <span className="font-mono" style={{ fontSize: '13px', fontWeight: 800, color: direction === 'LONG' ? '#00E396' : '#FF4560' }}>
                         {direction === 'LONG' ? '+' : '-'}{movePercent}% → ${target.toLocaleString()}
                     </span>
@@ -165,7 +167,7 @@ export default function LeverageCalculator() {
                         background: 'rgba(255,255,255,0.03)',
                         borderBottom: '1px solid rgba(255,255,255,0.06)',
                     }}>
-                        {['Leverage', 'Position', 'PnL', 'ROI', 'Liquidation'].map(h => (
+                        {[t('ui.leverage') || 'Leverage', t('ui.position') || 'Position', t('ui.pnl') || 'PnL', t('ui.roi') || 'ROI', t('ui.liquidation') || 'Liquidation'].map(h => (
                             <span key={h} style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</span>
                         ))}
                     </div>
@@ -212,7 +214,7 @@ export default function LeverageCalculator() {
             }}>
                 <AlertTriangle size={14} color="#FF4560" />
                 <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontFamily: "'Inter', sans-serif" }}>
-                    High leverage amplifies both gains and losses. Never risk more than you can afford to lose.
+                    {t('ui.leverage_warning') || 'High leverage amplifies both gains and losses. Never risk more than you can afford to lose.'}
                 </span>
             </div>
         </div>

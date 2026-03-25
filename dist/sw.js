@@ -1,9 +1,1 @@
-self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open("spectr-v1").then((cache) => cache.addAll(["/"])));
-});
-
-self.addEventListener("fetch", (e) => {
-  e.respondWith(
-    caches.match(e.request).then((r) => r || fetch(e.request))
-  );
-});
+if(!self.define){let e,s={};const n=(n,i)=>(n=new URL(n+".js",i).href,s[n]||new Promise(s=>{if("document"in self){const e=document.createElement("script");e.src=n,e.onload=s,document.head.appendChild(e)}else e=n,importScripts(n),s()}).then(()=>{let e=s[n];if(!e)throw new Error(`Module ${n} didn’t register its module`);return e}));self.define=(i,o)=>{const r=e||("document"in self?document.currentScript.src:"")||location.href;if(s[r])return;let t={};const l=e=>n(e,r),d={module:{uri:r},exports:t,require:l};s[r]=Promise.all(i.map(e=>d[e]||l(e))).then(e=>(o(...e),t))}}define(["./workbox-8c29f6e4"],function(e){"use strict";self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"offline.html",revision:"e4a69d5bcff21e8a3eb68dca442165f5"},{url:"index.html",revision:"733cb42de5c149db70b04550abef8736"},{url:"assets/workbox-window.prod.es5-BIl4cyR9.js",revision:null},{url:"assets/index-DATbdgsJ.css",revision:null},{url:"assets/index-CWHHnRen.js",revision:null},{url:"logo.png",revision:"40fd2e15b92436d387afb8c0ae03b6c0"},{url:"manifest.webmanifest",revision:"25a46cf59ac9f8dda69c818be2d0444b"}],{}),e.cleanupOutdatedCaches(),e.registerRoute(new e.NavigationRoute(e.createHandlerBoundToURL("index.html")))});

@@ -7,6 +7,7 @@ import * as exchangeController from '../controllers/exchangeController.js';
 import * as tradeController from '../controllers/tradeController.js';
 import * as aiController from '../controllers/aiController.js';
 import * as notificationController from '../controllers/notificationController.js';
+import * as paymentController from '../controllers/paymentController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -20,6 +21,12 @@ router.post('/solana/signatures', proxyController.solanaProxy);
 router.post('/auth/register', authController.register);
 router.post('/auth/login', authController.login);
 router.get('/auth/me', authMiddleware, authController.getMe);
+
+// Payment Routes
+router.post('/payments/deposit', authMiddleware, paymentController.createDeposit);
+router.post('/payments/verify', authMiddleware, paymentController.verifyPayment);
+router.get('/payments/history', authMiddleware, paymentController.getPaymentHistory);
+router.get('/payments/status', authMiddleware, paymentController.getProStatus);
 
 // Exchange Creds Routes
 router.post('/exchange/keys', authMiddleware, exchangeController.saveExchangeKeys);

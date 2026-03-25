@@ -1,3 +1,6 @@
+/* Google Fonts: JetBrains Mono for financial data */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -456,6 +459,47 @@ input[type=range]::-webkit-slider-runnable-track {
 /* =========================================
    UNIFIED BUTTON SYSTEM
    ========================================= */
+/* Glassmorphism 2.0 — Global Card System */
+.dx-card {
+  background: rgba(17, 17, 17, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.dx-card:hover {
+  border-color: rgba(0, 255, 255, 0.12);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 255, 255, 0.04);
+}
+
+/* Glass Modal Overlay */
+.glass-modal-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-modal {
+  background: rgba(17, 17, 17, 0.95);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  border-radius: 20px;
+  box-shadow: 0 0 60px rgba(0, 255, 255, 0.1), 0 25px 50px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+
+/* Panels container */
+.dx-panels {
+  padding: 20px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
 .dx-btn {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
   color: #fff;
@@ -695,6 +739,60 @@ input[type=range]::-webkit-slider-runnable-track {
   height: 200%;
   background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%);
   pointer-events: none;
+}
+
+/* Brand Glow Keyframes */
+@keyframes brand-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); }
+}
+
+/* Subtle neon pulse for accent elements */
+@keyframes neon-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* =========================================
+   Accessibility: Reduced Motion
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .price-pulse-up,
+  .price-pulse-down {
+    animation: none !important;
+  }
+
+  .skeleton {
+    animation: none !important;
+  }
+
+  .dx-nav-item:hover {
+    transform: none !important;
+  }
+
+  .dx-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* Cursor pointer on all interactive elements */
+.dx-nav-item,
+.dx-bot-item,
+.dx-burger,
+.dx-btn,
+.pill,
+.toggle,
+button,
+a[href],
+[role="button"] {
+  cursor: pointer;
 }
 
 /* End of cleanup */

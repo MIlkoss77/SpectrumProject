@@ -11,3 +11,22 @@ node_modules/.vite/
 # IDE
 .vscode/
 .idea/
+.vs/
+.agent/
+
+# Database
+*.db
+*.sqlite
+
+# OS
+Thumbs.db
+Desktop.ini
+nul
+
+# Logs
+logs/
+*.log
+
+workflows/
+
+/src/generated/prisma

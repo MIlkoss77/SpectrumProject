@@ -138,6 +138,7 @@ textarea,
 
 .card:hover {
   border-color: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 255, 255, 0.04);
 }
 
 .btn {
@@ -444,5 +445,21 @@ textarea,
 
   100% {
     background-position: 0% 50%;
+  }
+}
+
+/* PWA native polish */
+body {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .price-pulse-up,
+  .price-pulse-down {
+    animation: none;
+  }
+  .skeleton {
+    animation: none;
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Bell, Mail, MessageCircle, Moon, Sun, Globe, Shield, ShieldAlert, Zap, Brain } from 'lucide-react'
+import { Bell, Mail, MessageCircle, Moon, Sun, Globe, Shield, ShieldAlert, Zap, Brain, Receipt, History } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useTrading } from '@/context/TradingContext.jsx'
 import axios from 'axios'
@@ -22,6 +22,10 @@ export default function Settings() {
   const [anthropicKey, setAnthropicKey] = useState('••••••••••••')
   const [isSaving, setIsSaving] = useState(false)
 
+  // Transaction History
+  const [payments, setPayments] = useState([])
+  const [loadingPayments, setLoadingPayments] = useState(false)
+
   useEffect(() => {
     if (lang !== i18n.language) {
       i18n.changeLanguage(lang.toLowerCase())
@@ -30,6 +34,28 @@ export default function Settings() {
 
   useEffect(() => localStorage.setItem('ui.theme', theme), [theme])
   useEffect(() => localStorage.setItem('ai_provider', aiProvider), [aiProvider])
+
+  // Fetch payment history
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) return
+        setLoadingPayments(true)
+        const res = await axios.get('/api/payments/history', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        if (res.data.ok) {
+          setPayments(res.data.payments)
+        }
+      } catch {
+        // Silent fail
+      } finally {
+        setLoadingPayments(false)
+      }
+    }
+    fetchPayments()
+  }, [])
 
   const handleSaveAIKey = async (provider, key) => {
     if (!key || key.includes('•')) return;
@@ -53,16 +79,22 @@ export default function Settings() {
 
   const handleTestNotification = () => {
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Spectr Trading', { body: 'Test notification! 🚀', icon: '/icon-192.png' })
+      new Notification('Spectr Trading', { body: 'Test notification!', icon: '/icon-192.png' })
     } else if ('Notification' in window) {
       Notification.requestPermission().then(p => {
         if (p === 'granted') {
-          new Notification('Spectr Trading', { body: 'Notifications enabled! 🎉' })
+          new Notification('Spectr Trading', { body: 'Notifications enabled!' })
         }
       })
     } else {
       console.warn('Push notifications not supported in this browser.')
     }
+  }
+
+  const STATUS_COLORS = {
+    COMPLETED: { bg: 'rgba(0,227,150,0.1)', border: 'rgba(0,227,150,0.25)', text: '#00E396' },
+    PENDING: { bg: 'rgba(254,176,25,0.1)', border: 'rgba(254,176,25,0.25)', text: '#FEB019' },
+    FAILED: { bg: 'rgba(255,69,96,0.1)', border: 'rgba(255,69,96,0.25)', text: '#FF4560' },
   }
 
   return (
@@ -223,6 +255,65 @@ export default function Settings() {
           {t('pages.settings.test_notification') || 'Send Test Notification'}
         </button>
       </div>
+
+      {/* Transaction History */}
+      <div className="dx-card">
+        <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Receipt size={20} color="var(--accent)" /> {t('pages.settings.tx_history') || 'Transaction History'}
+        </h3>
+
+        {loadingPayments ? (
+          <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+            Loading...
+          </div>
+        ) : payments.length === 0 ? (
+          <div style={{ padding: '24px 0', textAlign: 'center', color: 'var(--muted)', fontSize: 13 }}>
+            <History size={20} style={{ marginBottom: 8, opacity: 0.4 }} />
+            <div>No transactions yet</div>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <th style={{ textAlign: 'left', padding: '8px 12px', color: 'var(--muted)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>Date</th>
+                  <th style={{ textAlign: 'left', padding: '8px 12px', color: 'var(--muted)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>Currency</th>
+                  <th style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--muted)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>Amount</th>
+                  <th style={{ textAlign: 'center', padding: '8px 12px', color: 'var(--muted)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>Status</th>
+                  <th style={{ textAlign: 'right', padding: '8px 12px', color: 'var(--muted)', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>TxID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map(payment => {
+                  const statusStyle = STATUS_COLORS[payment.status] || STATUS_COLORS.PENDING
+                  return (
+                    <tr key={payment.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                      <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+                        {new Date(payment.createdAt).toLocaleDateString()}
+                      </td>
+                      <td style={{ padding: '10px 12px', fontWeight: 600 }}>{payment.currency}</td>
+                      <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>${payment.amount}</td>
+                      <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                        <span style={{
+                          padding: '3px 10px', borderRadius: 6, fontSize: 10, fontWeight: 800,
+                          background: statusStyle.bg, border: `1px solid ${statusStyle.border}`,
+                          color: statusStyle.text, textTransform: 'uppercase', letterSpacing: 0.5,
+                        }}>
+                          {payment.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 12px', textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--muted)' }}>
+                        {payment.txId ? `${payment.txId.slice(0, 8)}...${payment.txId.slice(-6)}` : '—'}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
+

@@ -4,7 +4,9 @@ import { useTranslation } from "react-i18next";
 
 const langs = [
   { code: "en", label: "EN" },
-  { code: "es", label: "ES" }
+  { code: "es", label: "ES" },
+  { code: "pt", label: "PT" },
+  { code: "ru", label: "RU" }
 ];
 
 export default function LanguageSwitcher() {

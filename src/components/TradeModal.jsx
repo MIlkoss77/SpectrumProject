@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTrade } from '@/context/TradeContext'
-import { X, ArrowRight, Loader2, CheckCircle } from 'lucide-react'
+import { X, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import axios from 'axios'
 import './trade-modal.css'
 
 export default function TradeModal() {
     const { isOpen, activeAsset, closeTrade } = useTrade()
-    const [step, setStep] = useState('input') // input, processing, success
+    const [step, setStep] = useState('input') // input, processing, success, error
     const [amount, setAmount] = useState('1000')
+    const [errorMsg, setErrorMsg] = useState('')
 
     // Reset state when opening
     useEffect(() => {
@@ -16,12 +18,36 @@ export default function TradeModal() {
 
     if (!isOpen || !activeAsset) return null
 
-    const handleExecute = () => {
+    const handleExecute = async () => {
         setStep('processing')
-        // Simulate network request
-        setTimeout(() => {
-            setStep('success')
-        }, 2000)
+        setErrorMsg('')
+        
+        try {
+            // Get token from localStorage (assuming this is where it's stored for now)
+            const token = localStorage.getItem('token')
+            
+            const response = await axios.post('/api/trade/execute', {
+                symbol: activeAsset.symbol,
+                amount: amount,
+                side: activeAsset.action?.toLowerCase() || 'buy',
+                exchange: activeAsset.exchange || 'binance', // Fallback to binance
+                type: 'market'
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+
+            if (response.data.ok) {
+                setStep('success')
+            } else {
+                throw new Error(response.data.error || 'Execution failed')
+            }
+        } catch (err) {
+            console.error('Trade Execution Failed:', err)
+            setErrorMsg(err.message || 'Network error occurred')
+            setStep('error')
+        }
     }
 
     return (
@@ -99,6 +125,15 @@ export default function TradeModal() {
                                 <h3>Order Filled!</h3>
                                 <p>Bought {(parseFloat(amount) / activeAsset.price).toFixed(6)} {activeAsset.symbol}</p>
                                 <button className="secondary-btn" onClick={closeTrade}>Done</button>
+                            </div>
+                        )}
+
+                        {step === 'error' && (
+                            <div className="trade-status error">
+                                <AlertCircle size={56} color="#FF4560" />
+                                <h3>Execution Failed</h3>
+                                <p>{errorMsg}</p>
+                                <button className="secondary-btn" onClick={() => setStep('input')}>Try Again</button>
                             </div>
                         )}
 

@@ -26,6 +26,8 @@ import { TradeProvider } from '@/context/TradeContext.jsx'
 import { TradingProvider } from '@/context/TradingContext.jsx'
 import TradeModal from '@/components/TradeModal.jsx'
 
+import Landing from '@/pages/Landing.jsx'
+
 export default function App() {
   return (
     <Web3Provider>
@@ -35,23 +37,27 @@ export default function App() {
             <BrowserRouter>
               <TradeModal />
               <Routes>
-                <Route path='/' element={<AppShell />}>
+                {/* Landing Page as Root */}
+                <Route path='/' element={<Landing />} />
+
+                {/* Main App Terminal at /app */}
+                <Route path='/app' element={<AppShell />}>
                   <Route index element={<Overview />} />
-                  <Route path='/portfolio' element={<Portfolio />} />
-                  <Route path='/alerts' element={<Alerts />} />
-                  <Route path='/signals' element={<Signals />} />
-                  <Route path='/news' element={<News />} />
-                  <Route path='/arbitrage' element={<Arbitrage />} />
-                  <Route path='/agent' element={<Agent />} />
-                  <Route path='/staking' element={<Staking />} />
-                  <Route path='/academy' element={<Academy />} />
-                  <Route path='/analytics' element={<Analytics />} />
-                  <Route path='/pricing' element={<Pricing />} />
-                  <Route path='/settings' element={<Settings />} />
-                  <Route path='/ta' element={<TA />} />
-                  <Route path='/calibration' element={<Calibration />} />
-                  <Route path='/forecasts' element={<Forecasts />} />
-                  <Route path='/events' element={<Events />} />
+                  <Route path='portfolio' element={<Portfolio />} />
+                  <Route path='alerts' element={<Alerts />} />
+                  <Route path='signals' element={<Signals />} />
+                  <Route path='news' element={<News />} />
+                  <Route path='arbitrage' element={<Arbitrage />} />
+                  <Route path='agent' element={<Agent />} />
+                  <Route path='staking' element={<Staking />} />
+                  <Route path='academy' element={<Academy />} />
+                  <Route path='analytics' element={<Analytics />} />
+                  <Route path='pricing' element={<Pricing />} />
+                  <Route path='settings' element={<Settings />} />
+                  <Route path='ta' element={<TA />} />
+                  <Route path='calibration' element={<Calibration />} />
+                  <Route path='forecasts' element={<Forecasts />} />
+                  <Route path='events' element={<Events />} />
                 </Route>
 
                 <Route path='*' element={<NotFound />} />

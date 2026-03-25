@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,6 +13,15 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+process.on('uncaughtException', (err) => {
+    console.error('[FATAL] Uncaught Exception:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('[FATAL] Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -19,24 +29,32 @@ const PORT = process.env.PORT || 3000;
 const distPath = path.resolve(__dirname, '../dist');
 console.log(`[Server] Static files directory: ${distPath}`);
 
-// 1. Log all requests (Move to top for debugging)
+// 1. Security Headers
+app.use(helmet());
+
+// 2. Log all requests
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 
-// 2. Security: Restricted CORS
+// 3. API-specific Middleware
 const ALLOWED_ORIGINS = [
     'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'http://localhost:5176',
     'http://127.0.0.1:5173',
-    'http://64.188.119.175',
-    'http://64.188.119.175:3000',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:5175',
+    'http://127.0.0.1:5176',
     process.env.FRONTEND_URL
 ].filter(Boolean);
 
-app.use(cors({
+app.use('/api', cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl) or if in whitelist
+        // Allow requests with no origin (like mobile apps or curl) 
+        // OR if origin is in the allowed list
         if (!origin || ALLOWED_ORIGINS.includes(origin)) {
             callback(null, true);
         } else {
@@ -47,10 +65,10 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json());
-app.use('/api/', limiter);
+app.use('/api', express.json());
+app.use('/api', limiter);
 
-// Routes
+// 4. API Routes
 app.use('/api', apiRoutes);
 
 // Serve Static Files (Frontend)
@@ -90,15 +108,24 @@ app.use('/api', (req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
+    const isDev = process.env.NODE_ENV === 'development';
     console.error(`[Server] Global Error: ${err.message}`);
-    res.status(500).json({ 
+    
+    res.status(err.status || 500).json({ 
         error: 'Internal Server Error', 
-        message: err.message,
-        path: req.url 
+        message: isDev ? err.message : 'An unexpected error occurred',
+        path: isDev ? req.url : undefined
     });
 });
 
 // Start the Server
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
+    
+    // Explicitly keep the process alive
+    setInterval(() => {
+        if (process.env.NODE_ENV === 'debug') {
+            console.log('[Keep-Alive] Heartbeat at', new Date().toISOString());
+        }
+    }, 60000);
 });

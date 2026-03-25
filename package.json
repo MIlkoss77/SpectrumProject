@@ -5,7 +5,8 @@
     "type": "module",
     "scripts": {
         "dev": "concurrently \"npm run frontend\" \"npm run server\"",
-        "frontend": "vite --host",
+        "frontend": "vite --host --port 5174",
+        "studio": "vite spectr-studio --config spectr-studio/vite.config.js --host --port 5175",
         "build": "vite build",
         "preview": "vite preview",
         "server": "node server/index.js"
@@ -22,6 +23,7 @@
         "express": "^5.2.1",
         "express-rate-limit": "^8.3.0",
         "framer-motion": "^12.34.3",
+        "helmet": "^8.0.0",
         "i18next": "^25.4.2",
         "i18next-browser-languagedetector": "^8.2.0",
         "jsonwebtoken": "^9.0.2",

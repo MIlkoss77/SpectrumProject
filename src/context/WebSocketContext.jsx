@@ -7,198 +7,215 @@ export function useWebSocket() {
 }
 
 const BINANCE_WS_URL = 'wss://stream.binance.com:9443/ws'
+const BYBIT_WS_URL = 'wss://stream.bybit.com/v5/public/linear'
 
 export const WebSocketProvider = ({ children }) => {
     const [isConnected, setIsConnected] = useState(false)
+    const [isBybitConnected, setIsBybitConnected] = useState(false)
     const [tickers, setTickers] = useState({})
     const [depth, setDepth] = useState({})
     const [trades, setTrades] = useState({})
     const [lastMessage, setLastMessage] = useState(null)
-    const ws = useRef(null)
-    const subscribers = useRef(new Set()) // Track subscribed streams
+    const wsBinance = useRef(null)
+    const wsBybit = useRef(null)
+    const binanceSubscribers = useRef(new Set())
+    const bybitSubscribers = useRef(new Set())
 
     useEffect(() => {
-        connect()
+        connectBinance()
+        connectBybit()
         return () => {
-            if (ws.current) ws.current.close()
+            if (wsBinance.current) wsBinance.current.close()
+            if (wsBybit.current) wsBybit.current.close()
         }
     }, [])
 
-    const connect = () => {
-        // Prevent multiple connections
-        if (ws.current && ws.current.readyState !== WebSocket.CLOSED) return
+    const connectBinance = () => {
+        if (wsBinance.current && wsBinance.current.readyState !== WebSocket.CLOSED) return
+        wsBinance.current = new WebSocket(BINANCE_WS_URL)
 
-        ws.current = new WebSocket(BINANCE_WS_URL)
-
-        ws.current.onopen = () => {
-            console.log('WS Connected')
+        wsBinance.current.onopen = () => {
+            console.log('Binance WS Connected')
             setIsConnected(true)
-            // Resubscribe ALL previously requested streams
-            const allStreams = Array.from(subscribers.current)
-            if (allStreams.length > 0) {
-                const msg = {
-                    method: "SUBSCRIBE",
-                    params: allStreams,
-                    id: Date.now()
-                }
-                ws.current.send(JSON.stringify(msg))
+            const streams = Array.from(binanceSubscribers.current)
+            if (streams.length > 0) {
+                wsBinance.current.send(JSON.stringify({ method: "SUBSCRIBE", params: streams, id: Date.now() }))
             }
         }
 
-        ws.current.onmessage = (event) => {
-            const message = JSON.parse(event.data)
-            setLastMessage(message)
+        wsBinance.current.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+            setLastMessage(data)
 
-            // Handle Ticker Updates (Full Ticker @ticker or Mini Ticker @miniTicker)
-            if (message.e === '24hrTicker' || message.e === '24hrMiniTicker') {
-                const symbol = message.s.toLowerCase()
-                const isFullTicker = message.e === '24hrTicker'
+            // Binance Ticker
+            if (data.e === '24hrTicker' || data.e === '24hrMiniTicker') {
+                const symbol = data.s.toLowerCase()
+                const price = parseFloat(data.c)
+                const changeP = data.P ? parseFloat(data.P) : 0
+                const vol = parseFloat(data.v)
+
+                if (isNaN(price)) return prev
 
                 setTickers(prev => ({
                     ...prev,
                     [symbol]: {
-                        symbol: message.s,
-                        price: parseFloat(message.c),
-                        // 'P' is only in full ticker. For mini, we keep the previous value or set to 0.
-                        changePercent: isFullTicker ? parseFloat(message.P) : (prev[symbol]?.changePercent || 0),
-                        volume: parseFloat(message.v)
+                        exchange: 'binance',
+                        symbol: data.s,
+                        price: price,
+                        changePercent: isNaN(changeP) ? (prev[symbol]?.changePercent || 0) : changeP,
+                        volume: isNaN(vol) ? 0 : vol
                     }
                 }))
             }
 
-            // Handle Depth Updates
-            if (message.e === 'depthUpdate' || (message.lastUpdateId && !message.e)) {
-                // For partial depth streams (e.g. btcusdt@depth20)
-                // Binance partial depth doesn't have "e": "depthUpdate" always, sometimes just looks like this
-                const symbol = message.s?.toLowerCase() || (lastMessage?.stream?.split('@')[0])
-                if (symbol) {
-                    setDepth(prev => ({
-                        ...prev,
-                        [symbol]: {
-                            bids: message.b || message.bids,
-                            asks: message.a || message.asks
-                        }
-                    }))
-                }
-            }
-
-            // Handle AggTrade
-            if (message.e === 'aggTrade') {
-                const symbol = message.s.toLowerCase()
-                setTrades(prev => {
-                    const newTrade = {
-                        id: message.a,
-                        price: parseFloat(message.p),
-                        qty: parseFloat(message.q),
-                        time: message.T,
-                        isBuyerMaker: message.m
-                    }
-                    const existing = prev[symbol] || []
-                    return {
-                        ...prev,
-                        [symbol]: [newTrade, ...existing].slice(0, 20)
-                    }
-                })
+            // Binance AggTrade
+            if (data.e === 'aggTrade') {
+                const symbol = data.s.toLowerCase()
+                setTrades(prev => ({
+                    ...prev,
+                    [symbol]: [{
+                        id: data.a,
+                        price: parseFloat(data.p),
+                        qty: parseFloat(data.q),
+                        time: data.T,
+                        isBuyerMaker: data.m,
+                        exchange: 'binance'
+                    }, ...(prev[symbol] || [])].slice(0, 20)
+                }))
             }
         }
 
-        ws.current.onclose = (event) => {
-            // Only log if it wasn't a clean close
-            if (!event.wasClean) {
-                console.log('WS Disconnected (Switching to polling...)', event.code)
-            }
+        wsBinance.current.onclose = () => {
             setIsConnected(false)
+            setTimeout(connectBinance, 5000)
+        }
+    }
 
-            // Reconnect logic with backoff
-            if (ws.current) {
-                setTimeout(connect, 5000)
+    const connectBybit = () => {
+        if (wsBybit.current && wsBybit.current.readyState !== WebSocket.CLOSED) return
+        wsBybit.current = new WebSocket(BYBIT_WS_URL)
+
+        wsBybit.current.onopen = () => {
+            console.log('Bybit WS Connected')
+            setIsBybitConnected(true)
+            const streams = Array.from(bybitSubscribers.current)
+            if (streams.length > 0) {
+                wsBybit.current.send(JSON.stringify({ op: 'subscribe', args: streams }))
+            }
+            // Keepalive
+            setInterval(() => {
+                if (wsBybit.current?.readyState === WebSocket.OPEN) {
+                    wsBybit.current.send(JSON.stringify({ op: 'ping' }))
+                }
+            }, 20000)
+        }
+
+        wsBybit.current.onmessage = (event) => {
+            const msg = JSON.parse(event.data)
+            if (msg.op === 'pong') return
+            setLastMessage(msg)
+
+            // Bybit Tickers
+            if (msg.topic?.startsWith('tickers.')) {
+                const data = msg.data
+                const symbol = data.symbol.toLowerCase()
+                const price = parseFloat(data.lastPrice)
+                const changeP = parseFloat(data.price24hPcnt) * 100
+                const vol = parseFloat(data.volume24h)
+
+                if (isNaN(price)) return prev
+
+                setTickers(prev => ({
+                    ...prev,
+                    [symbol]: {
+                        exchange: 'bybit',
+                        symbol: data.symbol,
+                        price: price,
+                        changePercent: isNaN(changeP) ? (prev[symbol]?.changePercent || 0) : changeP,
+                        volume: isNaN(vol) ? 0 : vol
+                    }
+                }))
+            }
+
+            // Bybit Orderbook
+            if (msg.topic?.startsWith('orderbook.')) {
+                const symbol = msg.topic.split('.')[2].toLowerCase()
+                setDepth(prev => ({
+                    ...prev,
+                    [symbol]: {
+                        exchange: 'bybit',
+                        bids: msg.data.b,
+                        asks: msg.data.a
+                    }
+                }))
+            }
+
+            // Bybit Public Trades
+            if (msg.topic?.startsWith('publicTrade.')) {
+                const symbol = msg.topic.split('.')[1].toLowerCase()
+                const newTrades = msg.data.map(t => ({
+                    id: t.i,
+                    price: parseFloat(t.p),
+                    qty: parseFloat(t.v),
+                    time: t.T,
+                    isBuyerMaker: t.side === 'Sell',
+                    exchange: 'bybit'
+                }))
+                setTrades(prev => ({
+                    ...prev,
+                    [symbol]: [...newTrades, ...(prev[symbol] || [])].slice(0, 20)
+                }))
             }
         }
 
-        ws.current.onerror = (err) => {
-            // Keep console clean for common network interruptions
-            // console.warn('WS Connection Warning')
+        wsBybit.current.onclose = () => {
+            setIsBybitConnected(false)
+            setTimeout(connectBybit, 5000)
         }
     }
 
-    // --- 🌍 POLLING FALLBACK (When WS is down) ---
-    useEffect(() => {
-        let pollInterval = null;
-
-        if (!isConnected) {
-            // Wait 5 seconds before starting polling to give WS a chance to reconnect
-            pollInterval = setInterval(async () => {
-                try {
-                    const symbols = [...subscribers.current]
-                        .filter(s => s.includes('@ticker'))
-                        .map(s => s.split('@')[0].toUpperCase());
-
-                    if (symbols.length === 0) return;
-
-                    // Fetch latest prices for all subscribed symbols via Binance REST (using proxy)
-                    const resp = await fetch(`/api/proxy/binance/api/v3/ticker/24hr?symbols=${JSON.stringify(symbols)}`);
-                    const data = await resp.json();
-
-                    if (Array.isArray(data)) {
-                        setTickers(prev => {
-                            const newTickers = { ...prev };
-                            data.forEach(item => {
-                                const symbol = item.symbol.toLowerCase();
-                                newTickers[symbol] = {
-                                    symbol: item.symbol,
-                                    price: parseFloat(item.lastPrice),
-                                    changePercent: parseFloat(item.priceChangePercent),
-                                    volume: parseFloat(item.volume)
-                                };
-                            });
-                            return newTickers;
-                        });
-                    }
-                } catch (e) {
-                    // Silent fail for polling errors
-                }
-            }, 10000); // Poll every 10s
+    const subscribe = (streams, exchange = 'binance') => {
+        if (exchange === 'binance') {
+            streams.forEach(s => binanceSubscribers.current.add(s))
+            if (wsBinance.current?.readyState === WebSocket.OPEN) {
+                wsBinance.current.send(JSON.stringify({ method: "SUBSCRIBE", params: streams, id: Date.now() }))
+            }
+        } else if (exchange === 'bybit') {
+            streams.forEach(s => bybitSubscribers.current.add(s))
+            if (wsBybit.current?.readyState === WebSocket.OPEN) {
+                wsBybit.current.send(JSON.stringify({ op: 'subscribe', args: streams }))
+            }
         }
-
-        return () => {
-            if (pollInterval) clearInterval(pollInterval);
-        };
-    }, [isConnected]);
-
-    const subscribe = (streams) => {
-        if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
-            // Add to pending subscribers
-            streams.forEach(s => subscribers.current.add(s))
-            return
-        }
-
-        const newStreams = streams.filter(s => !subscribers.current.has(s))
-        if (newStreams.length === 0) return
-
-        const msg = {
-            method: "SUBSCRIBE",
-            params: newStreams,
-            id: Date.now()
-        }
-        ws.current.send(JSON.stringify(msg))
-        newStreams.forEach(s => subscribers.current.add(s))
     }
 
-    const unsubscribe = (streams) => {
-        if (!ws.current || ws.current.readyState !== WebSocket.OPEN) return
-
-        const msg = {
-            method: "UNSUBSCRIBE",
-            params: streams,
-            id: Date.now()
+    const unsubscribe = (streams, exchange = 'binance') => {
+        if (exchange === 'binance') {
+            streams.forEach(s => binanceSubscribers.current.delete(s))
+            if (wsBinance.current?.readyState === WebSocket.OPEN) {
+                wsBinance.current.send(JSON.stringify({ method: "UNSUBSCRIBE", params: streams, id: Date.now() }))
+            }
+        } else if (exchange === 'bybit') {
+            streams.forEach(s => bybitSubscribers.current.delete(s))
+            if (wsBybit.current?.readyState === WebSocket.OPEN) {
+                wsBybit.current.send(JSON.stringify({ op: 'unsubscribe', args: streams }))
+            }
         }
-        ws.current.send(JSON.stringify(msg))
-        streams.forEach(s => subscribers.current.delete(s))
     }
 
     return (
-        <WebSocketContext.Provider value={{ isConnected, tickers, depth, trades, lastMessage, subscribe, unsubscribe }}>
+        <WebSocketContext.Provider value={{
+            isConnected: isConnected || isBybitConnected,
+            isBinanceConnected: isConnected,
+            isBybitConnected,
+            tickers,
+            depth,
+            trades,
+            lastMessage,
+            subscribe,
+            unsubscribe
+        }}>
             {children}
         </WebSocketContext.Provider>
     )
 }
+

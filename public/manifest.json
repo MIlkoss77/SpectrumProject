@@ -1,11 +1,18 @@
 {
   "name": "Spectr Trading",
   "short_name": "Spectr",
-  "description": "AI-Powered Copy & Arbitrage PWA",
+  "description": "AI-Powered Crypto Trading Assistant",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0b1220",
-  "theme_color": "#0b1220",
+  "orientation": "portrait-primary",
+  "background_color": "#0A0A0A",
+  "theme_color": "#00FFFF",
+  "categories": [
+    "finance",
+    "crypto",
+    "trading"
+  ],
+  "lang": "en",
   "icons": [
     {
       "src": "/icon-192.png",

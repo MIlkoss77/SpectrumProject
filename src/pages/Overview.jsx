@@ -7,7 +7,7 @@ import { useWebSocket } from '@/context/WebSocketContext'
 import NumberTicker from '@/components/NumberTicker'
 import TechnicalBrief from '../components/TechnicalBrief'
 import Predictor from '../components/Predictor'
-import { TrendingUp, TrendingDown, Activity, Zap, Globe, Users, Shield, Loader2, ArrowRight, ShieldCheck } from 'lucide-react'
+import { TrendingUp, TrendingDown, Activity, Zap, Globe, Users, Shield, Loader2, ArrowRight, ShieldCheck, Brain, Fish, BarChart3, Briefcase, Rocket } from 'lucide-react'
 import { useTrade } from '@/context/TradeContext'
 import { useTrading } from '@/context/TradingContext'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -171,13 +171,16 @@ export default function Overview() {
 
   // 🔔 Subscribe to Ticker Streams for the Marquee Strip
   useEffect(() => {
-    const marqueeSymbols = ['btcusdt', 'ethusdt', 'bnbusdt', 'solusdt', 'xrpusdt', 'dogeusdt', 'adausdt', 'avaxusdt']
-    const tickerStreams = marqueeSymbols.map(s => `${s}@ticker`)
+    const symbols = ['btcusdt', 'ethusdt', 'bnbusdt', 'solusdt', 'xrpusdt', 'dogeusdt', 'adausdt', 'avaxusdt']
+    const binanceStreams = symbols.map(s => `${s}@ticker`)
+    const bybitStreams = symbols.map(s => `tickers.${s.toUpperCase()}`)
 
-    subscribe(tickerStreams)
+    subscribe(binanceStreams, 'binance')
+    subscribe(bybitStreams, 'bybit')
 
     return () => {
-      unsubscribe(tickerStreams)
+      unsubscribe(binanceStreams, 'binance')
+      unsubscribe(bybitStreams, 'bybit')
     }
   }, [])
 
@@ -205,12 +208,26 @@ export default function Overview() {
               const price = ticker?.price
               const change = ticker?.changePercent
               return (
-                <span key={`${rep}-${sym}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12, fontFamily: 'var(--font-mono)' }}>
+                <span key={`${rep}-${sym}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 11, fontFamily: 'var(--font-mono)' }}>
                   <span style={{ fontWeight: 800, color: '#fff', letterSpacing: 1 }}>{sym}</span>
-                  <span style={{ color: '#8899a6' }}>{price ? `$${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : '---'}</span>
-                  {change != null && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontWeight: 900 }}>BIN</span>
+                      <span style={{ color: '#8899a6' }}>
+                        {Number.isFinite(price) ? `$${price.toLocaleString(undefined, { maximumFractionDigits: 1 })}` : '---'}
+                      </span>
+                    </div>
+                    {/* Only show Bybit if it's actually different or exists */}
+                    {tickers[key]?.exchange === 'bybit' && Number.isFinite(tickers[key].price) && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: '9px', color: 'rgba(0,255,255,0.3)', fontWeight: 900 }}>BYB</span>
+                        <span style={{ color: 'var(--brand-cyan)' }}>${tickers[key].price.toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                  {Number.isFinite(change) && (
                     <span style={{ color: change >= 0 ? '#22d3ee' : '#ef4444', fontWeight: 700 }}>
-                      {change >= 0 ? '▲' : '▼'} {Math.abs(change)}%
+                      {change >= 0 ? '▲' : '▼'}{Math.abs(change).toFixed(2)}%
                     </span>
                   )}
                 </span>
@@ -353,7 +370,12 @@ export default function Overview() {
             <div className="ticker-row">
               <div className="ticker-info">
                 <span className="ticker-symbol text-lg font-bold">BTC/USDT</span>
-                <span className="ticker-name text-white/40 text-xs">Bitcoin</span>
+                <span className="ticker-name text-white/40 text-[10px] uppercase font-black tracking-tighter flex items-center gap-2">
+                  Bitcoin 
+                  <span className={`px-1 rounded border ${tickers['btcusdt']?.exchange === 'bybit' ? 'border-cyan-500/50 text-cyan-400' : 'border-white/20 text-white/40'}`}>
+                    {tickers['btcusdt']?.exchange?.toUpperCase() || 'BINANCE'} WS
+                  </span>
+                </span>
               </div>
               <div className="ticker-price-group text-right">
                 <div className="ticker-price text-2xl font-mono font-bold">
@@ -442,7 +464,7 @@ export default function Overview() {
                   <img src={logoImg} alt="Spectr" style={{ width: 28, height: 28, objectFit: 'contain' }} />
                 </div>
                 <h2 style={{ fontSize: 20, fontWeight: 900, margin: '0 0 6px', letterSpacing: -0.5 }}>
-                  Welcome to <span style={{ color: '#00FFFF' }}>Spectr Trading</span> 🚀
+                  Welcome to <span style={{ color: '#00FFFF' }}>Spectr Trading</span>
                 </h2>
                 <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5, margin: 0 }}>
                   Your AI-powered crypto intelligence terminal is ready.
@@ -450,13 +472,15 @@ export default function Overview() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
                 {[
-                  { icon: '🧠', text: 'AI Predictor — ML directional signals' },
-                  { icon: '🐋', text: 'Whale Radar — Track big money' },
-                  { icon: '📊', text: 'Technical Brief — Live Binance data' },
-                  { icon: '💼', text: 'Portfolio — Connect your keys' },
-                ].map(({ icon, text }) => (
+                  { icon: Brain, text: 'AI Predictor — ML directional signals', color: '#00FFFF' },
+                  { icon: Fish, text: 'Whale Radar — Track big money', color: '#4F46E5' },
+                  { icon: BarChart3, text: 'Technical Brief — Live Binance data', color: '#00E396' },
+                  { icon: Briefcase, text: 'Portfolio — Connect your keys', color: '#FEB019' },
+                ].map(({ icon: Icon, text, color }) => (
                   <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', fontSize: 12 }}>
-                    <span style={{ fontSize: 18 }}>{icon}</span>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}15`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <Icon size={16} color={color} />
+                    </div>
                     <span style={{ color: 'rgba(255,255,255,0.7)' }}>{text}</span>
                   </div>
                 ))}
@@ -466,7 +490,7 @@ export default function Overview() {
                 style={{ width: '100%', justifyContent: 'center', background: '#00FFFF', color: '#000', fontWeight: 900, letterSpacing: 0.5, cursor: 'pointer' }}
                 onClick={() => { setShowWelcome(false); localStorage.setItem('spectr_welcomed', '1') }}
               >
-                🚀 Launch Dashboard
+                <Rocket size={14} /> Launch Dashboard
               </button>
             </motion.div>
           </>

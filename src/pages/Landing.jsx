@@ -1,4 +1,7 @@
 import logoImg from '@/assets/logo.png'
+import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { ArrowRight, Play, Activity, Zap, Shield } from 'lucide-react'
 
 export default function Landing() {
     return (

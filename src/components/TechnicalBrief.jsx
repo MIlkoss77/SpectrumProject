@@ -9,7 +9,7 @@ const ASSETS = [
     { symbol: 'SOLUSDT', name: 'Solana' }
 ];
 
-const API_BASE = import.meta.env.VITE_API_BASE || "/api";
+const API_BASE = "/api";
 
 export default function TechnicalBrief() {
     const [data, setData] = useState({});

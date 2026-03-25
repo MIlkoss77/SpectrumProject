@@ -2,18 +2,22 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useWebSocket } from '@/context/WebSocketContext';
 import { Activity } from 'lucide-react';
 
-export default function Orderbook({ symbol = 'BTCUSDT' }) {
+export default function Orderbook({ symbol = 'BTCUSDT', exchange = 'binance' }) {
     const { subscribe, unsubscribe, depth, tickers } = useWebSocket();
     const lSymbol = symbol.toLowerCase();
 
     useEffect(() => {
-        const streams = [`${lSymbol}@depth20@100ms`];
-        subscribe(streams);
-        return () => unsubscribe(streams);
-    }, [lSymbol]);
+        const streams = exchange === 'binance' 
+            ? [`${lSymbol}@depth20@100ms`]
+            : [`orderbook.50.${symbol.toUpperCase()}`];
+        
+        subscribe(streams, exchange);
+        return () => unsubscribe(streams, exchange);
+    }, [lSymbol, exchange]);
 
     const data = depth[lSymbol] || { bids: [], asks: [] };
     const currentPrice = tickers[lSymbol]?.price || 0;
+    const activeExchange = data.exchange || exchange;
 
     // Calculate max volume for depth bar scaling
     const maxVolume = useMemo(() => {
@@ -30,7 +34,7 @@ export default function Orderbook({ symbol = 'BTCUSDT' }) {
                     <h3 className="text-xs font-black uppercase tracking-widest text-white/70">Live Orderbook</h3>
                 </div>
                 <div className="text-[10px] font-bold text-cyan-400 py-0.5 px-2 rounded bg-cyan-400/10 border border-cyan-400/20">
-                    {symbol}
+                    {symbol} ({activeExchange.toUpperCase()})
                 </div>
             </div>
 
@@ -84,7 +88,7 @@ export default function Orderbook({ symbol = 'BTCUSDT' }) {
 
             <div className="mt-4 flex items-center justify-between opacity-30">
                 <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white/20" />
-                <span className="text-[8px] mx-2 font-bold tracking-tighter uppercase text-white/50">Depth 20 Levels (Binance)</span>
+                <span className="text-[8px] mx-2 font-bold tracking-tighter uppercase text-white/50">Depth Real-time ({activeExchange.toUpperCase()})</span>
                 <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white/20" />
             </div>
         </div>

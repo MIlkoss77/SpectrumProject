@@ -1,5 +1,35 @@
 import axios from 'axios';
 
+// Cache for Proxy
+const proxyCache = new Map();
+const CACHE_TTL = {
+    KLINES: 10000,
+    TICKER: 5000,
+    DEFAULT: 2000,
+};
+
+function getCacheKey(url) {
+    return url;
+}
+
+function getFromCache(url) {
+    const entry = proxyCache.get(url);
+    if (entry && Date.now() - entry.ts < entry.ttl) {
+        return entry.data;
+    }
+    return null;
+}
+
+function setToCache(url, data, status) {
+    if (status !== 200) return;
+    
+    let ttl = CACHE_TTL.DEFAULT;
+    if (url.includes('klines')) ttl = CACHE_TTL.KLINES;
+    if (url.includes('ticker')) ttl = CACHE_TTL.TICKER;
+
+    proxyCache.set(url, { data, ts: Date.now(), ttl });
+}
+
 const BINANCE_WHITELIST = ['/api/v3/klines', '/api/v3/ticker/24hr', '/api/v3/ticker/price', '/api/v3/depth'];
 const BYBIT_WHITELIST = ['/v5/market/tickers', '/v5/market/kline', '/v5/market/orderbook'];
 
@@ -13,6 +43,11 @@ export const binanceProxy = async (req, res) => {
         }
 
         const url = `https://api.binance.com${req.url}`;
+        
+        // Cache lookup
+        const cached = getFromCache(url);
+        if (cached) return res.json(cached);
+
         const response = await axios({
             method: req.method,
             url: url,
@@ -23,6 +58,7 @@ export const binanceProxy = async (req, res) => {
             }
         });
 
+        setToCache(url, response.data, response.status);
         res.status(response.status).json(response.data);
     } catch (error) {
         console.error(`Binance Proxy Error [${req.url}]:`, error.response?.data || error.message);
@@ -44,6 +80,11 @@ export const bybitProxy = async (req, res) => {
         }
 
         const url = `https://api.bybit.com${req.url}`;
+
+        // Cache lookup
+        const cached = getFromCache(url);
+        if (cached) return res.json(cached);
+
         const response = await axios({
             method: req.method,
             url: url,
@@ -54,6 +95,7 @@ export const bybitProxy = async (req, res) => {
             }
         });
 
+        setToCache(url, response.data, response.status);
         res.status(response.status).json(response.data);
     } catch (error) {
         console.error(`Bybit Proxy Error [${req.url}]:`, error.response?.data || error.message);

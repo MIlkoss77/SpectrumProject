@@ -14,69 +14,85 @@ export default function Predictor() {
     const [loading, setLoading] = useState(true)
     const [polyTitle, setPolyTitle] = useState('Prediction Markets')
 
+    const lastUpdateRef = React.useRef(0)
+    const isAnalyzingRef = React.useRef(false)
+    const analysisInterval = 3000 // 3 seconds minimum
+
     useEffect(() => {
         const analyze = async () => {
-            // 1. Technicals (15%)
-            const btc = tickers['btcusdt']
-            let techScore = 50
-            if (btc) {
-                const change = parseFloat(btc.changePercent)
-                if (change > 3) techScore = 90
-                else if (change > 0.5) techScore = 65
-                else if (change < -3) techScore = 10
-                else if (change < -0.5) techScore = 35
-                else techScore = 50
+            if (isAnalyzingRef.current) return
+            const now = Date.now()
+            if (now - lastUpdateRef.current < analysisInterval) return
+
+            isAnalyzingRef.current = true
+            try {
+                // 1. Technicals (15%)
+                const btc = tickers['btcusdt']
+                let techScore = 50
+                if (btc) {
+                    const change = parseFloat(btc.changePercent)
+                    if (change > 3) techScore = 90
+                    else if (change > 0.5) techScore = 65
+                    else if (change < -3) techScore = 10
+                    else if (change < -0.5) techScore = 35
+                    else techScore = 50
+                }
+
+                // 2. Whales (20%)
+                const whales = await getSolanaWhaleTransactions()
+                const largeBuys = whales.filter(w => w.type === 'inflow').length
+                const largeSells = whales.filter(w => w.type === 'outflow').length
+                let whaleScore = 50
+                if (largeBuys > largeSells) whaleScore = 75
+                else if (largeSells > largeBuys) whaleScore = 25
+
+                // 3. Polymarket (20%)
+                const polyData = await getPolymarketOdds('Bitcoin')
+                const polyScore = polyData.odds
+                setPolyTitle(polyData.title.length > 30 ? polyData.title.substring(0, 28) + '...' : polyData.title)
+
+                // 4. Neural Network (25%) - Regression v2
+                let mlScore = 50
+                let predictedMove = 0
+                const predictions = await fetchPredictionSnapshot({ symbols: ['BTCUSDT'] })
+                const btc4h = predictions.find(p => p.symbol === 'BTCUSDT' && p.horizon === '4h')
+                if (btc4h) {
+                    predictedMove = (btc4h.probUp - 0.5) * 4 // Simulated % move
+                    mlScore = Math.max(0, Math.min(100, (predictedMove * 25) + 50))
+                }
+
+                // 5. Sentiment (20%)
+                let sentimentScore = (techScore + whaleScore + mlScore) / 3
+
+                const finalScore = Math.round(
+                    (techScore * 0.15) +
+                    (whaleScore * 0.20) +
+                    (polyScore * 0.20) +
+                    (mlScore * 0.25) +
+                    (sentimentScore * 0.20)
+                )
+
+                setScore(finalScore)
+                setFactors({
+                    sentiment: sentimentScore,
+                    whales: whaleScore,
+                    tech: techScore,
+                    poly: polyScore,
+                    ml: mlScore,
+                    forecast: predictedMove
+                })
+
+                if (finalScore >= 65) setDirection('BULLISH')
+                else if (finalScore <= 35) setDirection('BEARISH')
+                else setDirection('NEUTRAL')
+
+                lastUpdateRef.current = now
+                setLoading(false)
+            } catch (err) {
+                console.error("Analysis error:", err)
+            } finally {
+                isAnalyzingRef.current = false
             }
-
-            // 2. Whales (20%)
-            const whales = await getSolanaWhaleTransactions()
-            const largeBuys = whales.filter(w => w.type === 'inflow').length
-            const largeSells = whales.filter(w => w.type === 'outflow').length
-            let whaleScore = 50
-            if (largeBuys > largeSells) whaleScore = 75
-            else if (largeSells > largeBuys) whaleScore = 25
-
-            // 3. Polymarket (20%)
-            const polyData = await getPolymarketOdds('Bitcoin')
-            const polyScore = polyData.odds
-            setPolyTitle(polyData.title.length > 30 ? polyData.title.substring(0, 28) + '...' : polyData.title)
-
-            // 4. Neural Network (25%) - Regression v2
-            let mlScore = 50
-            let predictedMove = 0
-            const predictions = await fetchPredictionSnapshot({ symbols: ['BTCUSDT'] })
-            const btc4h = predictions.find(p => p.symbol === 'BTCUSDT' && p.horizon === '4h')
-            if (btc4h) {
-                predictedMove = (btc4h.probUp - 0.5) * 4 // Simulated % move
-                mlScore = Math.max(0, Math.min(100, (predictedMove * 25) + 50))
-            }
-
-            // 5. Sentiment (20%)
-            let sentimentScore = (techScore + whaleScore + mlScore) / 3
-
-            const finalScore = Math.round(
-                (techScore * 0.15) +
-                (whaleScore * 0.20) +
-                (polyScore * 0.20) +
-                (mlScore * 0.25) +
-                (sentimentScore * 0.20)
-            )
-
-            setScore(finalScore)
-            setFactors({
-                sentiment: sentimentScore,
-                whales: whaleScore,
-                tech: techScore,
-                poly: polyScore,
-                ml: mlScore,
-                forecast: predictedMove
-            })
-
-            if (finalScore >= 65) setDirection('BULLISH')
-            else if (finalScore <= 35) setDirection('BEARISH')
-            else setDirection('NEUTRAL')
-
-            setLoading(false)
         }
 
         if (Object.keys(tickers).length > 0) {

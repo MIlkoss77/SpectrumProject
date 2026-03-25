@@ -1,20 +1,29 @@
 {
+  "name": "Spectr Trading",
   "short_name": "Spectr",
-  "name": "Spectr Trading — AI Copy & Arbitrage",
-  "start_url": ".",
+  "description": "AI-Powered Crypto Trading Assistant",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "background_color": "#0A0A0A",
+  "theme_color": "#00FFFF",
+  "categories": [
+    "finance",
+    "crypto",
+    "trading"
+  ],
+  "lang": "en",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

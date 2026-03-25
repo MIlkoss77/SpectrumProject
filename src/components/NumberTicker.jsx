@@ -36,5 +36,6 @@ export default function NumberTicker({ value, prefix = '', suffix = '', decimals
     }, [springValue, decimals, prefix, suffix])
 
     // Initial render
-    return <span className={className} ref={ref}>{prefix}{numericValue?.toFixed(decimals)}{suffix}</span>
+    const displayValue = Number.isFinite(numericValue) ? numericValue.toFixed(decimals) : '---'
+    return <span className={className} ref={ref}>{prefix}{displayValue}{suffix}</span>
 }
