@@ -30,7 +30,11 @@ const distPath = path.resolve(__dirname, '../dist');
 console.log(`[Server] Static files directory: ${distPath}`);
 
 // 1. Security Headers
-app.use(helmet());
+app.set('trust proxy', 1); // Required for express-rate-limit behind proxies
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for easier debugging of asset loading
+    crossOriginEmbedderPolicy: false
+}));
 
 // 2. Log all requests
 app.use((req, res, next) => {
