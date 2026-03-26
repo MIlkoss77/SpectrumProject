@@ -9,8 +9,15 @@ import * as aiController from '../controllers/aiController.js';
 import * as notificationController from '../controllers/notificationController.js';
 import * as paymentController from '../controllers/paymentController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import rateLimit from 'express-rate-limit';
 
 const router = express.Router();
+
+const paymentLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // Limit each IP to 5 payment requests per windowMs
+    message: { error: 'Too many payment verification attempts, please try again later.' }
+});
 
 // Proxy Routes
 router.use('/proxy/binance', proxyController.binanceProxy);
@@ -23,8 +30,8 @@ router.post('/auth/login', authController.login);
 router.get('/auth/me', authMiddleware, authController.getMe);
 
 // Payment Routes
-router.post('/payments/deposit', authMiddleware, paymentController.createDeposit);
-router.post('/payments/verify', authMiddleware, paymentController.verifyPayment);
+router.post('/payments/deposit', authMiddleware, paymentLimiter, paymentController.createDeposit);
+router.post('/payments/verify', authMiddleware, paymentLimiter, paymentController.verifyPayment);
 router.get('/payments/history', authMiddleware, paymentController.getPaymentHistory);
 router.get('/payments/status', authMiddleware, paymentController.getProStatus);
 

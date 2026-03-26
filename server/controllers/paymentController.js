@@ -76,6 +76,14 @@ export const verifyPayment = async (req, res) => {
       return res.status(400).json({ ok: false, error: 'paymentId and txId are required' });
     }
 
+    // Validate TxID Format to prevent fake completions or injection payloads
+    const evmRegex = /^0x([A-Fa-f0-9]{64})$/;
+    const solRegex = /^[1-9A-HJ-NP-Za-km-z]{87,88}$/;
+    
+    if (!evmRegex.test(txId) && !solRegex.test(txId)) {
+        return res.status(400).json({ ok: false, error: 'Invalid transaction hash format' });
+    }
+
     // Verify ownership
     const payment = await prisma.payment.findFirst({
       where: { id: paymentId, userId },

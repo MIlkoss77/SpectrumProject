@@ -53,9 +53,9 @@ const ALLOWED_ORIGINS = [
 
 app.use('/api', cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or curl) 
-        // OR if origin is in the allowed list
-        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+        // Enforce strict origin checking
+        const isDev = process.env.NODE_ENV === 'development';
+        if (ALLOWED_ORIGINS.includes(origin) || (isDev && !origin)) {
             callback(null, true);
         } else {
             console.warn(`[CORS] Blocked origin: ${origin}`);
@@ -66,6 +66,24 @@ app.use('/api', cors({
 }));
 
 app.use('/api', express.json());
+
+// Basic XSS Sanitization Middleware
+app.use('/api', (req, res, next) => {
+    const sanitize = (obj) => {
+        for (let key in obj) {
+            if (typeof obj[key] === 'string') {
+                obj[key] = obj[key].replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                                   .replace(/onload|onerror|javascript:/gi, '');
+            } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                sanitize(obj[key]);
+            }
+        }
+    };
+    if (req.body) sanitize(req.body);
+    if (req.query) sanitize(req.query);
+    if (req.params) sanitize(req.params);
+    next();
+});
 app.use('/api', limiter);
 
 // 4. API Routes

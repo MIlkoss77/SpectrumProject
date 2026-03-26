@@ -12,7 +12,6 @@ import News from '@/pages/News.jsx'
 import Analytics from '@/pages/Analytics.jsx'
 import NotFound from '@/pages/NotFound.jsx'
 import Arbitrage from '@/pages/Arbitrage.jsx'
-import Agent from '@/pages/Agent.jsx'
 import Staking from '@/pages/Staking.jsx'
 import Academy from '@/pages/Academy.jsx'
 import Settings from '@/pages/Settings.jsx'
@@ -48,7 +47,6 @@ export default function App() {
                   <Route path='signals' element={<Signals />} />
                   <Route path='news' element={<News />} />
                   <Route path='arbitrage' element={<Arbitrage />} />
-                  <Route path='agent' element={<Agent />} />
                   <Route path='staking' element={<Staking />} />
                   <Route path='academy' element={<Academy />} />
                   <Route path='analytics' element={<Analytics />} />
