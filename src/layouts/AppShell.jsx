@@ -34,7 +34,6 @@ export default function AppShell() {
     { label: t('app.alerts'), to: '/app/alerts', icon: Bell },
     { label: t('app.news'), to: '/app/news', icon: Newspaper },
     { label: t('app.ta'), to: '/app/analytics', icon: PieChart },
-    { label: t('app.agent') || 'AI Agent', to: '/app/agent', icon: Bot },
     { label: t('app.arbitrage'), to: '/app/arbitrage', icon: Scale },
     { label: t('app.staking'), to: '/app/staking', icon: Wallet },
     { label: t('app.academy'), to: '/app/academy', icon: GraduationCap },
@@ -162,7 +161,7 @@ export default function AppShell() {
                   <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,1)]" />
                   <h4 className="font-bold text-xs uppercase tracking-widest text-white/90">Pro Plan</h4>
                 </div>
-                <p className="text-[10px] text-white/40 mb-4 leading-relaxed font-medium">Unlock Neural Signals &<br />AI Auto-Pilot engines.</p>
+                <p className="text-[10px] text-white/40 mb-4 leading-relaxed font-medium">Unlock Neural Signals &<br />Advanced Strategy Analytics.</p>
                 <button className="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-black text-[10px] uppercase tracking-tighter rounded-lg shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all">
                   Upgrade Now <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle' }} />
                 </button>

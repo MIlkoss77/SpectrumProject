@@ -161,7 +161,7 @@ export default function Settings() {
 
       <div className="dx-card">
         <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Brain size={20} /> {t('pages.settings.ai_config') || 'AI Agent Configuration'}
+          <Brain size={20} /> {t('pages.settings.ai_config') || 'AI Analytics Configuration'}
         </h3>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr)', gap: 16 }}>
