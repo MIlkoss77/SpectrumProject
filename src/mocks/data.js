@@ -49,7 +49,7 @@ export const MOCK_TOP_TRADERS = [
     verified: true,
     currentPositions: [
       { pair: 'BTCUSDT', side: 'LONG', entry: 66800, current: 67380, pnl: 0.87 },
-      { pair: 'ETHUSDT', side: 'SHORT', entry: 3450, current: 3420, pnl: 0.87 }
+      { pair: 'ETHUSDT', side: 'SHORT', entry: 4000, current: 3980, pnl: 0.5 }
     ]
   },
   {
