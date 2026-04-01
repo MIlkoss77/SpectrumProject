@@ -4,10 +4,10 @@ export function getFallbackArbitrage() {
   return {
     ts: new Date(now).toISOString(),
     legs: [
-      { exchange: "Binance", pair: "BTCUSDT", price: 68000.0 },
-      { exchange: "Bybit", pair: "BTCUSDT", price: 68010.5 },
-      { exchange: "Kraken", pair: "BTCUSDT", price: 67995.7 },
-      { exchange: "Coinbase", pair: "BTCUSD", price: 68005.3 },
+      { exchange: "Binance", pair: "BTCUSDT", price: 95000.0 },
+      { exchange: "Bybit", pair: "BTCUSDT", price: 95010.5 },
+      { exchange: "Kraken", pair: "BTCUSDT", price: 94995.7 },
+      { exchange: "Coinbase", pair: "BTCUSD", price: 95005.3 },
     ],
     bestSpreadPct: 0.03,
     estNetAfterFeesPct: 0.02,
@@ -27,7 +27,7 @@ export function getFallbackSignals({ symbols = ["BTCUSDT", "ETHUSDT"], timeframe
         id: `${symbol}-${timeframe}`,
         symbol,
         timeframe,
-        price: symbol.startsWith('BTC') ? 67200 : symbol.startsWith('ETH') ? 3450 : 150,
+        price: symbol.startsWith('BTC') ? 95000 : symbol.startsWith('ETH') ? 4000 : 150,
         change24h: (Math.random() - 0.5) * 5, // -2.5% to +2.5%
         rsi: 45 + (Math.random() - 0.5) * 40, // 25-65
         emaFast: null,

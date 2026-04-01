@@ -122,6 +122,7 @@ textarea,
   font-weight: 700;
   background: linear-gradient(135deg, #fff 0%, var(--muted) 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -130,8 +131,8 @@ textarea,
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px;
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }

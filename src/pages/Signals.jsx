@@ -263,8 +263,8 @@ function DetailView({ symbol, tf, onBack }) {
         const data = await fetchBinanceKlines(symbol, tf, 240)
         setCandles(data)
       } catch (e) {
-        console.error("Chart fetch failed, using fallback", e)
-        const start = symbol.startsWith('BTC') ? 67200 : (symbol.startsWith('ETH') ? 3450 : 150)
+        // Start from current price to generate mock signals, using a realistic start point.
+        const start = symbol.startsWith('BTC') ? 95000 : (symbol.startsWith('ETH') ? 4000 : 150)
         const mock = genCandles(240, start)
         setCandles(mock)
       } finally {
