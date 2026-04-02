@@ -1,7 +1,7 @@
 // src/services/providers/market.js
 // --- Binance API helper ------------------------------------------------------
 // Получение свечей с Binance API (через Vite proxy)
-const BINANCE_BASE = '/binance-api'; // Routed through Vite proxy directly to Binance
+const BINANCE_BASE = '/api/proxy/binance'; // Routed through backend proxy for both dev and prod
 const TF_MAP = { '1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h', '1d': '1d' };
 
 export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) {
@@ -66,11 +66,11 @@ export async function fetchBybitTicker(symbol) {
   const timeoutId = setTimeout(() => controller.abort(), 1200);
 
   try {
-    const res = await fetch(`/api/bybit/ticker/${symbol}`, { signal: controller.signal });
+    const res = await fetch(`/api/proxy/bybit/v5/market/tickers?category=spot&symbol=${symbol}`, { signal: controller.signal });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error('Bybit Proxy Error');
     const data = await res.json();
-    return data.ok ? data.price : null;
+    return data?.result?.list?.[0]?.lastPrice ? parseFloat(data.result.list[0].lastPrice) : null;
   } catch (e) {
     clearTimeout(timeoutId);
     // Silent fallback
@@ -157,15 +157,13 @@ export async function getRealArbitrage(minNetPct = 0.1) {
 
       if (binPrice == null && bybitPrice == null) failedCount++;
 
-      // Fallback if APIs fail (Critical for MVP Demo)
-      const validBinance = binPrice && !isNaN(binPrice);
-      const validBybit = bybitPrice && !isNaN(bybitPrice);
+      const validBinance = binPrice != null && !isNaN(binPrice);
+      const validBybit = bybitPrice != null && !isNaN(bybitPrice);
 
-      let bPrice = validBinance ? binPrice : (ARB_SYMBOLS.indexOf(sym) * 100 + 67000);
-      let byPrice = validBybit ? bybitPrice : bPrice * (1 + (Math.random() * 0.005 - 0.0025));
+      if (!validBinance || !validBybit) return; // Skip if live data is unavailable
 
-      if (validBinance && !validBybit) byPrice = binPrice * (1 + (Math.random() * 0.004 - 0.002));
-      if (!validBinance && validBybit) bPrice = byPrice * (1 + (Math.random() * 0.004 - 0.002));
+      let bPrice = parseFloat(binPrice);
+      let byPrice = parseFloat(bybitPrice);
 
       // 1. Buy Binance -> Sell Bybit
       const diff1 = byPrice - bPrice;
