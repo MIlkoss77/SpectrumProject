@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, X, Zap, Target, Shield, GraduationCap, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { ChevronRight, ChevronLeft, X, Zap, Target, Shield, GraduationCap, CheckCircle, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const STEPS = [
@@ -206,7 +206,7 @@ export default function OnboardingModal() {
                                         {currentStep === STEPS.length - 1 ? (
                                             <>Ignite Engines <Sparkles size={16} /></>
                                         ) : (
-                                            <>Next Protocol <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>
+                                            <>Next Protocol <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" /></>
                                         )}
                                     </span>
                                 </button>

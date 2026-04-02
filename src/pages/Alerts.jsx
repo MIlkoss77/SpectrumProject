@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { alertService, ALERT_TYPES, ALERT_ACTIONS } from '@/services/alerts/aggregator'
 import { useTrade } from '@/context/TradeContext'
-import { Bell, Activity, ArrowRight, Zap, TrendingUp, TrendingDown, DollarSign, X, Calculator, Coins } from 'lucide-react'
+import { Bell, Activity, ChevronRight, Zap, TrendingUp, TrendingDown, DollarSign, X, Calculator, Coins } from 'lucide-react'
 import './dashboard.css'
 
 // Helper for icons
@@ -148,7 +148,7 @@ export default function Alerts() {
                                             boxShadow: '0 0 15px rgba(0,255,255,0.2)',
                                         }}
                                     >
-                                        {alert.action === 'STAKE' ? <><Coins size={14} /> Stake Now</> : <>Execute Trade <ArrowRight size={14} /></>}
+                                        {alert.action === 'STAKE' ? <><Coins size={14} /> Stake Now</> : <>Execute Trade <ChevronRight size={14} /></>}
                                     </button>
                                     <button
                                         onClick={() => alertService.dismiss(alert.id)}

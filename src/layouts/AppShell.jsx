@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import PageTransition from '@/components/PageTransition'
 import { useWeb3 } from '@/context/Web3Context.jsx'
-import { Home, LayoutDashboard, BarChart3, Settings, Shield, User, Menu, X, LogOut, ChevronRight, Zap, Target, ShieldAlert, ShieldCheck, Wallet, Bell, Activity, Newspaper, Bot, Scale, GraduationCap, PieChart, CreditCard, ArrowRight } from 'lucide-react'
+import { Home, LayoutDashboard, BarChart3, Settings, Shield, User, Menu, X, LogOut, ChevronRight, Zap, Target, ShieldAlert, ShieldCheck, Wallet, Bell, Activity, Newspaper, Bot, Scale, GraduationCap, PieChart, CreditCard } from 'lucide-react'
 import { capitalShield } from '@/services/trading/capitalShield'
 import { useTrading } from '@/context/TradingContext.jsx'
 import '@/pages/dashboard.css'
@@ -163,7 +163,7 @@ export default function AppShell() {
                 </div>
                 <p className="text-[10px] text-white/40 mb-4 leading-relaxed font-medium">Unlock Neural Signals &<br />Advanced Strategy Analytics.</p>
                 <button className="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-black text-[10px] uppercase tracking-tighter rounded-lg shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all">
-                  Upgrade Now <ArrowRight size={12} style={{ display: 'inline', verticalAlign: 'middle' }} />
+                  Upgrade Now <ChevronRight size={12} style={{ display: 'inline', verticalAlign: 'middle' }} />
                 </button>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTrade } from '@/context/TradeContext'
-import { X, ArrowRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
+import { X, ChevronRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react'
 import axios from 'axios'
 import './trade-modal.css'
 
@@ -101,7 +101,7 @@ export default function TradeModal() {
                                 </div>
 
                                 <button className="primary-btn execute-btn" onClick={handleExecute}>
-                                    Execute Trade <ArrowRight size={18} />
+                                    Execute Trade <ChevronRight size={18} />
                                 </button>
                             </div>
                         )}

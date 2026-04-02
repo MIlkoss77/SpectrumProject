@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Check, Zap, Crown, ArrowRight, Shield, CheckCircle, Sparkles, Copy, ExternalLink, X, Wallet, Coins } from 'lucide-react'
+import { Check, Zap, Crown, ChevronRight, Shield, CheckCircle, Sparkles, Copy, ExternalLink, X, Wallet, Coins } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
@@ -237,7 +237,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
                       <div style={{ fontWeight: 700, fontSize: 14 }}>{crypto.label}</div>
                       <div style={{ fontSize: 12, color: '#8899A6' }}>${plan.price}</div>
                     </div>
-                    <ArrowRight size={16} color="#8899A6" />
+                    <ChevronRight size={16} color="#8899A6" />
                   </button>
                 )
               })}
@@ -354,7 +354,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
                   background: '#00FFFF', color: '#000', fontWeight: 800,
                 }}
               >
-                Start Trading <ArrowRight size={16} />
+                Start Trading <ChevronRight size={16} />
               </button>
             </div>
           )}
@@ -506,7 +506,7 @@ export default function Pricing() {
               {isPro && plan.id !== 'free' ? (
                 <><Shield size={16} /> Pro Active</>
               ) : (
-                <>{plan.cta} {plan.id !== 'free' && <ArrowRight size={16} />}</>
+                <>{plan.cta} {plan.id !== 'free' && <ChevronRight size={16} />}</>
               )}
             </button>
           </motion.div>

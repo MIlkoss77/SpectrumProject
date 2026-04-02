@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getArbitrage } from '@/services/providers/market'
-import { ArrowRight, RefreshCw, Zap, Loader2, Scale, CheckCircle } from 'lucide-react'
+import { ChevronRight, RefreshCw, Zap, Loader2, Scale, CheckCircle } from 'lucide-react'
 import NumberTicker from '@/components/NumberTicker'
 import { useExecution } from '@/services/trading/execution'
 import { useTrading } from '@/context/TradingContext'
@@ -104,7 +104,7 @@ export default function Arbitrage() {
                     <div className="text-[9px] font-bold text-white/30 uppercase mb-1">Buy on</div>
                     <div className="text-xs font-bold text-white">{item.fromEx}</div>
                   </div>
-                  <ArrowRight size={14} className="text-white/20" />
+                  <ChevronRight size={14} className="text-white/20" />
                   <div className="text-center">
                     <div className="text-[9px] font-bold text-white/30 uppercase mb-1">Sell on</div>
                     <div className="text-xs font-bold text-white">{item.toEx}</div>

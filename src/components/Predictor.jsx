@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { TrendingUp, TrendingDown, Minus, ArrowRight, Zap, Target, Brain, Shield, BarChart3 } from 'lucide-react'
+import { TrendingUp, TrendingDown, Minus, Zap, Target, Brain, Shield, BarChart3 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWebSocket } from '@/context/WebSocketContext'
 import { getSolanaWhaleTransactions } from '@/services/blockchain/solscan'

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getWhaleAlerts } from '@/services/providers/whales.js'
-import { ArrowRight, ArrowDownLeft, ArrowUpRight, Box, DollarSign } from 'lucide-react'
+import { ChevronRight, ArrowDownLeft, ArrowUpRight, Box, DollarSign } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import NumberTicker from './NumberTicker'
 
@@ -36,7 +36,7 @@ export default function WhaleWatch() {
             case 'inflow': return <ArrowDownLeft size={16} color="#ff3b30" /> // Exchange Inflow (Bearish usually)
             case 'outflow': return <ArrowUpRight size={16} color="#4caf50" /> // Exchange Outflow (Bullish)
             case 'mint': return <DollarSign size={16} color="#00FFFF" /> // Minting
-            default: return <ArrowRight size={16} color="#888" /> // Transfer
+            default: return <ChevronRight size={16} color="#888" /> // Transfer
         }
     }
 
@@ -92,7 +92,7 @@ export default function WhaleWatch() {
                                     <span style={{ color: '#888', fontWeight: 400 }}>({formatMoney(alert.amount_usd)})</span>
                                 </div>
                                 <div style={{ fontSize: 11, color: '#666', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    {alert.from_wallet} <ArrowRight size={10} /> {alert.to_wallet}
+                                    {alert.from_wallet} <ChevronRight size={10} /> {alert.to_wallet}
                                 </div>
                                 {alert.txHash && (
                                     <a

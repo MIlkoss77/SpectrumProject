@@ -1,7 +1,7 @@
 import logoImg from '@/assets/logo.png'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Play, Activity, Zap, Shield } from 'lucide-react'
+import { ChevronRight, Play, Activity, Zap, Shield } from 'lucide-react'
 
 export default function Landing() {
     return (
@@ -47,7 +47,7 @@ export default function Landing() {
                         alignItems: 'center',
                         gap: 8
                     }}>
-                        Launch App <ArrowRight size={16} />
+                        Launch App <ChevronRight size={16} />
                     </Link>
                 </div>
             </nav>
