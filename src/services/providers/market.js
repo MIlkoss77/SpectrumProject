@@ -115,16 +115,16 @@ export async function getMarkets() {
     const items = [
       {
         symbol: 'BTC/USDT',
-        ask: btc || 95000,
-        bid: (btc || 95000) + 20,
+        ask: btc || 0,
+        bid: (btc || 0) + 20,
         takerFeePct: 0.001,
         networkFeePct: 0.0005,
         latencyMs: 120
       },
       {
         symbol: 'ETH/USDT',
-        ask: eth || 4000,
-        bid: (eth || 4000) + 2,
+        ask: eth || 0,
+        bid: (eth || 0) + 2,
         takerFeePct: 0.001,
         networkFeePct: 0.0005,
         latencyMs: 240

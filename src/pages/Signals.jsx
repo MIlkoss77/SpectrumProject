@@ -263,10 +263,8 @@ function DetailView({ symbol, tf, onBack }) {
         const data = await fetchBinanceKlines(symbol, tf, 240)
         setCandles(data)
       } catch (e) {
-        // Start from current price to generate mock signals, using a realistic start point.
-        const start = symbol.startsWith('BTC') ? 95000 : (symbol.startsWith('ETH') ? 4000 : 150)
-        const mock = genCandles(240, start)
-        setCandles(mock)
+        // If the websocket connection failed or Proxy fails, return empty data to enforce real-time necessity
+        setCandles([])
       } finally {
         setChartLoading(false)
       }
