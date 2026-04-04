@@ -18,56 +18,64 @@ export default function ConnectionHub() {
   const isAllGood = isBinanceConnected && isBybitConnected && proxyStatus === 'LIVE'
 
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all duration-300 ${
-          isAllGood ? 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400' : 'bg-red-500/5 border-red-500/20 text-red-400'
-        }`}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 12px',
+          borderRadius: '12px', border: '1px solid',
+          transition: 'all 0.3s',
+          backgroundColor: isAllGood ? 'rgba(0, 255, 255, 0.05)' : 'rgba(255, 69, 96, 0.05)',
+          borderColor: isAllGood ? 'rgba(0, 255, 255, 0.2)' : 'rgba(255, 69, 96, 0.2)',
+          color: isAllGood ? '#00FFFF' : '#FF4560'
+        }}
       >
-        <div className="relative">
-          <Activity size={14} className={isAllGood ? 'animate-pulse' : ''} />
-          {isAllGood && <div className="absolute -top-1 -right-1 w-2 h-2 bg-cyan-400 rounded-full blur-[2px]" />}
+        <div style={{ position: 'relative' }}>
+          <Activity size={14} className={isAllGood ? 'price-pulse-up' : ''} />
+          {isAllGood && <div style={{ position: 'absolute', top: -4, right: -4, width: '8px', height: '8px', background: '#00FFFF', borderRadius: '50%', filter: 'blur(2px)' }} />}
         </div>
-        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
+        <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }} className="hidden sm:inline">
           {isAllGood ? 'Network Verified' : 'Sync Issue'}
         </span>
-        <ChevronDown size={12} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={12} style={{ transition: 'transform 0.3s', transform: isOpen ? 'rotate(180deg)' : 'none' }} />
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <>
-            <div className="fixed inset-0 z-[1001]" onClick={() => setIsOpen(false)} />
+            <div style={{ position: 'fixed', inset: 0, zIndex: 1001 }} onClick={() => setIsOpen(false)} />
             <motion.div 
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute top-full right-0 mt-2 w-72 p-5 rounded-2xl bg-[#0a0a0f] border border-white/10 shadow-2xl z-[1002] backdrop-blur-xl"
               onClick={(e) => e.stopPropagation()}
+              style={{
+                position: 'absolute', top: '100%', right: 0, marginTop: '8px', width: '280px', padding: '20px',
+                borderRadius: '16px', background: 'rgba(10, 10, 15, 0.95)', border: '1px solid rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 25px 50px rgba(0,0,0,0.5)', zIndex: 1002, backdropFilter: 'blur(24px)'
+              }}
             >
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-2">
-                  <span className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-1">Live Data Streams</span>
-                  <div className="flex flex-col gap-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '4px' }}>Live Data Streams</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <StatusItem label="Binance WS" connected={isBinanceConnected} />
                     <StatusItem label="Bybit WS" connected={isBybitConnected} />
                     <StatusItem label="API Proxy" status={proxyStatus} />
                   </div>
                 </div>
 
-                <div className="h-px bg-white/5" />
+                <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)' }} />
 
-                <div className="flex justify-between items-center bg-white/5 p-3 rounded-2xl border border-white/5">
-                  <div className="flex items-center gap-2">
-                    <Zap size={14} className="text-cyan-400" />
-                    <span className="text-[11px] font-bold text-white/70">Throughput</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Zap size={14} color="#00FFFF" />
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>Throughput</span>
                   </div>
-                  <span className="text-[11px] font-mono font-bold text-cyan-400">{throughput} msg/s</span>
+                  <span style={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, color: '#00FFFF' }}>{throughput} msg/s</span>
                 </div>
 
-
-                <div className="flex items-center gap-2 text-[9px] font-bold text-white/40 italic">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
                   <ShieldCheck size={10} />
                   Real-time exchange verification active
                 </div>
@@ -77,20 +85,22 @@ export default function ConnectionHub() {
         )}
       </AnimatePresence>
     </div>
+
   )
 }
 
 function StatusItem({ label, connected, status }) {
   const isOk = status ? status === 'LIVE' : connected
   return (
-    <div className="flex justify-between items-center">
-      <span className="text-[11px] font-bold text-white/60">{label}</span>
-      <div className="flex items-center gap-1.5">
-        <span className={`text-[9px] font-black uppercase tracking-tighter ${isOk ? 'text-cyan-400' : 'text-red-400'}`}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <span style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.05em', color: isOk ? '#00FFFF' : '#FF4560' }}>
           {isOk ? 'Optimal' : (status || 'Offline')}
         </span>
-        <div className={`w-1.5 h-1.5 rounded-full ${isOk ? 'bg-cyan-400 shadow-[0_0_8px_#00FFFF]' : 'bg-red-500 shadow-[0_0_8px_#FF4560]'}`} />
+        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: isOk ? '#00FFFF' : '#FF4560', boxShadow: `0 0 8px ${isOk ? '#00FFFF' : '#FF4560'}` }} />
       </div>
     </div>
   )
 }
+
