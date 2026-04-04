@@ -14,7 +14,7 @@
 .overview-hero {
   background: linear-gradient(135deg, rgba(20, 20, 25, 0.8) 0%, rgba(10, 10, 15, 0.9) 100%) !important;
   border: 1px solid var(--glass-border) !important;
-  border-radius: 16px !important;
+  border-radius: 24px !important;
   padding: 24px 32px !important;
   margin-bottom: 24px !important;
   display: block !important;
@@ -36,7 +36,7 @@
 .action-card {
   background: rgba(15, 15, 20, 0.7) !important;
   border: 1px solid var(--glass-border) !important;
-  border-radius: 16px !important;
+  border-radius: 24px !important;
   padding: 20px !important;
   transition: all 0.2s ease !important;
   -webkit-backdrop-filter: blur(24px) !important;
@@ -56,30 +56,27 @@
 
 .dx-grid-premium {
   display: grid !important;
-  grid-template-columns: 1fr !important;
-  gap: 20px !important;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+  gap: 24px !important;
   width: 100% !important;
-  grid-auto-flow: row dense !important;
-}
-
-@media (min-width: 1024px) {
-  .dx-grid-premium {
-    grid-template-columns: repeat(3, 1fr) !important;
-  }
-}
-
-@media (min-width: 1280px) {
-  .dx-grid-premium {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
 }
 
 @media (min-width: 1600px) {
   .dx-grid-premium {
-    grid-template-columns: repeat(4, 1fr) !important;
-    /* Cap at 4 for better component scale */
+    grid-template-columns: repeat(auto-fill, minmax(380px, 450px)) !important;
+    justify-content: center !important;
   }
 }
+
+
+
+@media (min-width: 2560px) {
+  .dx-grid-premium {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)) !important;
+  }
+}
+
+
 
 .hero-header {
   display: flex;
@@ -469,7 +466,7 @@ input[type=range]::-webkit-slider-runnable-track {
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 24px;
   padding: 20px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -500,9 +497,12 @@ input[type=range]::-webkit-slider-runnable-track {
 /* Panels container */
 .dx-panels {
   padding: 20px 24px;
-  max-width: 1400px;
+  width: 100%;
+  max-width: 1700px;
   margin: 0 auto;
 }
+
+
 
 .dx-btn {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);

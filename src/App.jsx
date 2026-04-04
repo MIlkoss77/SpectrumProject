@@ -21,7 +21,9 @@ import TA from '@/pages/TA.jsx'
 import Calibration from '@/pages/Calibration.jsx'
 import Forecasts from '@/pages/Forecasts.jsx'
 import Events from '@/pages/Events.jsx'
+import Polymarket from '@/pages/Polymarket.jsx'
 import { TradeProvider } from '@/context/TradeContext.jsx'
+
 import { TradingProvider } from '@/context/TradingContext.jsx'
 import TradeModal from '@/components/TradeModal.jsx'
 
@@ -52,11 +54,11 @@ export default function App() {
                   <Route path='analytics' element={<Analytics />} />
                   <Route path='pricing' element={<Pricing />} />
                   <Route path='settings' element={<Settings />} />
-                  <Route path='ta' element={<TA />} />
-                  <Route path='calibration' element={<Calibration />} />
                   <Route path='forecasts' element={<Forecasts />} />
                   <Route path='events' element={<Events />} />
+                  <Route path='polymarket' element={<Polymarket />} />
                 </Route>
+
 
                 <Route path='*' element={<NotFound />} />
               </Routes>

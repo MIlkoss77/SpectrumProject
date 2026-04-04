@@ -128,8 +128,15 @@
 
 .premium-grid-main {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
+    width: 100%;
+}
+
+@media (min-width: 1600px) {
+    .premium-grid-main {
+        grid-template-columns: 2fr 1fr;
+    }
 }
 
 @media (max-width: 1200px) {
@@ -137,6 +144,7 @@
         grid-template-columns: 1fr;
     }
 }
+
 
 .analytics-col,
 .market-col {

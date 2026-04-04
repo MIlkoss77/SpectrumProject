@@ -4,29 +4,38 @@ const BASE = '/api/news';
 // Proxied through Vite/Server
 
 /**
- * Fetch news from real CryptoPanic API via local backend
+ * Fetch news from multiple sources via local backend
  */
 async function fetchRSSNews() {
   try {
-    // Try to reach our local backend proxy
-    const res = await fetch(`${BASE}?filter=hot`);
+    const key = localStorage.getItem('cryptopanic_key');
+    const headers = {};
+    if (key) headers['X-CryptoPanic-Key'] = key;
+
+    // Fetch from our consolidated backend service
+    const res = await fetch(`${BASE}`, { headers });
     if (!res.ok) throw new Error('Backend unavailable');
 
     const data = await res.json();
-    if (!data.results) return getFallbackNews();
 
-    // Mapping real RSS items from our backend proxy
-    return data.results.map(item => {
-      const tags = extractTags(item.title);
-      const impact = detectImpact(item.title);
+    const items = data.results || [];
+    
+    if (items.length === 0) return getFallbackNews();
+
+    // Mapping real items from our high-volume backend
+    return items.map(item => {
+      const tags = item.currencies?.map(c => c.code) || extractTags(item.title);
+      const impact = detectImpact(item.title + ' ' + (item.description || ''));
 
       return {
         id: item.id || Math.random(),
         title: item.title,
-        summary: item.title, // RSS usually has title as summary
+        summary: item.description || item.title,
         source: item.source?.title || item.domain || 'Crypto News',
+        domain: item.domain,
         tags: tags,
-        time: new Date(item.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        time: formatNewsTime(item.published_at),
+        rawTime: item.published_at,
         impact: impact,
         sentiment: 'NEUTRAL', // Will be refined by AI in getNews()
         confidence: 0.8,
@@ -40,7 +49,22 @@ async function fetchRSSNews() {
 }
 
 /**
- * Extract crypto tags from title
+ * Helper to format relative or short time
+ */
+function formatNewsTime(publishedAt) {
+  const date = new Date(publishedAt);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+  
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+/**
+ * Extract crypto tags from title (Legacy fallback)
  */
 function extractTags(title) {
   const cryptos = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'TON', 'AVAX', 'DOT']
@@ -51,18 +75,18 @@ function extractTags(title) {
 /**
  * Detect impact level from keywords
  */
-function detectImpact(title) {
-  const highImpact = ['SEC', 'ETF', 'hack', 'crash', 'surge', 'record', 'billion', 'regulation']
-  const medImpact = ['launch', 'update', 'partnership', 'listing']
+function detectImpact(text) {
+  const highImpact = ['SEC', 'ETF', 'hack', 'crash', 'surge', 'record', 'billion', 'regulation', 'fiat', 'collapse']
+  const medImpact = ['launch', 'update', 'partnership', 'listing', 'upgrade', 'whale']
 
-  const lower = title.toLowerCase()
+  const lower = text.toLowerCase()
   if (highImpact.some(w => lower.includes(w))) return 'HIGH'
   if (medImpact.some(w => lower.includes(w))) return 'MED'
   return 'LOW'
 }
 
 /**
- * Curated local news feed (Premium quality, zero network errors)
+ * Curated local news feed
  */
 function getFallbackNews() {
   const now = Date.now()
@@ -73,7 +97,7 @@ function getFallbackNews() {
       summary: 'Crypto markets show resilience amid global uncertainty.',
       source: 'Market Analysis',
       tags: ['BTC'],
-      time: new Date(now - 1000 * 60 * 15).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: '15m ago',
       impact: 'MED',
       sentiment: 'BULLISH',
       confidence: 0.7,
@@ -85,63 +109,24 @@ function getFallbackNews() {
       summary: 'Pectra upgrade scheduled for Q2 2026 with major improvements.',
       source: 'Dev Update',
       tags: ['ETH'],
-      time: new Date(now - 1000 * 60 * 45).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: '45m ago',
       impact: 'MED',
       sentiment: 'NEUTRAL',
       confidence: 0.6,
       url: 'https://example.com/news/2'
-    },
-    {
-      id: 'n3',
-      title: 'Solana MEV research reveals new optimization strategies',
-      summary: 'Researchers publish findings on extractable value in Solana ecosystem.',
-      source: 'Research',
-      tags: ['SOL'],
-      time: new Date(now - 1000 * 60 * 90).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      impact: 'LOW',
-      sentiment: 'NEUTRAL',
-      confidence: 0.5,
-      url: 'https://example.com/news/3'
-    },
-    {
-      id: 'n4',
-      title: 'BTC ETF inflows hit record $1.2B',
-      summary: 'Bitcoin ETFs saw unprecedented inflows as institutional demand surges.',
-      source: 'Market Data',
-      tags: ['BTC', 'ETF'],
-      time: new Date(now - 1000 * 60 * 120).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      impact: 'HIGH',
-      sentiment: 'BULLISH',
-      confidence: 0.8,
-      url: 'https://example.com/news/4'
-    },
-    {
-      id: 'n5',
-      title: 'SEC delays decision on Ethereum spot ETF applications',
-      summary: 'Regulatory uncertainty continues as SEC pushes deadline by 45 days.',
-      source: 'Regulatory',
-      tags: ['ETH', 'SEC'],
-      time: new Date(now - 1000 * 60 * 180).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      impact: 'HIGH',
-      sentiment: 'BEARISH',
-      confidence: 0.7,
-      url: 'https://example.com/news/5'
     }
   ]
 }
 
 /**
- * Get news with AI sentiment analysis
- * @param {boolean} withSentiment - Whether to analyze sentiment (slower but AI-powered)
+ * Get news with AI sentiment analysis & Clustering
  */
 export async function getNews(withSentiment = true) {
-  // Fetch from REAL backend proxy
   let items = await fetchRSSNews()
 
-  // Analyze sentiment with AI (if enabled and items exist)
   if (withSentiment && items.length > 0) {
-    // Only analyze first 3 items to save API calls
-    const toAnalyze = items.slice(0, 3)
+    // Analyze top 5 items for better "Pro" feel
+    const toAnalyze = items.slice(0, 5)
 
     for (const item of toAnalyze) {
       try {
@@ -150,20 +135,50 @@ export async function getNews(withSentiment = true) {
         item.confidence = analysis.confidence
         item.aiSummary = analysis.summary
       } catch (e) {
-        // Sentiment analysis failed, keep defaults
+        // Sentiment analysis failed
       }
     }
   }
 
+  // Implementation of Basic Narrative Clustering
+  const clusters = clusterNews(items);
+
   return {
     ts: Date.now(),
-    items: items.length > 0 ? items : getFallbackNews()
+    items: items,
+    clusters: clusters
   }
 }
 
 /**
- * Get news without AI sentiment (faster, for initial load)
+ * Group news into narrative clusters based on tags and title similarity
  */
+function clusterNews(items) {
+  const clusters = [];
+  const groups = {};
+
+  items.forEach(item => {
+    const primaryTag = item.tags[0] || 'Market';
+    if (!groups[primaryTag]) groups[primaryTag] = [];
+    groups[primaryTag].push(item);
+  });
+
+  Object.entries(groups).forEach(([tag, groupItems]) => {
+    if (groupItems.length >= 2) {
+      clusters.push({
+        id: `cluster-${tag}`,
+        name: `${tag} Narrative`,
+        count: groupItems.length,
+        topStory: groupItems[0].title,
+        items: groupItems.slice(0, 5)
+      });
+    }
+  });
+
+  return clusters.sort((a, b) => b.count - a.count);
+}
+
 export async function getNewsFast() {
   return getNews(false)
 }
+

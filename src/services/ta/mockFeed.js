@@ -1,5 +1,6 @@
 // Генерируем свечи для демонстрации
-export function genCandles(n = 400, start = 95000, noise = 0.015) {
+export function genCandles(n = 400, start = 68420.5, noise = 0.015) {
+
   const arr = []
   let price = start
   for (let i = 0; i < n; i++) {

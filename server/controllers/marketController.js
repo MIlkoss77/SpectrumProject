@@ -51,14 +51,18 @@ export const getOHLC = async (req, res) => {
 
 export const getNews = async (req, res) => {
     try {
-        const results = await fetchNews();
+        const apiKey = req.headers['x-cryptopanic-key'] || process.env.CRYPTOPANIC_KEY;
+        const results = await fetchNews(apiKey);
         res.json({ results });
     } catch (error) {
         console.error('RSS News Error:', error.message);
         const mockNews = getMockNews();
-        setTimeout(() => res.json(mockNews), 500);
+        res.json(mockNews);
     }
 };
+
+
+
 
 export const getWhaleTransactions = async (req, res) => {
     try {

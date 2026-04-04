@@ -16,7 +16,10 @@ export const WebSocketProvider = ({ children }) => {
     const [depth, setDepth] = useState({})
     const [trades, setTrades] = useState({})
     const [lastMessage, setLastMessage] = useState(null)
+    const [throughput, setThroughput] = useState(0)
+    const msgCount = useRef(0)
     const wsBinance = useRef(null)
+
     const wsBybit = useRef(null)
     const binanceSubscribers = useRef(new Set())
     const bybitSubscribers = useRef(new Set())
@@ -24,11 +27,19 @@ export const WebSocketProvider = ({ children }) => {
     useEffect(() => {
         connectBinance()
         connectBybit()
+
+        const interval = setInterval(() => {
+          setThroughput(msgCount.current)
+          msgCount.current = 0
+        }, 1000)
+
         return () => {
+            clearInterval(interval)
             if (wsBinance.current) wsBinance.current.close()
             if (wsBybit.current) wsBybit.current.close()
         }
     }, [])
+
 
     const connectBinance = () => {
         if (wsBinance.current && wsBinance.current.readyState !== WebSocket.CLOSED) return
@@ -44,8 +55,10 @@ export const WebSocketProvider = ({ children }) => {
         }
 
         wsBinance.current.onmessage = (event) => {
+            msgCount.current++
             const data = JSON.parse(event.data)
             setLastMessage(data)
+
 
             // Binance Ticker
             if (data.e === '24hrTicker' || data.e === '24hrMiniTicker') {
@@ -111,8 +124,10 @@ export const WebSocketProvider = ({ children }) => {
         }
 
         wsBybit.current.onmessage = (event) => {
+            msgCount.current++
             const msg = JSON.parse(event.data)
             if (msg.op === 'pong') return
+
             setLastMessage(msg)
 
             // Bybit Tickers
@@ -211,8 +226,10 @@ export const WebSocketProvider = ({ children }) => {
             depth,
             trades,
             lastMessage,
+            throughput,
             subscribe,
             unsubscribe
+
         }}>
             {children}
         </WebSocketContext.Provider>

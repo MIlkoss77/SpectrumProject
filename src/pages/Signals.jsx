@@ -4,9 +4,18 @@ import { genCandles } from '@/services/ta/mockFeed'
 import { ema, rsi, macd } from '@/services/ta/indicators'
 import { IchimokuCloud } from 'technicalindicators'
 import { fetchSignalsSnapshot } from '@/services/providers/signals'
+import { monitor } from '@/services/providers/market'
 import { ArrowLeft, TrendingUp, TrendingDown, Activity, Zap, Eye, Loader2 } from 'lucide-react'
 import Skeleton from '@/components/ui/Skeleton'
 import './dashboard.css'
+
+// - [x] Implement `NetworkMonitor` in `market.js` (Track proxy health)
+// - [x] Update `WebSocketContext.jsx` with message throughput and latency trackers
+// - [x] Create `ConnectionHub.jsx` component for real-time status monitoring
+// - [x] Integrate `ConnectionHub` into `AppShell.jsx` toolbar
+// - [x] Add 'SOURCE: LIVE' / 'SOURCE: SIMULATION' badges to `Signals.jsx`
+// - [x] Add 'SOURCE: LIVE' / 'SOURCE: SIMULATION' badges to `Overview.jsx`
+// - [x] Verify transparency system with manual network toggling
 
 function MiniSparkline({ data, color = '#1AF2FF', height = 40 }) {
   if (!data || data.length < 2) return null
@@ -109,13 +118,18 @@ function ScannerView({ onSelect }) {
   const { t } = useTranslation()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
+  const [dataStatus, setDataStatus] = useState('UNKNOWN')
 
   useEffect(() => {
+    setDataStatus(monitor.getStatus())
+    const unsub = monitor.subscribe(status => setDataStatus(status))
     fetchSignalsSnapshot().then(data => {
       setItems(data)
       setLoading(false)
     })
+    return unsub
   }, [])
+
 
   if (loading) return (
     <div className="w-full animate-in">
@@ -127,8 +141,10 @@ function ScannerView({ onSelect }) {
         <Skeleton style={{ width: '100%', height: '16px', marginTop: '8px' }} />
       </div>
       <div className="dx-grid-premium">
+
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="action-card" style={{ background: 'rgba(255,255,255,0.02)', padding: '16px', minHeight: '220px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div key={i} className="action-card" style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
             <div className="flex justify-between">
               <div className="flex gap-2">
                 <Skeleton variant="circle" style={{ width: '40px', height: '40px' }} />
@@ -147,6 +163,7 @@ function ScannerView({ onSelect }) {
           </div>
         ))}
       </div>
+
     </div>
   )
 
@@ -158,7 +175,12 @@ function ScannerView({ onSelect }) {
             <Zap size={20} className="text-cyan-400" />
             <span className="tracking-widest font-bold text-sm uppercase">{t('pages.signals.title') || 'AI SIGNAL SCANNER'}</span>
           </div>
-          <span className="dx-tag bg-cyan-500/10 text-cyan-400 border-cyan-500/30">{t('ui.live_scanning') || 'LIVE SCANNING'}</span>
+          <div className={`px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest flex items-center gap-2 ${
+            dataStatus === 'LIVE' ? 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400' : 'bg-red-500/5 border-red-500/20 text-red-400'
+          }`}>
+            <div className={`w-1.5 h-1.5 rounded-full ${dataStatus === 'LIVE' ? 'bg-cyan-400 shadow-[0_0_8px_#00FFFF]' : 'bg-red-500 shadow-[0_0_8px_#FF4560]'}`} />
+            {dataStatus === 'LIVE' ? 'Data Source: Verified Binance' : 'Data Source: Synthetic Simulation'}
+          </div>
         </div>
         <p className="text-white/40 text-sm max-w-xl">
           {t('pages.signals.description') || 'Real-time market analysis detecting high-probability setups across multiple timeframes with neural network accuracy.'}
@@ -166,6 +188,8 @@ function ScannerView({ onSelect }) {
       </div>
 
       <div className="dx-grid-premium">
+
+
         {items.map(item => {
           const isPositive = item.change24h >= 0
           const isBuy = item.signal === 'BUY' || item.signal === 'BULLISH'
@@ -178,70 +202,80 @@ function ScannerView({ onSelect }) {
               style={{
                 borderColor: isBuy ? 'rgba(34,211,238,0.2)' : 'rgba(239,68,68,0.1)',
                 background: 'rgba(20, 20, 25, 0.7)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                padding: '16px'
+                backdropFilter: 'blur(30px)',
+                WebkitBackdropFilter: 'blur(30px)',
+                padding: '20px',
+                borderRadius: '24px',
+                display: 'flex',
+                flexDirection: 'column'
+
               }}
               onClick={() => onSelect(item.symbol, item.timeframe)}
             >
+
               <div className={`absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl ${isBuy ? 'bg-cyan-400' : 'bg-red-400'}`} />
 
-              <div className="relative z-10 flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg border ${isBuy ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+              <div className="relative z-10 flex justify-between items-start mb-auto">
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl border ${isBuy ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
                     {item.symbol.substring(0, 1)}
                   </div>
                   <div>
-                    <div className="text-base font-bold text-white group-hover:text-cyan-400 transition-colors">{item.symbol}</div>
-                    <div className="text-[9px] font-mono font-bold text-white/30 uppercase">{item.timeframe} Range</div>
+                    <div className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors tracking-tight">{item.symbol}</div>
+                    <div className="text-[10px] font-black font-mono text-white/20 uppercase tracking-widest">{item.timeframe} RANGE</div>
                   </div>
                 </div>
-                <div className="action-status font-bold tracking-wider text-[9px] px-2 py-0.5 rounded bg-black/40 border border-white/5"
+                <div className="action-status font-black tracking-[0.2em] text-[9px] px-2.5 py-1 rounded-lg bg-black/40 border border-white/5"
                   style={{ color: accentColor, borderColor: `${accentColor}40` }}>
                   {item.signal}
                 </div>
               </div>
 
-              <div className="relative z-10 flex items-end justify-between mb-4">
+
+              <div className="relative z-10 flex items-end justify-between mt-6 mb-6">
                 <div>
-                  <div className="text-xl font-mono font-bold text-white tabular-nums">${item.price?.toLocaleString()}</div>
-                  <div className={`flex items-center gap-1 text-[10px] font-bold ${isPositive ? 'text-cyan-400' : 'text-red-400'}`}>
-                    {isPositive ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                    {item.change24h?.toFixed(2)}%
+                  <div className="text-2xl font-mono font-bold text-white tabular-nums tracking-tighter">${item.price?.toLocaleString()}</div>
+                  <div className={`flex items-center gap-1.5 text-xs font-bold leading-none mt-1 ${isPositive ? 'text-cyan-400' : 'text-red-400'}`}>
+                    {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                    <span className="tracking-widest">{item.change24h?.toFixed(2)}%</span>
                   </div>
                 </div>
-                <div className="w-20 h-8 opacity-60 group-hover:opacity-100 transition-opacity">
-                  <MiniSparkline data={item.sparkline} color={accentColor} height={32} />
+                <div className="w-24 h-10 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <MiniSparkline data={item.sparkline} color={accentColor} height={40} />
                 </div>
               </div>
 
-              <div className="relative z-10 pt-4 border-t border-white/5">
-                <div className="action-score w-full mb-3">
-                  <div className="flex justify-between text-[9px] uppercase font-bold text-white/30 mb-1">
+
+              <div className="relative z-10 mt-auto pt-6 border-t border-white/5">
+                <div className="action-score w-full mb-6">
+                  <div className="flex justify-between text-[10px] uppercase font-black text-white/20 mb-2 tracking-widest">
                     <span>{t('ui.ai_confidence') || 'AI Confidence'}</span>
                     <span style={{ color: accentColor }}>{Math.round(item.confidence * 100)}%</span>
                   </div>
-                  <div className="score-bar h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div className="score-bar h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div className="score-fill h-full rounded-full"
                       style={{
                         width: `${item.confidence * 100}%`,
                         background: accentColor,
-                        boxShadow: isBuy ? '0 0 8px rgba(34,211,238,0.5)' : 'none'
+                        boxShadow: isBuy ? '0 0 10px rgba(34,211,238,0.6)' : 'none'
                       }} />
                   </div>
                 </div>
 
+
                 <button
-                  className="w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-wider transition-all duration-300"
+                  className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all duration-300 shadow-lg"
                   style={{
-                    background: isBuy ? 'linear-gradient(90deg, rgba(34,211,238,0.1) 0%, rgba(6,182,212,0.2) 100%)' : 'rgba(255,255,255,0.05)',
+                    background: isBuy ? 'linear-gradient(90deg, rgba(34,211,238,0.15) 0%, rgba(6,182,212,0.2) 100%)' : 'rgba(255,255,255,0.05)',
                     color: isBuy ? '#22d3ee' : '#fff',
-                    border: `1px solid ${isBuy ? 'rgba(34,211,238,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                    border: `1px solid ${isBuy ? 'rgba(34,211,238,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                    borderRadius: '16px'
                   }}
                 >
-                  <Eye size={14} /> {t('ui.analyze_setup') || 'ANALYZE SETUP'}
+                  <Eye size={16} /> {t('ui.analyze_setup') || 'ANALYZE SETUP'}
                 </button>
               </div>
+
             </div>
           )
         })}

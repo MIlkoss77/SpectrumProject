@@ -8,7 +8,9 @@ import * as tradeController from '../controllers/tradeController.js';
 import * as aiController from '../controllers/aiController.js';
 import * as notificationController from '../controllers/notificationController.js';
 import * as paymentController from '../controllers/paymentController.js';
+import * as polymarketController from '../controllers/polymarketController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+
 import rateLimit from 'express-rate-limit';
 
 const router = express.Router();
@@ -61,4 +63,10 @@ router.get('/bybit/ticker/:symbol', marketController.getBybitTickerPrice);
 // Backtest Route
 router.post('/backtest', backtestController.handleBacktest);
 
+// Polymarket Routes
+router.get('/polymarket/markets', polymarketController.getMarkets);
+router.post('/polymarket/order', polymarketController.placeOrder);
+router.get('/polymarket/orders', polymarketController.getOrders);
+
 export default router;
+

@@ -57,15 +57,15 @@ const ALLOWED_ORIGINS = [
 
 app.use('/api', cors({
     origin: (origin, callback) => {
-        // Enforce strict origin checking
-        const isDev = process.env.NODE_ENV === 'development';
-        if (ALLOWED_ORIGINS.includes(origin) || (isDev && !origin)) {
+        const isDev = process.env.NODE_ENV !== 'production'; // More permissive dev check
+        if (!origin || ALLOWED_ORIGINS.includes(origin) || isDev) {
             callback(null, true);
         } else {
             console.warn(`[CORS] Blocked origin: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
+
     credentials: true
 }));
 
@@ -139,6 +139,8 @@ app.use((err, req, res, next) => {
         path: isDev ? req.url : undefined
     });
 });
+
+
 
 // Start the Server
 app.listen(PORT, '0.0.0.0', () => {

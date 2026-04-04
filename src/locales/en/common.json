@@ -16,8 +16,10 @@
         "backtest": "Backtest",
         "ta": "Analytics",
         "agent": "AI Agent",
+        "polymarket": "Polymarket",
         "notFound": "Page not found"
     },
+
     "ui": {
         "refresh": "Refresh",
         "loading": "Loading...",
@@ -133,6 +135,9 @@
         },
         "ta": {
             "title": "Analytics"
+        },
+        "polymarket": {
+            "title": "Polymarket Trading"
         }
     }
 }

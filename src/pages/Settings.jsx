@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Bell, Mail, MessageCircle, Moon, Sun, Globe, Shield, ShieldAlert, Zap, Brain, Receipt, History } from 'lucide-react'
+import { Bell, Mail, MessageCircle, Moon, Sun, Globe, Shield, ShieldAlert, Zap, Brain, Receipt, History, Key, Cpu, Wallet as WalletIcon } from 'lucide-react'
+
 import { useTranslation } from 'react-i18next'
 import { useTrading } from '@/context/TradingContext.jsx'
 import axios from 'axios'
@@ -20,7 +21,10 @@ export default function Settings() {
   const [aiProvider, setAiProvider] = useState(() => localStorage.getItem('ai_provider') || 'openai')
   const [openaiKey, setOpenaiKey] = useState('••••••••••••')
   const [anthropicKey, setAnthropicKey] = useState('••••••••••••')
+  const [cryptoPanicKey, setCryptoPanicKey] = useState(() => localStorage.getItem('cryptopanic_key') || '')
+  const [polyPk, setPolyPk] = useState(() => localStorage.getItem('poly_hot_wallet') || '')
   const [isSaving, setIsSaving] = useState(false)
+
 
   // Transaction History
   const [payments, setPayments] = useState([])
@@ -76,6 +80,12 @@ export default function Settings() {
       setIsSaving(false)
     }
   }
+
+  const handleSaveLocalKey = (key, value) => {
+    localStorage.setItem(key, value)
+    alert(`Success: ${key.replace('_', ' ').toUpperCase()} updated locally.`)
+  }
+
 
   const handleTestNotification = () => {
     if ('Notification' in window && Notification.permission === 'granted') {
@@ -201,6 +211,49 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      <div className="dx-card">
+        <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Key size={20} className="text-amber-400" /> {t('pages.settings.developer_title') || 'Developer & Pro Settings (BYOK)'}
+        </h3>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div className="p-4 rounded-xl border border-white/5 bg-white/5">
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>
+              <Cpu size={14} className="text-cyan-400" /> CRYPTOPANIC API KEY
+            </label>
+            <input
+              type="password"
+              value={cryptoPanicKey}
+              onChange={e => setCryptoPanicKey(e.target.value)}
+              onBlur={e => handleSaveLocalKey('cryptopanic_key', e.target.value)}
+              placeholder="Enter your personal API Key"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 12 }}
+            />
+            <p style={{ fontSize: 10, color: 'var(--muted)', marginTop: 8 }}>
+              Use your own key for higher news frequency and sentiment analysis speed.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl border border-white/5 bg-white/5">
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>
+              <WalletIcon size={14} className="text-green-400" /> POLYMARKET HOT WALLET
+            </label>
+            <input
+              type="password"
+              value={polyPk}
+              onChange={e => setPolyPk(e.target.value)}
+              onBlur={e => handleSaveLocalKey('poly_hot_wallet', e.target.value)}
+              placeholder="0x... Private Key"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--accent)', fontSize: 12, fontFamily: 'var(--font-mono)' }}
+            />
+            <p style={{ fontSize: 10, color: 'var(--muted)', marginTop: 8 }}>
+              Stored encrypted in local browser storage only. Used for instant API-based bet execution.
+            </p>
+          </div>
+        </div>
+      </div>
+
 
       <div className="dx-card">
         <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>

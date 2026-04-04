@@ -4,11 +4,14 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import PageTransition from '@/components/PageTransition'
 import { useWeb3 } from '@/context/Web3Context.jsx'
-import { Home, LayoutDashboard, BarChart3, Settings, Shield, User, Menu, X, LogOut, ChevronRight, Zap, Target, ShieldAlert, ShieldCheck, Wallet, Bell, Activity, Newspaper, Bot, Scale, GraduationCap, PieChart, CreditCard } from 'lucide-react'
+import { Home, LayoutDashboard, BarChart3, Settings, Shield, User, Menu, X, LogOut, ChevronRight, Zap, Target, ShieldAlert, ShieldCheck, Wallet, Bell, Activity, Newspaper, Bot, Scale, GraduationCap, PieChart, CreditCard, Layers } from 'lucide-react'
+
 import { capitalShield } from '@/services/trading/capitalShield'
 import { useTrading } from '@/context/TradingContext.jsx'
 import '@/pages/dashboard.css'
 import '@/pages/mobile.css'
+import Skeleton from '@/components/ui/Skeleton'
+import ConnectionHub from '@/components/dashboard/ConnectionHub'
 import logoImg from '@/assets/logo.png'
 import OnboardingModal from '@/components/onboarding/OnboardingModal'
 import NotificationDropdown from '@/components/NotificationDropdown'
@@ -30,6 +33,7 @@ export default function AppShell() {
   const NAV = [
     { label: t('app.dashboard'), to: '/app', icon: LayoutDashboard },
     { label: t('app.portfolio'), to: '/app/portfolio', icon: Wallet },
+    { label: t('app.polymarket'), to: '/app/polymarket', icon: Layers },
     { label: t('app.signals'), to: '/app/signals', icon: Activity },
     { label: t('app.alerts'), to: '/app/alerts', icon: Bell },
     { label: t('app.news'), to: '/app/news', icon: Newspaper },
@@ -40,6 +44,7 @@ export default function AppShell() {
     { label: t('app.pricing'), to: '/app/pricing', icon: CreditCard },
     { label: t('app.settings'), to: '/app/settings', icon: Settings },
   ]
+
 
   useEffect(() => {
     const handleProChange = () => setIsPro(localStorage.getItem('spectr_pro_status') === 'true')
@@ -219,6 +224,8 @@ export default function AppShell() {
           </div>
 
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px' }}>
+            <ConnectionHub />
+
             <div className="desktop-shield-only" style={{ alignItems: 'center', gap: '10px', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
               <Shield size={16} color="#00FFFF" />
               <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
@@ -226,6 +233,7 @@ export default function AppShell() {
                 <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', lineHeight: 1 }}>PROTECTED</span>
               </div>
             </div>
+
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ position: 'relative' }}>

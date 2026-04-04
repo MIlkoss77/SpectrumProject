@@ -1,7 +1,44 @@
 // src/services/providers/market.js
 // --- Binance API helper ------------------------------------------------------
 // Получение свечей с Binance API (через Vite proxy)
-const BINANCE_BASE = '/api/proxy/binance'; // Routed through backend proxy for both dev and prod
+const BINANCE_BASE = '/api/proxy/binance';
+const BYBIT_BASE = '/api/proxy/bybit';
+
+// Singleton to track data integrity
+class NetworkMonitor {
+  constructor() {
+    this.history = [];
+    this.maxHistory = 10;
+    this.listeners = new Set();
+  }
+
+  log(success) {
+    this.history.push({ ts: Date.now(), success });
+    if (this.history.length > this.maxHistory) this.history.shift();
+    this.notify();
+  }
+
+  getStatus() {
+    if (this.history.length === 0) return 'UNKNOWN';
+    const recent = this.history.slice(-5);
+    const successCount = recent.filter(h => h.success).length;
+    if (successCount === recent.length) return 'LIVE';
+    if (successCount === 0) return 'FALLBACK';
+    return 'DEGRADED';
+  }
+
+  subscribe(fn) {
+    this.listeners.add(fn);
+    return () => this.listeners.delete(fn);
+  }
+
+  notify() {
+    this.listeners.forEach(fn => fn(this.getStatus()));
+  }
+}
+
+export const monitor = new NetworkMonitor();
+
 const TF_MAP = { '1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h', '1d': '1d' };
 
 export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) {
@@ -14,6 +51,7 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
       throw new Error(`HTTP ${res.status} ${res.statusText}`);
     }
     const data = await res.json();
+    monitor.log(true);
 
     // Форматируем данные в единый формат: { t, o, h, l, c, v, openTime, volume }
     return data.map(k => ({
@@ -28,6 +66,7 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
       closeTime: k[6],
     }));
   } catch (err) {
+    monitor.log(false);
     throw new Error(`[fetchBinanceKlines] ${symbol} ${timeframe} :: ${err?.message || 'Network error'}`);
   }
 }

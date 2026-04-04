@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getMarkets } from '@/services/providers/market'
+import { monitor } from '@/services/providers/market'
 import { getTopActions, calculateSuperScore } from '@/services/ai/superScore'
+
 import { useWebSocket } from '@/context/WebSocketContext'
 import NumberTicker from '@/components/NumberTicker'
 import TechnicalBrief from '../components/TechnicalBrief'
@@ -20,7 +22,8 @@ import logoImg from '@/assets/logo.png'
 
 function ActionCard({ action, loading, openTrade, t }) {
   if (loading) return (
-    <div className="action-card" style={{ background: 'rgba(20,20,28,0.4)', borderColor: 'rgba(255,255,255,0.02)' }}>
+    <div className="action-card" style={{ background: 'rgba(20,20,28,0.4)', borderColor: 'rgba(255,255,255,0.02)', borderRadius: '24px', padding: '20px' }}>
+
       <div className="flex justify-between items-center mb-4">
         <Skeleton className="w-16 h-4" />
         <Skeleton className="w-20 h-5" />
@@ -35,41 +38,47 @@ function ActionCard({ action, loading, openTrade, t }) {
 
   return (
     <div className="action-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02]"
-      style={{ borderColor: isPositive ? 'rgba(0,255,255,0.2)' : 'rgba(255,255,255,0.05)', background: 'linear-gradient(145deg, rgba(20,20,28,0.6) 0%, rgba(5,5,8,0.8) 100%)' }}>
+      style={{ 
+        borderColor: isPositive ? 'rgba(0,255,255,0.2)' : 'rgba(255,255,255,0.05)', 
+        background: 'linear-gradient(145deg, rgba(20,20,28,0.6) 0%, rgba(5,5,8,0.8) 100%)',
+        borderRadius: '24px',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column'
 
-      {/* Hover Glow */}
+      }}>
+
       <div className={`absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl ${isPositive ? 'bg-cyan-400' : 'bg-red-400'}`} />
 
-      <div className="action-main relative z-10">
-        <div className="action-symbol flex items-center gap-2">
-          <span className={`w-1.5 h-1.5 rounded-full ${isPositive ? 'bg-cyan-400' : 'bg-red-500'}`} />
+      <div className="action-main relative z-10 flex justify-between items-center mb-auto">
+        <div className="action-symbol flex items-center gap-2 font-bold text-lg">
+          <span className={`w-2 h-2 rounded-full ${isPositive ? 'bg-cyan-400 shadow-[0_0_8px_#00FFFF]' : 'bg-red-500 shadow-[0_0_8px_#FF4560]'}`} />
           {action.symbol.replace('USDT', '')}
         </div>
-        <div className="action-status font-bold tracking-wider text-xs px-2 py-0.5 rounded bg-black/40 border border-white/5"
+        <div className="action-status font-black tracking-[0.2em] text-[10px] px-2.5 py-1 rounded-lg bg-black/40 border border-white/5"
           style={{ color: isPositive ? '#22d3ee' : color, borderColor: isPositive ? 'rgba(34,211,238,0.3)' : 'rgba(255,59,48,0.2)' }}>
           {action.status}
         </div>
       </div>
-      <div className="action-footer relative z-10 mt-4">
-        <div className="action-score w-full mb-3">
-          <div className="flex justify-between text-[10px] uppercase font-bold text-white/30 mb-1">
+      
+      <div className="action-footer relative z-10 mt-6 overflow-hidden">
+        <div className="action-score w-full mb-6">
+          <div className="flex justify-between text-[11px] uppercase font-black text-white/30 mb-2 tracking-widest">
             <span>{t('pages.dashboard.confidence') || 'Confidence'}</span>
             <span style={{ color: isPositive ? '#00FFFF' : color }}>{action.score}%</span>
           </div>
-          <div className="score-bar h-1.5 bg-white/5 rounded-full overflow-hidden">
+          <div className="score-bar h-2 bg-white/5 rounded-full overflow-hidden">
             <div className="score-fill h-full rounded-full"
-              style={{ width: `${action.score}% `, background: isPositive ? '#00FFFF' : color, boxShadow: isPositive ? '0 0 10px rgba(0,255,255,0.5)' : 'none' }} />
+              style={{ width: `${action.score}%`, background: isPositive ? '#00FFFF' : color, boxShadow: isPositive ? '0 0 10px rgba(0,255,255,0.5)' : 'none' }} />
           </div>
         </div>
         <button
-          className="w-full py-2.5 rounded-lg flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider transition-all duration-300"
+          className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all duration-300 shadow-xl"
           style={{
-            background: isPositive ? 'linear-gradient(135deg, rgba(0,255,255,0.08) 0%, rgba(99,102,241,0.12) 100%)' : 'rgba(255,255,255,0.05)',
+            background: isPositive ? 'linear-gradient(135deg, rgba(0,255,255,0.15) 0%, rgba(99,102,241,0.2) 100%)' : 'rgba(255,255,255,0.05)',
             color: isPositive ? '#00FFFF' : '#fff',
-            border: '1px solid ' + (isPositive ? 'rgba(0,255,255,0.25)' : 'rgba(255,255,255,0.1)'),
-            boxShadow: isPositive ? '0 0 15px rgba(0,255,255,0.1)' : 'none',
-            borderRadius: '12px',
-            fontFamily: "'Inter', sans-serif"
+            border: '1px solid ' + (isPositive ? 'rgba(0,255,255,0.4)' : 'rgba(255,255,255,0.1)'),
+            borderRadius: '16px'
           }}
           onClick={() => openTrade({ symbol: action.symbol.replace('USDT', ''), price: action.price, action: action.status.includes('BUY') ? 'BUY' : 'SELL' })}
         >
@@ -80,6 +89,7 @@ function ActionCard({ action, loading, openTrade, t }) {
     </div>
   )
 }
+
 
 function MiniChart({ data, color = '#22d3ee', height = 60 }) {
   if (!data || data.length < 2) return null
@@ -109,6 +119,8 @@ export default function Overview() {
   const [mainScore, setMainScore] = useState(null)
   const [activeTrade, setActiveTrade] = useState(null)
   const [showWelcome, setShowWelcome] = useState(false)
+  const [dataStatus, setDataStatus] = useState('UNKNOWN')
+
 
   React.useEffect(() => {
     if (showWelcome) {
@@ -140,7 +152,13 @@ export default function Overview() {
     }
   }
 
-  useEffect(() => { loadData() }, [])
+  useEffect(() => { 
+    loadData() 
+    setDataStatus(monitor.getStatus())
+    const unsub = monitor.subscribe(status => setDataStatus(status))
+    return unsub
+  }, [])
+
 
   // Update chart with real-time BTC price
   useEffect(() => {
@@ -273,10 +291,15 @@ export default function Overview() {
       <div className="overview-hero">
         <div className="hero-header">
           <div className="hero-title">
-            <ShieldCheck size={20} className="text-cyan-400" />
-            <span className="tracking-widest font-bold text-sm">{t('pages.dashboard.top_actions') || 'TOP ACTIONS TODAY'}</span>
+            <div className={`px-2 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${
+              dataStatus === 'LIVE' ? 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400' : 'bg-red-500/5 border-red-500/20 text-red-400'
+            }`}>
+              <div className={`w-1.5 h-1.5 rounded-full ${dataStatus === 'LIVE' ? 'bg-cyan-400 shadow-[0_0_8px_#00FFFF]' : 'bg-red-500 shadow-[0_0_8px_#FF4560]'}`} />
+              {dataStatus === 'LIVE' ? 'Verified Live Binance Data' : 'Synthetic Data Active'}
+            </div>
           </div>
           <span className="dx-tag bg-cyan-500/10 text-cyan-400 border-cyan-500/30">{t('ui.ai_filtered') || 'AI FILTERED'}</span>
+
         </div>
         {loading ? (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -286,7 +309,7 @@ export default function Overview() {
             <Skeleton className="h-40" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="dx-grid-premium">
             {topActions.map((action, i) => (
               <ActionCard key={i} action={action} loading={false} openTrade={openTrade} t={t} />
             ))}
@@ -296,7 +319,6 @@ export default function Overview() {
 
       {/* Main Grid */}
       <div className="premium-grid-main">
-
         {/* Left Column: Core Analytics */}
         <div className="analytics-col">
           <div className="dx-card score-card-premium relative overflow-hidden border-cyan-500/20" style={{ padding: '24px' }}>
