@@ -39,7 +39,11 @@ export const initClobClient = async (privateKey, apiCredentials = null) => {
 export const fetchMarkets = async (query = "") => {
     try {
         const url = `${GAMMA_HOST}/markets?limit=20&active=true&closed=false&q=${query}`;
-        const response = await axios.get(url);
+        const response = await axios.get(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            }
+        });
         
         return response.data.map(m => ({
             id: m.id,

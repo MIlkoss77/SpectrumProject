@@ -4,6 +4,10 @@ import Parser from 'rss-parser';
 const parser = new Parser({
     customFields: {
         item: ['content:encoded', 'creator', 'dc:creator', 'pubDate', 'description']
+    },
+    headers: {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     }
 });
 
@@ -63,7 +67,12 @@ export const fetchNews = async (apiKey = null) => {
             ? `https://cryptopanic.com/api/v1/posts/?auth_token=${apiKey}`
             : `https://cryptopanic.com/api/v1/posts/?public=true`;
             
-        const cpPromise = axios.get(cpUrl, { timeout: 8000 }).then(res => {
+        const cpPromise = axios.get(cpUrl, { 
+            timeout: 8000,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            }
+        }).then(res => {
             return (res.data.results || []).map(item => ({
                 title: item.title,
                 url: item.url,
