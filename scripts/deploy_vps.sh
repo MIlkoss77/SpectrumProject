@@ -26,7 +26,11 @@ echo "📂 Setting up project in $WEB_ROOT..."
 git config core.ignorecase false
 
 sudo mkdir -p $WEB_ROOT
+# Copy standard files
 sudo cp -r ./* $WEB_ROOT
+# Copy hidden files if they exist (crucial for .env)
+sudo cp -r ./.env $WEB_ROOT 2>/dev/null || true
+sudo cp -r ./.env.local $WEB_ROOT 2>/dev/null || true
 cd $WEB_ROOT
 
 echo "🧹 Cleaning up old dependencies and build..."
