@@ -1,4 +1,11 @@
 import axios from 'axios';
+import Parser from 'rss-parser';
+
+const parser = new Parser({
+    customFields: {
+        item: ['content:encoded', 'creator', 'dc:creator', 'pubDate', 'description']
+    }
+});
 
 // Cache configuration
 const CACHE_TTL = 120 * 1000; // 120 seconds
@@ -7,81 +14,73 @@ let newsCache = {
     lastUpdate: 0
 };
 
+// Direct RSS URLs, bypassing rss2json!
 const RSS_SOURCES = [
-    { name: 'CoinDesk', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.coindesk.com/arc/outboundfeeds/rss/' },
-    { name: 'CoinTelegraph', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://cointelegraph.com/rss' },
-    { name: 'Decrypt', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://decrypt.co/feed' },
-    { name: 'Bitcoin.com', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://news.bitcoin.com/feed/' },
-    { name: 'CryptoSlate', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://cryptoslate.com/feed/' },
-    { name: 'UToday', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://u.today/rss' },
-    { name: 'NewsBTC', url: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.newsbtc.com/feed/' },
-    { name: 'CryptoPanic', url: 'https://cryptopanic.com/api/v1/posts/?public=true' } // Public feed
+    { name: 'CoinDesk', url: 'https://www.coindesk.com/arc/outboundfeeds/rss/' },
+    { name: 'CoinTelegraph', url: 'https://cointelegraph.com/rss' },
+    { name: 'Decrypt', url: 'https://decrypt.co/feed' }
 ];
 
-/**
- * Fetch and aggregate news from multiple sources
- */
 export const fetchNews = async (apiKey = null) => {
     const now = Date.now();
     
-    // Return cache if still valid (but only if no custom apiKey is used, to allow bypass)
+    // Serve from cache if available
     if (!apiKey && newsCache.data && (now - newsCache.lastUpdate < CACHE_TTL)) {
         console.log('[NewsService] Serving from cache');
         return newsCache.data;
     }
 
-    console.log(`[NewsService] Fetching fresh news from 10+ sources... ${apiKey ? '(User API Key Active)' : '(Public Mode)'}`);
+    console.log(`[NewsService] Fetching fresh news (Direct RSS & CryptoPanic)...`);
     
     const fetchPromises = RSS_SOURCES.map(async (source) => {
         try {
-            let fetchUrl = source.url;
-            if (source.name === 'CryptoPanic' && apiKey) {
-                fetchUrl = `https://cryptopanic.com/api/v1/posts/?auth_token=${apiKey}`;
-            }
-            const res = await axios.get(fetchUrl, { timeout: 5000 });
-
+            const feed = await parser.parseURL(source.url);
             
-            // Handle CryptoPanic API (JSON)
-            if (source.name === 'CryptoPanic') {
-                return (res.data.results || []).map(item => ({
+            return feed.items.map(item => {
+                let domain = 'crypto';
+                try {
+                    if (item.link) domain = new URL(item.link).hostname.replace('www.', '');
+                } catch (e) {}
+                
+                return {
                     title: item.title,
-                    url: item.url,
-                    published_at: item.published_at,
-                    source: { title: item.source?.title || 'CryptoPanic' },
-                    domain: item.domain,
-                    description: item.title
-                }));
-            }
-
-            // Handle RSS2JSON outputs
-            if (res.data && res.data.items) {
-                return res.data.items
-                    .filter(item => item && item.title) // Ensure title exists
-                    .map(item => {
-                        let domain = 'crypto';
-                        try {
-                            if (item.link) domain = new URL(item.link).hostname.replace('www.', '');
-                        } catch (e) { /* ignore URL errors */ }
-                        
-                        return {
-                            title: item.title,
-                            url: item.link || '',
-                            published_at: item.pubDate || item.published_at || new Date().toISOString(),
-                            source: { title: source.name },
-                            domain: domain,
-                            description: item.content || item.description || item.title || ''
-                        };
-                    });
-            }
-
-            return [];
+                    url: item.link || '',
+                    published_at: item.isoDate || item.pubDate || new Date().toISOString(),
+                    source: { title: source.name },
+                    domain: domain,
+                    description: item.contentSnippet || item.content || item.title || ''
+                };
+            });
         } catch (err) {
-            console.error(`[NewsService] Failed to fetch from ${source.name}:`, err.message);
+            console.error(`[NewsService] Failed to fetch from ${source.name} via rss-parser:`, err.message);
             return [];
         }
     });
 
-    const results = await Promise.all(fetchPromises);
+    // Add CryptoPanic logic if apiKey provided or public feed
+    try {
+        let cpUrl = apiKey 
+            ? `https://cryptopanic.com/api/v1/posts/?auth_token=${apiKey}`
+            : `https://cryptopanic.com/api/v1/posts/?public=true`;
+            
+        const cpPromise = axios.get(cpUrl, { timeout: 8000 }).then(res => {
+            return (res.data.results || []).map(item => ({
+                title: item.title,
+                url: item.url,
+                published_at: item.published_at,
+                source: { title: item.source?.title || 'CryptoPanic' },
+                domain: item.domain,
+                description: item.title
+            }));
+        }).catch(e => {
+            console.error(`[NewsService] Failed to fetch CryptoPanic:`, e.message);
+            return [];
+        });
+        
+        fetchPromises.push(cpPromise);
+    } catch (e) {}
+
+    const results = await Promise.all([...fetchPromises]);
     let allItems = results.flat();
 
     // 1. Deduplication (by title slug)
@@ -93,7 +92,6 @@ export const fetchNews = async (apiKey = null) => {
         seen.add(slug);
         return true;
     });
-
 
     // 2. Sorting by date
     allItems.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
@@ -111,11 +109,9 @@ export const fetchNews = async (apiKey = null) => {
     }));
 
     if (formatted.length === 0) {
-        // If everything failed, use mock news instead of crashing
         return getMockNews().results;
     }
 
-    // Update cache
     newsCache.data = formatted;
     newsCache.lastUpdate = now;
 
@@ -131,7 +127,6 @@ function extractCurrencies(text) {
     const upperText = String(text).toUpperCase();
     return codes.filter(code => upperText.includes(code)).map(code => ({ code }));
 }
-
 
 export const getMockNews = () => ({
     results: [
@@ -157,4 +152,3 @@ export const getMockNews = () => ({
         }
     ]
 });
-

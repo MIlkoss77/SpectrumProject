@@ -42,7 +42,7 @@ export const binanceProxy = async (req, res) => {
             return res.status(403).json({ ok: false, error: 'Unauthorized proxy path' });
         }
 
-        const url = `https://api.binance.com${req.url}`;
+        const url = `https://data-api.binance.vision${req.url}`;
         
         // Cache lookup
         const cached = getFromCache(url);
@@ -79,7 +79,7 @@ export const bybitProxy = async (req, res) => {
             return res.status(403).json({ ok: false, error: 'Unauthorized proxy path' });
         }
 
-        const url = `https://api.bybit.com${req.url}`;
+        const url = `https://api.bytick.com${req.url}`;
 
         // Cache lookup
         const cached = getFromCache(url);
