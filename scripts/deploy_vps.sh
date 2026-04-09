@@ -33,6 +33,10 @@ sudo cp -r ./.env $WEB_ROOT 2>/dev/null || true
 sudo cp -r ./.env.local $WEB_ROOT 2>/dev/null || true
 cd $WEB_ROOT
 
+echo "🧐 Verifying files in $WEB_ROOT..."
+ls -la $WEB_ROOT/.env
+ls -la $WEB_ROOT/server/index.js
+
 echo "🧹 Cleaning up old dependencies and build..."
 sudo rm -rf node_modules package-lock.json dist
 

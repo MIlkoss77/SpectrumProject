@@ -6,6 +6,7 @@ const limiter = rateLimit({
     message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => req.url.includes('/health') || req.url.includes('/pulse')
 });
 
 export default limiter;

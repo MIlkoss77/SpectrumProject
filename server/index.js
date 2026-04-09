@@ -10,6 +10,12 @@ import { prisma } from './config/database.js';
 
 dotenv.config();
 
+console.log('[Server] Checking Environment Variables...');
+console.log(`- ETHERSCAN_API_KEY: ${process.env.ETHERSCAN_API_KEY ? '✅ Present' : '❌ MISSING'}`);
+console.log(`- CRYPTOPANIC_KEY: ${process.env.CRYPTOPANIC_KEY ? '✅ Present' : '❌ MISSING'}`);
+console.log(`- NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -132,11 +138,12 @@ app.use('/api', (req, res) => {
 app.use((err, req, res, next) => {
     const isDev = process.env.NODE_ENV === 'development';
     console.error(`[Server] Global Error: ${err.message}`);
+    if (err.stack) console.error(err.stack);
     
     res.status(err.status || 500).json({ 
         error: 'Internal Server Error', 
-        message: isDev ? err.message : 'An unexpected error occurred',
-        path: isDev ? req.url : undefined
+        message: err.message, // Always return message for now to debug VPS
+        path: req.url
     });
 });
 
