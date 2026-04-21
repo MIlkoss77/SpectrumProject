@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { fetchNews, getMockNews } from '../services/newsService.js';
 import { fetchBybitTicker } from '../services/exchangeService.js';
+import { fetchSocialBuzz } from '../services/socialService.js';
+import { telegramScout } from '../services/telegramService.js';
 
 // Simple In-memory Cache
 const cache = {
@@ -9,8 +11,8 @@ const cache = {
 };
 
 const CACHE_TTL = {
-    OHLC: 10000, // 10 seconds
-    TICKER: 5000, // 5 seconds
+    OHLC: 10000, 
+    TICKER: 5000,
 };
 
 function getFromCache(type, key) {
@@ -61,8 +63,26 @@ export const getNews = async (req, res) => {
     }
 };
 
+export const getSocialBuzz = async (req, res) => {
+    try {
+        const apiKey = process.env.CRYPTOPANIC_KEY;
+        const results = await fetchSocialBuzz(apiKey);
+        res.json({ results });
+    } catch (error) {
+        console.error('[MarketController] Social Buzz Error:', error.message);
+        res.json({ results: [] });
+    }
+};
 
-
+export const getScoutSignals = async (req, res) => {
+    try {
+        const signals = telegramScout.getSignals();
+        res.json({ ok: true, signals });
+    } catch (error) {
+        console.error('[MarketController] Scout Error:', error.message);
+        res.status(500).json({ ok: false, signals: [] });
+    }
+};
 
 export const getWhaleTransactions = async (req, res) => {
     try {
@@ -132,7 +152,6 @@ export const getBybitTickerPrice = async (req, res) => {
 
             const simulatedPrice = basePrice * (1 + (Math.random() * 0.006 - 0.003));
             const result = { ok: true, price: simulatedPrice, simulated: true };
-            // Don't cache simulated data for long, or at all
             return res.json(result);
         }
     } catch (error) {

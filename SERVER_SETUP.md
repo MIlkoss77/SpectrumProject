@@ -1,53 +1,99 @@
-# Server Setup Guide: Spectr Trading
+# Spectr Trading — Production Server Setup (Unified VPS)
 
-Before running the deployment script, ensure your server (VPS) meets the following requirements:
+Этот документ содержит базовые шаги для запуска Spectr Trading на едином Ubuntu VPS сервере.
 
-## 1. System Dependencies
-The app requires Node.js and Git.
+Инфраструктура:
+- **Frontend (PWA)** отдается Nginx как статичный SPA (Single Page Application).
+- **Backend (Node.js)** работает через PM2 на порту 3000 и проксируется с Nginx (`/api/`).
 
+---
+
+## Шаг 1: Сборка Frontend
+Перед загрузкой на сервер, сгенерируй продакшн сборку:
 ```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
+npm install
+npm run build
+```
+Папка `dist/` будет содержать все необходимые файлы. Загрузи содержимое папки `dist/` на сервер в `/var/www/spectr-trading/frontend`.
 
-# Install Node.js (v18 or higher recommended)
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# Install Git
-sudo apt install git -y
+## Шаг 2: Запуск Backend через PM2
+Загрузи содержимое папки `server/` на сервер в `/var/www/spectr-trading/backend`.
+```bash
+cd /var/www/spectr-trading/backend
+npm install
+# Запускаем сервер 
+pm2 start index.js --name "spectr-api"
+pm2 save
+pm2 startup
 ```
 
-## 2. Process Management (Recommended)
-We recommend using **PM2** to keep the application running in the background and restart it automatically if it crashes.
+## Шаг 3: Настройка Nginx
+Создай файл конфигурации для Nginx: `sudo nano /etc/nginx/sites-available/spectr-trading`
 
-```bash
-sudo npm install -g pm2
+Вставь следующий конфиг, заменив `yourdomain.com` на твой домен:
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+
+    root /var/www/spectr-trading/frontend;
+    index index.html;
+
+    # 1. Раздача статики Frontend (SPA)
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 2. Проксирование API на Backend
+    location /api/ {
+        proxy_pass http://127.0.0.1:3000/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Передача IP-адреса для rate limiter'ов
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_addrs;
+        
+        # CORS (Если необходимо)
+        proxy_set_header Access-Control-Allow-Origin *;
+    }
+
+    # Кеширование ассетов
+    location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|eot|ttf|svg)$ {
+        expires 6M;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+}
 ```
 
-## 3. Initial Setup
-1. Clone the repository (if not already done):
-   ```bash
-   git clone -b feature/live-bybit https://github.com/MIlkoss77/SpectrumProject.git
-   cd SpectrumProject
-   ```
-2. Create and configure your `.env` file:
-   ```bash
-   cp .env.example .env
-   # Ensure DATABASE_URL="file:./dev.db" is present in your .env
-   nano .env
-   ```
-3. Give execution permissions to the deployment script:
-   ```bash
-   chmod +x scripts/deploy.sh
-   ```
-
-## 4. Deploying
-Simply run:
+Активация сайта:
 ```bash
-./scripts/deploy.sh
+sudo ln -s /etc/nginx/sites-available/spectr-trading /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
 ```
 
-## 5. Troubleshooting
-- **Database Errors**: Ensure the `prisma/` folder exists and you have write permissions for `dev.db`.
-- **Port Busy**: If the server fails to start, check if port 3000 (or your configured port) is already in use.
-- **NPM Errors**: If `npm install` fails, try `npm ci --legacy-peer-deps`.
+## Шаг 4: SSL Сертификаты (Let's Encrypt)
+Для работы Service Worker и PWA обязательно наличие HTTPS!
+
+```bash
+sudo snap install core; sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+```
+
+Certbot автоматически изменит файл `/etc/nginx/sites-available/spectr-trading` на HTTPS порты (443).
+
+## Шаг 5: Переменные Окружения (.env)
+Не забудь пробросить боевые ключи в папке backend (e.g. `/var/www/spectr-trading/backend/.env`).
+- Порт должен быть 3000 (так настроен Nginx).
+- Дабавь IPN-секрет NOWPayments: `NOWPAYMENTS_IPN_SECRET=твой-секрет`.
+
+Поздравляю! Теперь у тебя есть полноценный production flow.

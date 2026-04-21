@@ -24,6 +24,7 @@ const paymentLimiter = rateLimit({
 // Proxy Routes
 router.use('/proxy/binance', proxyController.binanceProxy);
 router.use('/proxy/bybit', proxyController.bybitProxy);
+router.use('/proxy/mexc', proxyController.mexcProxy);
 router.post('/solana/signatures', proxyController.solanaProxy);
 
 // Auth Routes
@@ -57,6 +58,8 @@ router.post('/notifications/read-all', authMiddleware, notificationController.ma
 router.get('/ohlc', marketController.getOHLC);
 router.get('/ohlc/binance', marketController.getOHLC);
 router.get('/news', marketController.getNews);
+router.get('/social/buzz', marketController.getSocialBuzz);
+router.get('/intelligence/scout', marketController.getScoutSignals);
 router.get('/whales', marketController.getWhaleTransactions);
 router.get('/bybit/ticker/:symbol', marketController.getBybitTickerPrice);
 

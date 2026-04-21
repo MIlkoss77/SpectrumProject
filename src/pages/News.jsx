@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { getNews } from '@/services/providers/news'
-import { Globe, Zap, TrendingUp, TrendingDown, Minus, Clock, ExternalLink, Newspaper, Twitter, MessageCircle, Layers, Filter } from 'lucide-react'
+import { getNews, getSocialBuzz, getScoutSignals } from '@/services/providers/news'
+import { Globe, Zap, TrendingUp, TrendingDown, Minus, Clock, ExternalLink, Newspaper, Twitter, MessageCircle, Layers, Filter, Activity } from 'lucide-react'
 import Skeleton from '@/components/ui/Skeleton'
 import './dashboard.css'
 
@@ -56,6 +56,64 @@ function ClusterCard({ cluster, onSelect, isActive }) {
           ))}
         </div>
         <div className="text-[10px] font-black text-white/40 uppercase tracking-widest group-hover:text-cyan-400 transition-colors">Analyze Narrative →</div>
+      </div>
+    </div>
+  )
+}
+
+function ViralCard({ item }) {
+  const isReddit = item.source === 'Reddit';
+
+  return (
+    <div className="action-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+      style={{
+        width: '100%',
+        padding: '20px',
+        borderRadius: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        border: '1px solid rgba(255,255,255,0.05)',
+        background: 'rgba(15, 15, 20, 0.8)',
+        backdropFilter: 'blur(30px)',
+        WebkitBackdropFilter: 'blur(30px)'
+      }}>
+
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+            {isReddit ? <MessageCircle size={18} className="text-[#FF4500]" /> : <Twitter size={18} className="text-cyan-400" />}
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-white/40 leading-none mb-1 uppercase tracking-widest">{item.sub || item.source}</span>
+            <span className="text-[8px] font-mono text-white/20">@{item.author}</span>
+          </div>
+          <div className="ml-auto flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/5">
+            <Activity size={10} className="text-cyan-400" />
+            <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">{item.velocity} VEL</span>
+          </div>
+        </div>
+
+        <h3 className="text-sm font-bold leading-tight mb-4 group-hover:text-cyan-400 transition-colors line-clamp-4 tracking-tight">
+          {item.title}
+        </h3>
+
+        <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">
+          <div className="flex gap-4">
+            <div className="flex items-center gap-1.5">
+              <TrendingUp size={12} className="text-white/20" />
+              <span className="text-[10px] font-bold text-white/40">{item.score}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock size={12} className="text-white/20" />
+              <span className="text-[10px] font-bold text-white/40">{new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+          </div>
+
+          <a href={item.url || '#'} target="_blank" rel="noopener noreferrer"
+            className="p-2 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-white/40 hover:text-cyan-400 transition-all border border-white/5 shadow-xl">
+            <ExternalLink size={14} />
+          </a>
+        </div>
       </div>
     </div>
   )
@@ -127,54 +185,76 @@ function NewsCard({ item }) {
   )
 }
 
-function TweetCard({ tweet }) {
+function ScoutCard({ item }) {
+  const isHot = item.intelScore >= 80;
+  const dex = item.dexData;
+
   return (
-    <div className="action-card relative overflow-hidden transition-all duration-300 border-l-[4px] border-l-[#1da1f2]"
+    <div className="action-card group relative overflow-hidden transition-all duration-300"
       style={{ 
         padding: '20px',
         borderRadius: '24px',
         width: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        border: isHot ? '1px solid rgba(255, 69, 96, 0.3)' : '1px solid rgba(255,255,255,0.05)',
+        background: isHot ? 'rgba(255, 69, 96, 0.05)' : 'rgba(15, 15, 20, 0.8)'
       }}>
-      <div className="flex justify-between mb-6">
+      <div className="flex justify-between mb-4">
         <div className="flex gap-3 items-center">
-          <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-xl border border-white/10 shadow-lg">
-            {tweet.avatar}
-          </div>
-          <div>
-            <div className="font-bold text-sm flex items-center gap-1 text-white">
-              {tweet.author}
-              {tweet.verified && <div className="w-3.5 h-3.5 bg-[#1da1f2] rounded-full flex items-center justify-center text-[8px] text-white font-black">✓</div>}
+            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-cyan-400 overflow-hidden">
+              {item.photo ? <img src={item.photo} alt="Token" className="w-full h-full object-cover" /> : 'Intel'}
             </div>
-            <div className="text-[10px] text-white/40 font-mono lower">@{tweet.handle}</div>
-          </div>
+            <div>
+              <div className="font-bold text-sm text-white uppercase">{item.channel}</div>
+              <div className="text-[10px] text-white/40 font-mono">{new Date(item.timestamp).toLocaleTimeString()}</div>
+            </div>
         </div>
-        <Twitter size={20} color="#1da1f2" />
+        <div className="flex flex-col items-end">
+          <div className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest ${isHot ? 'bg-red-500 text-white shadow-[0_0_10px_#FF4560]' : 'bg-white/5 text-white/40'}`}>
+            {isHot ? 'HIGH ALPHA' : 'SCOUT SIGNAL'}
+          </div>
+          {dex && (
+             <div className="text-[9px] font-black text-green-400 mt-1">
+                {dex.change5m > 0 ? '+' : ''}{dex.change5m}% (5m)
+             </div>
+          )}
+        </div>
       </div>
 
-      <p className="text-base font-medium leading-relaxed mb-4 text-white/90 line-clamp-4 tracking-tight">
-        {tweet.text}
+      <p className="text-sm font-medium leading-relaxed mb-4 text-white/90 line-clamp-4 tracking-tight">
+        {item.text}
       </p>
 
-      <div className="mt-auto flex justify-between items-center text-[10px] text-white/30 pt-6 border-t border-white/5 font-bold uppercase tracking-widest">
-        <span>{tweet.time}</span>
-        <div className="flex gap-4">
-          <span className="flex items-center gap-1.5"><MessageCircle size={14} /> {tweet.replies}</span>
-          <span className="flex items-center gap-1.5 text-cyan-400 font-black"><Zap size={14} /> {tweet.likes}</span>
+      {item.tickers.length > 0 && (
+         <div className="flex gap-2 mb-4">
+            {item.tickers.map(t => (
+               <span key={t} className="px-2 py-1 rounded bg-cyan-500/10 text-cyan-400 text-[10px] font-bold">#{t}</span>
+            ))}
+         </div>
+      )}
+
+      {dex && (
+        <div className="mt-auto grid grid-cols-2 gap-4 pt-4 border-t border-white/5 text-[10px] font-bold uppercase tracking-widest">
+           <div>
+             <span className="text-white/20">Vol 24h:</span>
+             <span className="text-white ml-1">${(dex.volume24h / 1e3).toFixed(1)}K</span>
+           </div>
+           <div className="text-right">
+             <span className="text-white/20">Liq:</span>
+             <span className="text-white ml-1">${(dex.liquidity / 1e3).toFixed(1)}K</span>
+           </div>
         </div>
-      </div>
+      )}
+      
+      {item.contractAddress && (
+         <div className="mt-2 text-[8px] font-mono text-white/20 break-all bg-black/40 p-1.5 rounded-lg border border-white/5">
+            {item.contractAddress.address}
+         </div>
+      )}
     </div>
   )
 }
-
-
-const MOCK_TWEETS = [
-  { id: 1, author: 'Vitalik.eth', handle: 'VitalikButerin', avatar: '🧙‍♂️', verified: true, text: 'Rollups are the future of Ethereum scaling. The latest benchmarks show exciting progress.', time: '2m ago', likes: '12.5K', replies: 842 },
-  { id: 2, author: 'CZ 🔶', handle: 'cz_binance', avatar: '🔶', verified: true, text: 'Funds are SAFU. 🛡️', time: '15m ago', likes: '45K', replies: 2100 },
-  { id: 3, author: 'Whale Alert', handle: 'whale_alert', avatar: '🐳', verified: true, text: '🚨 10,000 #ETH (35,420,000 USD) transferred from #Binance to Unknown wallet.', time: '42m ago', likes: '2.1K', replies: 154 },
-  { id: 4, author: 'Miles Deutscher', handle: 'milesdeutscher', avatar: '🧢', verified: true, text: 'The altcoin market structure looks incredibly bullish here. $SOL breaking out.', time: '1h ago', likes: '3.4K', replies: 320 },
-]
 
 export default function News() {
   const [rows, setRows] = useState([])
@@ -182,12 +262,30 @@ export default function News() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const [activeTab, setActiveTab] = useState('ARTICLES') // ARTICLES | SOCIAL
+  const [activeTab, setActiveTab] = useState('ARTICLES') // ARTICLES | SOCIAL | DEGEN
   const [lang, setLang] = useState('ALL')
   const [impact, setImpact] = useState('ALL')
   const [selectedCluster, setSelectedCluster] = useState(null)
 
+  const [socialBuzz, setSocialBuzz] = useState([])
+  const [socialLoading, setSocialLoading] = useState(false)
+
+  const [scoutSignals, setScoutSignals] = useState([])
+  const [scoutLoading, setScoutLoading] = useState(false)
+
   useEffect(() => {
+    // 1. Instant load from cache
+    const cache = localStorage.getItem('sp_news_cache');
+    if (cache) {
+      try {
+        const parsed = JSON.parse(cache);
+        setRows(parsed.items || []);
+        setClusters(parsed.clusters || []);
+        setLoading(false); // Hide skeletons immediately if cache exists
+      } catch (e) {}
+    }
+
+    // 2. Background fresh fetch
     getNews()
       .then(r => {
         setRows(r.items)
@@ -195,17 +293,36 @@ export default function News() {
         setLoading(false)
       })
       .catch(e => {
-        setError(e?.message || 'Failed to load news')
-        setLoading(false)
+        if (!cache) { // Only show error if we have no cached data at all
+          setError(e?.message || 'Failed to load news')
+          setLoading(false)
+        }
       })
   }, [])
+
+  useEffect(() => {
+    if (activeTab === 'SOCIAL' && socialBuzz.length === 0) {
+      setSocialLoading(true)
+      getSocialBuzz().then(data => {
+        setSocialBuzz(data)
+        setSocialLoading(false)
+      })
+    }
+    if (activeTab === 'DEGEN' && scoutSignals.length === 0) {
+      setScoutLoading(true)
+      getScoutSignals().then(data => {
+        setScoutSignals(data)
+        setScoutLoading(false)
+      })
+    }
+  }, [activeTab])
 
   const filtered = useMemo(() => {
     return rows.filter(r => {
       if (selectedCluster) {
         // Simple cluster filter by primary tag
         const tag = selectedCluster.split('-')[1];
-        if (!r.tags.includes(tag)) return false;
+        if (!r.tags?.includes(tag)) return false;
       }
       if (lang !== 'ALL' && r.lang && r.lang !== lang) return false
       if (impact !== 'ALL' && r.impact && r.impact !== impact) return false
@@ -225,16 +342,14 @@ export default function News() {
           <div className="flex gap-2">
             <button className={`dx-tag transition-all ${activeTab === 'ARTICLES' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40' : 'bg-white/5 text-white/40 border-white/5'}`} onClick={() => setActiveTab('ARTICLES')}>FIREHOSE</button>
             <button className={`dx-tag transition-all ${activeTab === 'SOCIAL' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40' : 'bg-white/5 text-white/40 border-white/5'}`} onClick={() => setActiveTab('SOCIAL')}>SOCIAL RADAR</button>
+            <button className={`dx-tag transition-all ${activeTab === 'DEGEN' ? 'bg-red-500/20 text-red-400 border-red-500/40' : 'bg-white/5 text-white/40 border-white/5'}`} onClick={() => setActiveTab('DEGEN')}>DEGEN INTEL</button>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="text-white/40 text-sm max-w-3xl">
-            High-volume real-time ingestion from 10+ global sources. Multi-narrative clustering analysis.
+            {activeTab === 'DEGEN' ? 'Real-time Telegram scraping for high-alpha meme coin listings and whale alerts.' : 'High-volume real-time ingestion from 10+ global sources. Multi-narrative clustering analysis.'}
           </p>
-
-
-
 
           <div className="flex gap-3">
              {selectedCluster && (
@@ -245,8 +360,8 @@ export default function News() {
                  Clear Cluster: {selectedCluster.split('-')[1]}
                </button>
              )}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-[10px] font-bold text-cyan-400">
-               <Zap size={10} /> LIVE
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold ${activeTab === 'DEGEN' ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-white/5 border border-white/10 text-cyan-400'}`}>
+               <Zap size={10} /> {activeTab === 'DEGEN' ? 'ALIVE' : 'LIVE'}
             </div>
           </div>
         </div>
@@ -274,7 +389,7 @@ export default function News() {
         </div>
       )}
 
-      {loading && (
+      {(loading || (activeTab === 'SOCIAL' && socialLoading) || (activeTab === 'DEGEN' && scoutLoading)) && (
         <div className="dx-grid-premium">
           {[...Array(12)].map((_, i) => (
             <div key={i} className="action-card" style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', minHeight: '160px' }}>
@@ -288,7 +403,7 @@ export default function News() {
 
       {error && <div className="dx-error p-6 rounded-2xl border border-red-500/20 bg-red-500/5 text-red-400 text-sm font-bold">{error}</div>}
 
-      {!loading && !error && (
+      {!(loading || (activeTab === 'SOCIAL' && socialLoading) || (activeTab === 'DEGEN' && scoutLoading)) && !error && (
         <div className="dx-grid-premium" style={{ 
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
           gap: '24px'
@@ -299,13 +414,21 @@ export default function News() {
               {filtered.length === 0 && <div className="col-span-full py-20 text-center text-white/20 font-bold italic">No data matched your filters</div>}
               {filtered.map(n => <NewsCard key={n.id} item={n} />)}
             </>
+          ) : activeTab === 'SOCIAL' ? (
+            <>
+              {socialBuzz.length === 0 && <div className="col-span-full py-20 text-center text-white/20 font-bold italic">Gathering social velocity...</div>}
+              {socialBuzz.map(item => <ViralCard key={item.id} item={item} />)}
+            </>
           ) : (
-            MOCK_TWEETS.map(t => <TweetCard key={t.id} tweet={t} />)
+            <>
+              {scoutSignals.length === 0 && <div className="col-span-full py-20 text-center text-white/20 font-bold italic">Searching for high-alpha plays...</div>}
+              {scoutSignals.map(item => <ScoutCard key={item.id} item={item} />)}
+            </>
           )}
         </div>
       )}
 
-      <div className="mt-12 text-center text-[10px] font-bold text-white/10 uppercase tracking-[0.2em] border-t border-white/5 pt-8">
+      <div className="mt-12 text-center text-[10px] font-black text-white/10 uppercase tracking-[0.2em] border-t border-white/5 pt-8">
         Spectr Intelligence Engine v4.5 // Aggregating 10+ Sources // Hot Load Multi-Cluster
       </div>
     </div>

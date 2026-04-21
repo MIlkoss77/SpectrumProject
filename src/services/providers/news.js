@@ -1,4 +1,5 @@
 import { analyzeSentiment } from '../ai/groq.js'
+import { http } from '../api.js'
 
 const BASE = '/api/news';
 // Proxied through Vite/Server
@@ -13,10 +14,8 @@ async function fetchRSSNews() {
     if (key) headers['X-CryptoPanic-Key'] = key;
 
     // Fetch from our consolidated backend service
-    const res = await fetch(`${BASE}`, { headers });
-    if (!res.ok) throw new Error('Backend unavailable');
-
-    const data = await res.json();
+    const res = await http.get('/news', { headers });
+    const data = res.data;
 
     const items = data.results || [];
     
@@ -122,33 +121,58 @@ function getFallbackNews() {
  * Get news with AI sentiment analysis & Clustering
  */
 export async function getNews(withSentiment = true) {
-  let items = await fetchRSSNews()
+  const cacheKey = 'sp_news_cache';
+  
+  // Try to get from localStorage first for instant UI
+  const localCache = localStorage.getItem(cacheKey);
+  let cachedData = null;
+  if (localCache) {
+    try {
+      cachedData = JSON.parse(localCache);
+    } catch (e) {}
+  }
 
-  if (withSentiment && items.length > 0) {
-    // Analyze top 5 items for better "Pro" feel
-    const toAnalyze = items.slice(0, 5)
+  // Fetch fresh data
+  const fetchAndProcess = async () => {
+    let items = await fetchRSSNews()
 
-    for (const item of toAnalyze) {
-      try {
-        const analysis = await analyzeSentiment(item.title)
-        item.sentiment = analysis.sentiment
-        item.confidence = analysis.confidence
-        item.aiSummary = analysis.summary
-      } catch (e) {
-        // Sentiment analysis failed
-      }
+    if (withSentiment && items.length > 0) {
+      // Parallel analyze top 5 items for speed
+      const toAnalyze = items.slice(0, 5);
+      await Promise.all(toAnalyze.map(async (item) => {
+        try {
+          const analysis = await analyzeSentiment(item.title);
+          item.sentiment = analysis.sentiment;
+          item.confidence = analysis.confidence;
+          item.aiSummary = analysis.summary;
+        } catch (e) {
+          console.warn('Sentiment analysis failed for item', item.id);
+        }
+      }));
     }
+
+    const clusters = clusterNews(items);
+    const result = {
+      ts: Date.now(),
+      items: items,
+      clusters: clusters
+    };
+
+    localStorage.setItem(cacheKey, JSON.stringify(result));
+    return result;
+  };
+
+  // If we have cache, return it but also trigger a background update
+  if (cachedData) {
+    // We could return cache and then update, but getNews is usually called once.
+    // To keep it simple for now, we wait for fresh if cache is very old (>1h)
+    // or return cache and let the caller handle it.
+    // For now, let's just make the fresh fetch faster.
   }
 
-  // Implementation of Basic Narrative Clustering
-  const clusters = clusterNews(items);
-
-  return {
-    ts: Date.now(),
-    items: items,
-    clusters: clusters
-  }
+  return await fetchAndProcess();
 }
+
 
 /**
  * Group news into narrative clusters based on tags and title similarity
@@ -181,4 +205,31 @@ function clusterNews(items) {
 export async function getNewsFast() {
   return getNews(false)
 }
+
+/**
+ * Fetch viral social buzz from Reddit/X
+ */
+export async function getSocialBuzz() {
+  try {
+    const res = await http.get('/social/buzz');
+    return res.data.results || [];
+  } catch (e) {
+    console.warn('Social buzz failed, using empty list', e);
+    return [];
+  }
+}
+
+/**
+ * Fetch ferocious scout signals (Degen Alpha)
+ */
+export async function getScoutSignals() {
+  try {
+    const res = await http.get('/intelligence/scout');
+    return res.data.signals || [];
+  } catch (e) {
+    console.warn('Scout signals failed', e);
+    return [];
+  }
+}
+
 

@@ -5,7 +5,7 @@ import { Activity, Radio, Globe, ShieldCheck, AlertCircle, ChevronDown, Zap } fr
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function ConnectionHub() {
-  const { isBinanceConnected, isBybitConnected, throughput } = useWebSocket()
+  const { isBinanceConnected, isBybitConnected, isMexcConnected, throughput } = useWebSocket()
   const [proxyStatus, setProxyStatus] = useState('UNKNOWN')
   const [isOpen, setIsOpen] = useState(false)
 
@@ -15,7 +15,7 @@ export default function ConnectionHub() {
     return unsub
   }, [])
 
-  const isAllGood = isBinanceConnected && isBybitConnected && proxyStatus === 'LIVE'
+  const isAllGood = isBinanceConnected && isBybitConnected && isMexcConnected && proxyStatus === 'LIVE'
 
   return (
     <div style={{ position: 'relative' }}>
@@ -61,6 +61,7 @@ export default function ConnectionHub() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <StatusItem label="Binance WS" connected={isBinanceConnected} />
                     <StatusItem label="Bybit WS" connected={isBybitConnected} />
+                    <StatusItem label="MEXC WS" connected={isMexcConnected} />
                     <StatusItem label="API Proxy" status={proxyStatus} />
                   </div>
                 </div>

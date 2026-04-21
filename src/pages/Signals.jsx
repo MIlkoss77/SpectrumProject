@@ -5,7 +5,7 @@ import { ema, rsi, macd } from '@/services/ta/indicators'
 import { IchimokuCloud } from 'technicalindicators'
 import { fetchSignalsSnapshot } from '@/services/providers/signals'
 import { monitor } from '@/services/providers/market'
-import { ArrowLeft, TrendingUp, TrendingDown, Activity, Zap, Eye, Loader2 } from 'lucide-react'
+import { ArrowLeft, TrendingUp, TrendingDown, Activity, Zap, Eye, Loader2, Brain } from 'lucide-react'
 import Skeleton from '@/components/ui/Skeleton'
 import './dashboard.css'
 
@@ -343,10 +343,14 @@ function DetailView({ symbol, tf, onBack }) {
     }
   }, [highs, lows, closes])
 
-  const lastPrice = closes[closes.length - 1]
-  const lastRSI = rsi14[rsi14.length - 1]
-  const pMin = Math.min(...closes.slice(100), ...(ichimoku.spanB.filter(v => v != null).slice(-300) || []))
-  const pMax = Math.max(...closes.slice(100), ...(ichimoku.spanA.filter(v => v != null).slice(-300) || []))
+  const lastPrice = closes[closes.length - 1] || 0
+  const lastRSI = rsi14[rsi14.length - 1] || 0
+  const isStale = candles[0]?._stale
+  const dataAge = candles[0]?._age
+
+  // Safe pMin/pMax logic to prevent NaN
+  const pMin = Math.min(...closes.slice(100).filter(v => isFinite(v)), ...(ichimoku.spanB.filter(v => v != null).slice(-300) || [])) || 0
+  const pMax = Math.max(...closes.slice(100).filter(v => isFinite(v)), ...(ichimoku.spanA.filter(v => v != null).slice(-300) || [])) || 100
   const w = 980, h = 280
 
   const [aiInsight, setAiInsight] = useState(null)
@@ -412,32 +416,56 @@ function DetailView({ symbol, tf, onBack }) {
               <span style={{ color: 'var(--muted)', fontSize: 13 }}>{t('ui.timeframe') || 'Timeframe'}: {tf}</span>
             </div>
           </div>
-          <div className="stat-pill">
-            <Zap size={18} color={aiLoading ? 'var(--muted)' : '#ff9800'} className={aiLoading ? 'spin' : ''} />
-            <div>
-              <div style={{ fontSize: 10, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('ui.ai_sentiment') || 'AI Sentiment'}</div>
-              <div style={{ fontWeight: 600, color: aiInsight?.sentiment === 'BULLISH' ? '#4caf50' : aiInsight?.sentiment === 'BEARISH' ? '#f44336' : 'var(--text)' }}>
-                {aiLoading ? (t('ui.analyzing') || 'Analyzing...') : aiInsight?.sentiment || 'NEUTRAL'}
-                {!aiLoading && aiInsight?.confidence > 0 && <span className="data-number" style={{ fontSize: 12, opacity: 0.7, marginLeft: 6 }}>{Math.round(aiInsight.confidence * 100)}%</span>}
+          <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+            {isStale && (
+              <div className="flex flex-col items-end">
+                <span className="px-2 py-0.5 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-[9px] font-black uppercase tracking-widest mb-1">
+                  Cached Data
+                </span>
+                <span className="text-[8px] text-white/20 font-mono">{dataAge}s AGO</span>
               </div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 24 }}>
+            )}
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 12, color: 'var(--muted)' }}>{t('ui.price') || 'Price'}</div>
-              <div className="data-number" style={{ fontSize: 24, fontWeight: 700 }}>${lastPrice?.toFixed(2)}</div>
+              <div className="data-number" style={{ fontSize: 24, fontWeight: 700 }}>{lastPrice ? `$${lastPrice.toFixed(2)}` : '---'}</div>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 12, color: 'var(--muted)' }}>RSI</div>
               <div className="data-number" style={{ fontSize: 24, fontWeight: 700, color: lastRSI > 70 ? '#ff3b30' : lastRSI < 30 ? '#4caf50' : 'var(--text)' }}>
-                {lastRSI?.toFixed(1)}
+                {lastRSI > 0 ? lastRSI.toFixed(1) : '---'}
               </div>
             </div>
           </div>
         </div>
         {!aiLoading && aiInsight && (
-          <div style={{ marginTop: 16, padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, fontSize: 14, border: '1px solid rgba(255,255,255,0.05)' }}>
-            <strong>💡 AI Insight:</strong> {aiInsight.reason}
+          <div style={{ 
+            marginTop: 20, 
+            padding: '16px 20px', 
+            background: 'rgba(255,255,255,0.02)', 
+            borderRadius: '16px', 
+            border: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+               <Brain size={16} className="text-cyan-400" />
+               <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)' }}>Neural Insight / Narrative Analysis</span>
+            </div>
+            <div style={{ fontSize: '13px', lineHeight: '1.7', color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>
+              {(() => {
+                const clean = (aiInsight.reason || '').replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+                const truncated = clean.length > 320 ? clean.substring(0, 317) + '...' : clean;
+                return truncated;
+              })()}
+              <a 
+                href={aiInsight.url || '#'} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{ color: 'var(--brand-cyan)', textDecoration: 'none', marginLeft: '8px', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase' }}
+              >
+                Read Source →
+              </a>
+            </div>
           </div>
         )}
       </div>

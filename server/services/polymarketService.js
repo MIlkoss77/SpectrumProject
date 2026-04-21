@@ -51,11 +51,16 @@ export const fetchMarkets = async (query = "") => {
             description: m.description,
             outcomes: m.outcomes,
             outcomeSymbols: m.outcomeSymbols,
-            clobTokenIds: m.clobTokenIds, // [YesTokenId, NoTokenId]
+            clobTokenIds: m.clobTokenIds, 
             endDate: m.endDate,
             volume: m.volume,
             liquidity: m.liquidity,
-            icon: m.icon
+            icon: m.icon,
+            lastTradePrice: m.lastTradePrice,
+            bestBid: m.bestBid,
+            bestAsk: m.bestAsk,
+            spread: m.spread,
+            priceChange: m.oneMonthPriceChange
         }));
     } catch (err) {
         console.error("[Polymarket] Gamma API Error:", err.message);

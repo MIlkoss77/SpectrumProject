@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import apiRoutes from './routes/apiRoutes.js';
 import limiter from './middleware/rateLimiter.js';
 import { prisma } from './config/database.js';
+import { telegramScout } from './services/telegramService.js';
 
 dotenv.config();
 
@@ -153,6 +154,9 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
     
+    // Start Intelligence Scouts
+    telegramScout.start();
+
     // Explicitly keep the process alive
     setInterval(() => {
         if (process.env.NODE_ENV === 'debug') {

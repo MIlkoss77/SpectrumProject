@@ -22,14 +22,13 @@ import logoImg from '@/assets/logo.png'
 
 function ActionCard({ action, loading, openTrade, t }) {
   if (loading) return (
-    <div className="action-card" style={{ background: 'rgba(20,20,28,0.4)', borderColor: 'rgba(255,255,255,0.02)', borderRadius: '24px', padding: '20px' }}>
-
-      <div className="flex justify-between items-center mb-4">
-        <Skeleton className="w-16 h-4" />
-        <Skeleton className="w-20 h-5" />
+    <div className="dx-card skeleton-shimmer" style={{ minHeight: '200px' }}>
+      <div className="flex justify-between items-center mb-6">
+        <Skeleton className="w-24 h-5" />
+        <Skeleton className="w-16 h-5" />
       </div>
-      <Skeleton className="w-full h-1 my-4" />
-      <Skeleton className="w-full h-10 mt-2" />
+      <Skeleton className="w-full h-2 mb-6" />
+      <Skeleton className="w-full h-12 rounded-2xl" />
     </div>
   )
 
@@ -37,15 +36,11 @@ function ActionCard({ action, loading, openTrade, t }) {
   const color = isPositive ? '#00FFFF' : (action.status.includes('SELL') ? '#FF4560' : '#8899A6')
 
   return (
-    <div className="action-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02]"
+    <div className="dx-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02]"
       style={{ 
-        borderColor: isPositive ? 'rgba(0,255,255,0.2)' : 'rgba(255,255,255,0.05)', 
-        background: 'linear-gradient(145deg, rgba(20,20,28,0.6) 0%, rgba(5,5,8,0.8) 100%)',
-        borderRadius: '24px',
-        padding: '20px',
+        borderColor: isPositive ? 'rgba(0,255,255,0.15)' : 'rgba(255,255,255,0.05)', 
         display: 'flex',
         flexDirection: 'column'
-
       }}>
 
       <div className={`absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl ${isPositive ? 'bg-cyan-400' : 'bg-red-400'}`} />
@@ -226,25 +221,18 @@ export default function Overview() {
               const price = ticker?.price
               const change = ticker?.changePercent
               return (
-                <span key={`${rep}-${sym}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 11, fontFamily: 'var(--font-mono)' }}>
-                  <span style={{ fontWeight: 800, color: '#fff', letterSpacing: 1 }}>{sym}</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <span key={`${rep}-${sym}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 12, fontSize: 11, fontFamily: 'var(--font-mono)', minWidth: '220px' }}>
+                  <span style={{ fontWeight: 900, color: '#fff', letterSpacing: 1, width: '40px' }}>{sym}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: '100px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontWeight: 900 }}>BIN</span>
-                      <span style={{ color: '#8899a6' }}>
-                        {Number.isFinite(price) ? `$${price.toLocaleString(undefined, { maximumFractionDigits: 1 })}` : '---'}
+                      <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)', fontWeight: 900, letterSpacing: 1 }}>BIN</span>
+                      <span style={{ color: '#fff', fontWeight: 800 }}>
+                        {Number.isFinite(price) ? `$${price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}` : '---'}
                       </span>
                     </div>
-                    {/* Only show Bybit if it's actually different or exists */}
-                    {tickers[key]?.exchange === 'bybit' && Number.isFinite(tickers[key].price) && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ fontSize: '9px', color: 'rgba(0,255,255,0.3)', fontWeight: 900 }}>BYB</span>
-                        <span style={{ color: 'var(--brand-cyan)' }}>${tickers[key].price.toLocaleString()}</span>
-                      </div>
-                    )}
                   </div>
                   {Number.isFinite(change) && (
-                    <span style={{ color: change >= 0 ? '#22d3ee' : '#ef4444', fontWeight: 700 }}>
+                    <span style={{ color: change >= 0 ? '#00FFFF' : '#FF4560', fontWeight: 900, minWidth: '60px', textAlign: 'right', textShadow: change >= 0 ? '0 0 10px rgba(0,255,255,0.2)' : 'none' }}>
                       {change >= 0 ? '▲' : '▼'}{Math.abs(change).toFixed(2)}%
                     </span>
                   )}

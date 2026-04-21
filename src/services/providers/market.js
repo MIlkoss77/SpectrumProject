@@ -1,8 +1,10 @@
 // src/services/providers/market.js
-// --- Binance API helper ------------------------------------------------------
-// Получение свечей с Binance API (через Vite proxy)
-const BINANCE_BASE = '/api/proxy/binance';
-const BYBIT_BASE = '/api/proxy/bybit';
+import { http } from '../api.js'
+
+// Получение данных через прокси бэкенда
+const BINANCE_BASE = '/proxy/binance';
+const BYBIT_BASE = '/proxy/bybit';
+const MEXC_BASE = '/proxy/mexc';
 
 // Singleton to track data integrity
 class NetworkMonitor {
@@ -44,16 +46,18 @@ const TF_MAP = { '1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h', '
 export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) {
   const interval = TF_MAP[timeframe] || timeframe;
   const url = `${BINANCE_BASE}/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
+  const cacheKey = `klines_${symbol}_${interval}`;
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status} ${res.statusText}`);
-    }
-    const data = await res.json();
+    const res = await http.get(`${BINANCE_BASE}/api/v3/klines`, {
+      params: { symbol, interval, limit }
+    });
+    const data = res.data;
     monitor.log(true);
 
-    // Форматируем данные в единый формат: { t, o, h, l, c, v, openTime, volume }
+    // Save success to persistent storage
+    localStorage.setItem(cacheKey, JSON.stringify({ data, ts: Date.now() }));
+
     return data.map(k => ({
       openTime: k[0],
       t: k[0],
@@ -64,10 +68,37 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
       v: Number(k[5]),
       volume: Number(k[5]),
       closeTime: k[6],
+      _stale: false
     }));
   } catch (err) {
     monitor.log(false);
-    throw new Error(`[fetchBinanceKlines] ${symbol} ${timeframe} :: ${err?.message || 'Network error'}`);
+    console.warn(`[fetchBinanceKlines] Primary fetch failed for ${symbol}. checking LKG...`, err.message);
+    
+    // --- LKG FALLBACK (SWR) ---
+    const local = localStorage.getItem(cacheKey);
+    if (local) {
+      try {
+        const { data, ts } = JSON.parse(local);
+        const ageSec = Math.round((Date.now() - ts) / 1000);
+        console.log(`[SWR] Using cached data for ${symbol} (Age: ${ageSec}s)`);
+        
+        return data.map(k => ({
+          openTime: k[0],
+          t: k[0],
+          o: Number(k[1]),
+          h: Number(k[2]),
+          l: Number(k[3]),
+          c: Number(k[4]),
+          v: Number(k[5]),
+          volume: Number(k[5]),
+          closeTime: k[6],
+          _stale: true,
+          _age: ageSec
+        }));
+      } catch (e) {}
+    }
+
+    throw new Error(`[fetchBinanceKlines] Total Failure: ${err?.message || 'Network error'}`);
   }
 }
 
@@ -87,11 +118,12 @@ export async function fetchBinanceTicker(symbol) {
   const timeoutId = setTimeout(() => controller.abort(), 1200);
 
   try {
-    const res = await fetch(`${BINANCE_BASE}/api/v3/ticker/price?symbol=${symbol}`, { signal: controller.signal });
+    const res = await http.get(`${BINANCE_BASE}/api/v3/ticker/price`, { 
+      params: { symbol },
+      signal: controller.signal 
+    });
     clearTimeout(timeoutId);
-    if (!res.ok) throw new Error('Binance Ticker Error');
-    const data = await res.json();
-    return parseFloat(data.price);
+    return parseFloat(res.data.price);
   } catch (e) {
     clearTimeout(timeoutId);
     // Silent fallback
@@ -105,17 +137,37 @@ export async function fetchBybitTicker(symbol) {
   const timeoutId = setTimeout(() => controller.abort(), 1200);
 
   try {
-    const res = await fetch(`/api/proxy/bybit/v5/market/tickers?category=spot&symbol=${symbol}`, { signal: controller.signal });
+    const res = await http.get(`${BYBIT_BASE}/v5/market/tickers`, { 
+      params: { category: 'spot', symbol },
+      signal: controller.signal 
+    });
     clearTimeout(timeoutId);
-    if (!res.ok) throw new Error('Bybit Proxy Error');
-    const data = await res.json();
-    return data?.result?.list?.[0]?.lastPrice ? parseFloat(data.result.list[0].lastPrice) : null;
+    return res.data?.result?.list?.[0]?.lastPrice ? parseFloat(res.data.result.list[0].lastPrice) : null;
   } catch (e) {
     clearTimeout(timeoutId);
     // Silent fallback
     return null;
   }
 }
+
+export async function fetchMexcTicker(symbol) {
+  if (isNetworkBlocked()) return null;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 1500);
+
+  try {
+    const res = await http.get(`${MEXC_BASE}/api/v3/ticker/price`, { 
+      params: { symbol },
+      signal: controller.signal 
+    });
+    clearTimeout(timeoutId);
+    return res.data?.price ? parseFloat(res.data.price) : null;
+  } catch (e) {
+    clearTimeout(timeoutId);
+    return null;
+  }
+}
+
 
 // --- Latency penalty ---------------------------------------------------------
 // Простейший «штраф» за задержку: чем больше latency, тем сильнее режем net.
@@ -189,54 +241,52 @@ export async function getRealArbitrage(minNetPct = 0.1) {
   // Parallel fetch for all symbols
   const promises = ARB_SYMBOLS.map(async (sym) => {
     try {
-      const [binPrice, bybitPrice] = await Promise.all([
+      const [binPrice, bybitPrice, mexcPrice] = await Promise.all([
         fetchBinanceTicker(sym),
-        fetchBybitTicker(sym)
+        fetchBybitTicker(sym),
+        fetchMexcTicker(sym)
       ]);
 
-      if (binPrice == null && bybitPrice == null) failedCount++;
+      if (binPrice == null && bybitPrice == null && mexcPrice == null) failedCount++;
 
-      const validBinance = binPrice != null && !isNaN(binPrice);
+      const validBin = binPrice != null && !isNaN(binPrice);
       const validBybit = bybitPrice != null && !isNaN(bybitPrice);
+      const validMexc = mexcPrice != null && !isNaN(mexcPrice);
 
-      if (!validBinance || !validBybit) return; // Skip if live data is unavailable
+      const prices = [
+        { name: 'Binance', val: validBin ? binPrice : null },
+        { name: 'Bybit', val: validBybit ? bybitPrice : null },
+        { name: 'MEXC', val: validMexc ? mexcPrice : null }
+      ].filter(p => p.val !== null);
 
-      let bPrice = parseFloat(binPrice);
-      let byPrice = parseFloat(bybitPrice);
+      if (prices.length < 2) return;
 
-      // 1. Buy Binance -> Sell Bybit
-      const diff1 = byPrice - bPrice;
-      const grossPct1 = (diff1 / bPrice) * 100;
-      const netPct1 = grossPct1 - 0.2;
+      // Compare all pairs
+      for (let i = 0; i < prices.length; i++) {
+        for (let j = 0; j < prices.length; j++) {
+          if (i === j) continue;
+          
+          const ex1 = prices[i];
+          const ex2 = prices[j];
+          
+          const diff = ex2.val - ex1.val;
+          const grossPct = (diff / ex1.val) * 100;
+          const fees = (ex1.name === 'MEXC' || ex2.name === 'MEXC') ? 0.3 : 0.2; // MEXC has slightly higher taker or network friction in this model
+          const netPct = grossPct - fees;
 
-      items.push({
-        symbol: sym,
-        fromEx: 'Binance',
-        toEx: 'Bybit',
-        feesPct: 0.2,
-        netPct: netPct1,
-        ts: now,
-        ask: bPrice,
-        bid: byPrice,
-        status: netPct1 > minNetPct ? 'PROFIT' : 'MONITOR'
-      });
-
-      // 2. Buy Bybit -> Sell Binance
-      const diff2 = bPrice - byPrice;
-      const grossPct2 = (diff2 / byPrice) * 100;
-      const netPct2 = grossPct2 - 0.2;
-
-      items.push({
-        symbol: sym,
-        fromEx: 'Bybit',
-        toEx: 'Binance',
-        feesPct: 0.2,
-        netPct: netPct2,
-        ts: now,
-        ask: byPrice,
-        bid: bPrice,
-        status: netPct2 > minNetPct ? 'PROFIT' : 'MONITOR'
-      });
+          items.push({
+            symbol: sym,
+            fromEx: ex1.name,
+            toEx: ex2.name,
+            feesPct: fees,
+            netPct: netPct,
+            ts: now,
+            ask: ex1.val,
+            bid: ex2.val,
+            status: netPct > minNetPct ? 'PROFIT' : 'MONITOR'
+          });
+        }
+      }
 
     } catch (err) {
       failedCount++;

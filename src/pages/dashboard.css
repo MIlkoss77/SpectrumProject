@@ -125,9 +125,11 @@ body {
   --bg-dark: #050505;
   --bg-panel: #0a0a0a;
 
-  --card-bg: rgba(20, 20, 25, 0.4);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.15);
+  --card-bg: rgba(10, 10, 15, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-highlight: rgba(255, 255, 255, 0.12);
+  --glass-blur: 32px;
+  --neon-cyan-glow: 0 0 20px rgba(0, 255, 255, 0.15);
 
   --ok: #00E396;
   --warn: #FEB019;
@@ -155,6 +157,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  
+  /* PWA Polish: App-like behavior */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 /* Gradient Text Utility */
@@ -462,15 +469,31 @@ input[type=range]::-webkit-slider-runnable-track {
    ========================================= */
 /* Glassmorphism 2.0 — Global Card System */
 .dx-card {
-  background: rgba(17, 17, 17, 0.6);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: 24px;
-  padding: 20px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  margin-bottom: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dx-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .dx-card:hover {
@@ -747,10 +770,30 @@ input[type=range]::-webkit-slider-runnable-track {
   pointer-events: none;
 }
 
-/* Brand Glow Keyframes */
+/* =========================================
+   INSTITUTIONAL SKELETON SHIMMER
+   ========================================= */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0.02) 25%, 
+    rgba(255,255,255,0.06) 37%, 
+    rgba(255,255,255,0.02) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* =========================================
+   Brand Glow Keyframes
+   ========================================= */
 @keyframes brand-glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); }
-  50% { box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); }
+  0%, 100% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.08); }
+  50% { box-shadow: 0 0 32px rgba(0, 255, 255, 0.15); }
 }
 
 /* Subtle neon pulse for accent elements */

@@ -1,8 +1,8 @@
 // src/services/api.js
 import axios from "axios";
 
-// База для API (локально 8787, в проде подставим env)
-const base = "/api";
+// База для API (используем env переменную или относительный путь для unified VPS)
+const base = import.meta.env.VITE_API_URL || "/api";
 
 export const http = axios.create({
   baseURL: base,

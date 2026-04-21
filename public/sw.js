@@ -1,58 +1,62 @@
 
-// Spectr SW v2 — network-first strategy for critical assets
-const CACHE_VERSION = 'v2';
+// Spectr SW v3 — Robust network-first strategy for a premium PWA experience
+const CACHE_VERSION = 'v3';
 const STATIC_CACHE = `spectr-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `spectr-runtime-${CACHE_VERSION}`;
 const API_CACHE = `spectr-api-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
-const API_ALLOW = [/\/signals/, /\/news/, /\/arbitrage/, /\/predictions/];
 
+// Critical API routes to cache
+const API_ALLOW = [/\/signals/, /\/news/, /\/arbitrage/, /\/predictions/, /\/intelligence/];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => cache.addAll([OFFLINE_URL]))
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll([
+      OFFLINE_URL,
+      '/',
+      '/index.html',
+      '/logo.png',
+      '/icon-192.png',
+      '/icon-512.png'
+    ]))
   );
   self.skipWaiting();
 });
-self.addEventListener("activate", (e) => {
-  e.waitUntil((async () => {
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.map(k => ![STATIC_CACHE, RUNTIME_CACHE, API_CACHE].includes(k) && caches.delete(k)));
-    if ('navigationPreload' in self.registration) await self.registration.navigationPreload.enable();
+    await Promise.all(keys.map(k => {
+      if (![STATIC_CACHE, RUNTIME_CACHE, API_CACHE].includes(k)) {
+        return caches.delete(k);
+      }
+    }));
+    if ('navigationPreload' in self.registration) {
+      await self.registration.navigationPreload.enable();
+    }
     self.clients.claim();
   })());
-
+});
 
 self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  const url = new URL(req.url);
-  if (req.method !== "GET") return;
-
-  // API — stale-while-revalidate
-  if (API_ALLOW.some(rx => rx.test(url.pathname))) {
-    event.respondWith((async () => {
-      const cache = await caches.open(API_CACHE);
-      const cached = await cache.match(req);
-      const network = fetch(req).then(res => { if (res.ok) cache.put(req, res.clone()); return res; }).catch(() => cached);
-      return cached || network;
-    })());
-
-}
-
+  const { request } = event;
   const url = new URL(request.url);
 
-  if (API_ALLOW.some((rx) => rx.test(url.pathname))) {
+  if (request.method !== "GET") return;
+
+  // 1. API Strategy: Stale-While-Revalidate
+  if (API_ALLOW.some(rx => rx.test(url.pathname))) {
     event.respondWith(apiStaleWhileRevalidate(request));
     return;
   }
 
-  
+  // 2. Navigation Strategy: Network-First with Offline Fallback
   if (request.mode === 'navigate') {
     event.respondWith(navigationNetworkFirst(request));
     return;
   }
 
-  
+  // 3. Static Assets Strategy: Cache-First or Network-First depending on destination
   if (['style', 'script', 'image', 'font'].includes(request.destination)) {
     event.respondWith(assetNetworkFirst(request));
   }
@@ -68,11 +72,9 @@ async function navigationNetworkFirst(request) {
     return response;
   } catch (error) {
     const cached = await cache.match(request);
-    if (cached) {
-      return cached;
-    }
+    if (cached) return cached;
     const offline = await cache.match(OFFLINE_URL);
-    return offline ?? Response.error();
+    return offline || Response.error();
   }
 }
 
@@ -86,13 +88,14 @@ async function assetNetworkFirst(request) {
     return response;
   } catch (error) {
     const cached = await cache.match(request);
-    return cached ?? Response.error();
+    return cached || Response.error();
   }
 }
 
 async function apiStaleWhileRevalidate(request) {
   const cache = await caches.open(API_CACHE);
   const cached = await cache.match(request);
+  
   const networkFetch = fetch(request)
     .then((response) => {
       if (response && response.ok) {

@@ -1,132 +1,98 @@
 import { askAgent } from './llmProvider';
-import { getTopActiveMarkets } from '../providers/polymarket';
 import { searchWeb } from '../providers/webSearch';
+import axios from 'axios';
+
+/**
+ * Shared state for the AI Agent's intelligence
+ * This is exported so the UI can reactive to AI insights without re-fetching
+ */
+export const polyInsights = new Map();
 
 class PolymarketAgent {
     constructor() {
         this.isRunning = false;
         this.logs = [];
-        this.positions = [];
-        this.onLogCallback = null;
-        this.onPositionCallback = null;
+        this.positions = []; // Mock positions for the agent's internal tracker
+        this.onInsightUpdate = null;
         this.loopInterval = null;
     }
 
-    setCallbacks(onLog, onPosition) {
-        this.onLogCallback = onLog;
-        this.onPositionCallback = onPosition;
+    setCallbacks(onInsight) {
+        this.onInsightUpdate = onInsight;
     }
 
     log(message) {
         const timestamp = new Date().toLocaleTimeString();
-        const formatted = `[${timestamp}] ${message}`;
-        this.logs.push(formatted);
-        if (this.onLogCallback) {
-            this.onLogCallback([...this.logs]);
-        }
-    }
-
-    addPosition(pos) {
-        this.positions.push(pos);
-        if (this.onPositionCallback) {
-            this.onPositionCallback([...this.positions]);
-        }
+        console.log(`[PolymarketAgent][${timestamp}] ${message}`);
+        this.logs.push(`[${timestamp}] ${message}`);
+        if (this.logs.length > 50) this.logs.shift();
     }
 
     async start() {
         if (this.isRunning) return;
         this.isRunning = true;
-        this.logs = [];
-        this.log("Agent started... initializing core loop.");
-
+        this.log("Agent Intelligence Online.");
         this.runLoop();
     }
 
     stop() {
         this.isRunning = false;
-        if (this.loopInterval) {
-            clearTimeout(this.loopInterval);
-        }
-        this.log("Agent paused.");
+        if (this.loopInterval) clearTimeout(this.loopInterval);
+        this.log("Agent Intelligence Paused.");
     }
 
     async runLoop() {
         if (!this.isRunning) return;
 
         try {
-            this.log("Fetching top active Polymarket events...");
-            const markets = await getTopActiveMarkets(5);
+            // Fetch top markets from our enriched API
+            const res = await axios.get('/api/polymarket/markets?limit=10');
+            const markets = res.data;
 
-            if (!markets || markets.length === 0) {
-                this.log("No markets found. Retrying in 30s...");
-                this.loopInterval = setTimeout(() => this.runLoop(), 30000);
-                return;
+            if (markets && markets.length > 0) {
+                // Focus on one trending market per cycle to save tokens/bandwidth
+                const market = markets[Math.floor(Math.random() * Math.min(markets.length, 5))];
+                this.log(`Analyzing: "${market.question}"`);
+
+                const context = await searchWeb(market.question);
+                
+                const prompt = `
+                    As an institutional analyst, evaluate this Polymarket event: "${market.question}".
+                    Description: "${market.description}".
+                    Recent News: "${context.slice(0, 1000)}".
+                    Current Market Odds for YES: ${(market.lastTradePrice * 100).toFixed(1)}%.
+
+                    Return exactly this JSON format:
+                    {
+                        "probability": 75,
+                        "sentiment": 0.8,
+                        "verdict": "EDGE DETECTED",
+                        "reasoning": "1-sentence why"
+                    }
+                    Verdict options: "EDGE DETECTED", "MARKET OVERREACTION", "HIGH RISK", "AI CONFIRMED".
+                `;
+
+                const aiResponse = await askAgent(prompt);
+                
+                if (aiResponse && aiResponse.verdict) {
+                    const insight = {
+                        ...aiResponse,
+                        timestamp: Date.now(),
+                        marketId: market.id
+                    };
+                    
+                    polyInsights.set(market.id, insight);
+                    if (this.onInsightUpdate) this.onInsightUpdate(new Map(polyInsights));
+                    this.log(`Insight stored: ${aiResponse.verdict} (${aiResponse.probability}%)`);
+                }
             }
-
-            // Pick a random market from the top 5 to analyze
-            const market = markets[Math.floor(Math.random() * markets.length)];
-            this.log(`Analyzing market: "${market.title}" (Current Odds: ${market.odds}%)`);
-            this.log(`Gathering real-time context from the web for: ${market.title}...`);
-
-            // Fetch real context
-            const context = await searchWeb(market.title);
-
-            const preview = context.length > 50 ? context.substring(0, 47) + '...' : context;
-            this.log(`Context gathered (${preview}). Asking LLM...`);
-
-            const prompt = `
-        You are an expert prediction market analyst. 
-        Analyze this market: "${market.title}". 
-        Description: "${market.description}".
-        
-        Recent News/Context from Web Search:
-        """
-        ${context}
-        """
-
-        Current Polymarket odds for "Yes" are ${market.odds}%.
-        Do you think the true probability is higher or lower based on the fresh context?
-        Respond with ONLY JSON in this exact format, with reasoning explaining the impact of the news:
-        { "probability": 75, "reasoning": "Brief 1-sentence explanation" }
-      `;
-
-            const aiResponse = await askAgent(prompt);
-
-            if (!aiResponse || typeof aiResponse.probability !== 'number') {
-                throw new Error("Invalid LLM response. Could not parse probability.");
-            }
-
-            this.log(`LLM reasoning: "${aiResponse.reasoning}"`);
-            this.log(`My calculated probability: ${aiResponse.probability}% vs Market: ${market.odds}%`);
-
-            const edge = aiResponse.probability - market.odds;
-            if (Math.abs(edge) > 10) {
-                this.log(`Edge detected (${edge > 0 ? '+' : ''}${edge}%). Executing mock trade...`);
-
-                // Execute mock trade
-                const tradeSize = 100; // $100 mock
-                const position = {
-                    id: Date.now(),
-                    market: market.title,
-                    targetProb: aiResponse.probability,
-                    purchasedOdds: market.odds,
-                    holdings: `$${tradeSize}`,
-                    pnl: '$0.00' // mock initial
-                };
-
-                this.addPosition(position);
-                this.log(`Trade executed for ${market.title}.`);
-            } else {
-                this.log(`No significant edge (diff: ${edge}%). Skipping trade.`);
-            }
-
         } catch (error) {
-            this.log(`Error in agent loop: ${error.message}`);
+            this.log(`Loop error: ${error.message}`);
         }
 
         if (this.isRunning) {
-            this.log("Sleeping for 15 seconds before next analysis...");
-            this.loopInterval = setTimeout(() => this.runLoop(), 15000);
+            // Analysis cycle: Every 2 minutes
+            this.loopInterval = setTimeout(() => this.runLoop(), 120000);
         }
     }
 }

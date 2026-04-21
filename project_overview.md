@@ -1,66 +1,63 @@
-# 📊 Обзор проекта Spectr Trading
+# 📊 Spectr Trading: Project Overview
 
-Этот документ содержит технический анализ проекта, описание реализованных возможностей, философию бренда и визуальную идентичность.
+## 🎯 Positioning: "The Apple of Crypto Trading"
+Spectr Trading is a premium, institutional-grade intelligence platform designed to bridge the gap between high-velocity "degen" trading and elite financial software. It positions itself as a **Mass Market Premium** product—where complex on-chain data and AI signals are delivered through a seamless, "living" interface that prioritizes user experience and aesthetic excellence.
 
-## 🛠 Технический стек
-
-### Frontend
-- **Ядро**: [React 18](https://reactjs.org/) + [Vite 7](https://vitejs.dev/)
-- **Маршрутизация**: [React Router 7](https://reactrouter.com/)
-- **PWA**: `vite-plugin-pwa` (полноценное offline-first приложение)
-- **Локализация**: `i18next` (поддержка EN, RU, ES, PT)
-
-### Данные и AI
-- **Blockchain**: `ethers.js` (интеграция с кошельками, смарт-контрактами)
-- **AI/ML**: [TensorFlow.js](https://www.tensorflow.org/js) (локальные предсказания и анализ)
-- **Графики**: `lightweight-charts` (TradingView) и `recharts`
-- **Индикаторы**: `technicalindicators` (RSI, MACD, EMA и др.)
-- **API**: `axios`
-
-### Backend / Интеграция
-- **Server**: Node.js + Express
-- **Автоматизация**: Интеграция с `n8n` для ребалансировки и уведомлений
+### Core Philosophy
+*   **Sensory Trading**: Data shouldn't just be read; it should be felt. The UI uses "Glassmorphism," "Living Data" (pulsing prices), and micro-animations to create a premium, reactive atmosphere.
+*   **Alpha Velocity**: Focus on finding "Alpha" (early market advantages) via automated scrapers and real-time on-chain analysis.
+*   **Frictionless Entry**: Transitioning from a demo/waitlist state to a full-service platform with automated crypto payments.
 
 ---
 
-## 🚀 Реализованные возможности
+## 🚀 Working Functions (Current Features)
 
-1.  **AI Signals**: Система торговых сигналов на основе технического анализа с индикаторами уверенности (Confidence L/M/H).
-2.  **Arbitrage Monitoring**: Сканирование межбиржевого арбитража (CEX/DEX) с учётом комиссий и задержек сетей.
-3.  **News & Sentiment**: Агрегатор новостей с NLP-анализом настроений (BULLISH/BEARISH) и влиянием на рынок.
-4.  **Copy Trading (Simulation)**: Система копитрейдинга в режиме "Paper Trading" для тестирования стратегий без риска.
-5.  **Polymarket Agent**: Специализированный AI-агент для анализа рынков предсказаний.
-6.  **Spectr Academy**: Обучающая платформа с системой достижений (badges) и игрофикацией.
-7.  **AutoPilot**: Система автоматизированного управления позициями (в разработке/MVP).
-8.  **PWA Experience**: Установка на рабочий стол, отсутствие браузерных элементов, нативный мобильный UX.
+### 1. Degen Intel (The Intelligence Hub)
+*   **Ferocious Scout**: A high-speed parser that aggregates signals from elite Telegram alpha channels.
+*   **DexScreener Integration**: Real-time tracking of token boosts, trending pairs, and on-chain volume spikes.
+*   **Smart Sentiment**: NLP analysis of news and social feeds to determine market bias (Bullish/Bearish).
+
+### 2. Pro Membership & Payments
+*   **Automated Checkout**: Integration with **NOWPayments** for seamless upgrades to "Pro" via USDT, SOL, and ETH.
+*   **Instant Access**: Automated backend verification of transactions to unlock premium modules instantly.
+
+### 3. AI-Driven Signal Engine
+*   **TA Predictor**: Real-time technical analysis using RSI, MACD, and EMA cross-overs.
+*   **Confidence Levels**: Signals are weighted with Confidence Scores (Low/Medium/High) based on historical accuracy and volume confirms.
+*   **Market Heatmap**: Visual representation of global market liquidity and volatility.
+
+### 4. Advanced Trading Tools
+*   **Arbitrage Monitoring**: Scans CEX (Binance, Bybit) and DEX gaps for profit opportunities, factoring in network fees.
+*   **Polymarket Agent**: An AI specialized in analysis and prediction for decentralized prediction markets.
+*   **Paper Trading**: Risk-free simulation mode for testing AI signals before deploying capital.
+
+### 5. Native PWA Experience
+*   **Cross-Platform**: Fully installable Progressive Web App (PWA) with offline-first capabilities.
+*   **Native-Feel UX**: Zero browser chrome, gesture-based navigation, and high-performance FPS.
+
+---
+
+## 🛠 Technology Stack
+
+### Frontend (User Magic)
+*   **Framework**: React 18 + Vite 7 (High-performance HMR).
+*   **Animation**: Framer Motion & CSS Variables for "Glassmorphism 2.0".
+*   **Charts**: Lightweight Charts (TradingView) & Recharts.
+*   **Real-time**: WebSockets (Binance/Bybit) for tick-by-tick price updates.
+
+### Backend (Infrastructure)
+*   **Server**: Node.js + Express.
+*   **Database**: Prisma ORM with SQLite (dev/prod).
+*   **Intelligence**: NLP Services for sentiment analysis & Telegram scrapers.
+*   **Gateway**: NOWPayments API for secure crypto transactions.
 
 ---
 
-## 💎 Философия проекта
-
-> "Apple в мире торговых приложений"
-
-- **Mass Market Premium**: Сложные финансовые инструменты, упакованные в простой и элегантный интерфейс.
-- **Living Data**: Отказ от статических данных. Цены "дышат", графики обновляются в реальном времени, интерфейс чувствуется живым.
-- **Micro-interactions**: Каждый клик и переход сопровождается плавными анимациями для создания премиального ощущения.
-- **Native-like**: Приложение должно ощущаться как нативное (Swift/Kotlin), работая при этом в браузере или как PWA.
+## 💎 Visual Identity
+*   **Palette**: `Deep Charcoal (#050505)` background with `Neon Cyan (#00FFFF)` and `Electric Green (#00E396)` highlights.
+*   **Typography**: Inter (UI/UX) + JetBrains Mono (Financial/Technical data).
+*   **Aesthetics**: Glass blur (12px), thin borders (rgba(white, 0.08)), and subtle glow effects.
 
 ---
-
-## 🎨 Цветовая палитра
-
-Проект использует темную тему в стиле "Glassmorphism" с яркими неоновыми акцентами.
-
-| Элемент | Цвет | Код | Пример |
-| :--- | :--- | :--- | :--- |
-| **Background** | Deep Dark | `#0A0A0A` | ![#0A0A0A](https://via.placeholder.com/15/0A0A0A?text=+) |
-| **Surface** | Card/Nav | `#111111` | ![#111111](https://via.placeholder.com/15/111111?text=+) |
-| **Brand** | Cyan/Teal | `#00FFFF` | ![#00FFFF](https://via.placeholder.com/15/00FFFF?text=+) |
-| **Text** | Pure White | `#FFFFFF` | ![#FFFFFF](https://via.placeholder.com/15/FFFFFF?text=+) |
-| **Muted** | Blue Gray | `#8899A6` | ![#8899A6](https://via.placeholder.com/15/8899A6?text=+) |
-| **Positive** | Green | `#00E396` | ![#00E396](https://via.placeholder.com/15/00E396?text=+) |
-| **Negative** | Red | `#FF4560` | ![#FF4560](https://via.placeholder.com/15/FF4560?text=+) |
-| **Warning** | Amber | `#FEB019` | ![#FEB019](https://via.placeholder.com/15/FEB019?text=+) |
-
----
-*Документ подготовлен на основе анализа PRD 3.3/3.4 и исходного кода проекта.*
+> [!IMPORTANT]
+> **Current Status**: The project has successfully moved from a simulated prototype to a functional MVP with live data, working subscriptions, and real-time alpha intelligence.

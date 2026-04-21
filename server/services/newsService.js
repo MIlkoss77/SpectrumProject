@@ -28,19 +28,40 @@ const RSS_SOURCES = [
 export const fetchNews = async (apiKey = null) => {
     const now = Date.now();
     
-    // Serve from cache if available
-    if (!apiKey && newsCache.data && (now - newsCache.lastUpdate < CACHE_TTL)) {
-        console.log('[NewsService] Serving from cache');
+    // --- SWR: Return cache IMMEDIATELY if it exists ---
+    if (newsCache.data) {
+        const isStale = (now - newsCache.lastUpdate > CACHE_TTL);
+        if (isStale) {
+            // Trigger background refresh but don't wait for it
+            console.log('[NewsService] SWR: Cache stale, triggering background refresh');
+            refreshNewsCache(apiKey).catch(e => console.error('[NewsService] Background refresh failed:', e.message));
+        } else {
+            console.log('[NewsService] Serving fresh cache');
+        }
         return newsCache.data;
     }
 
-    console.log(`[NewsService] Fetching fresh news (Direct RSS & CryptoPanic)...`);
+    // First run or no cache: must wait
+    console.log(`[NewsService] First fetch, waiting for initial data...`);
+    return await refreshNewsCache(apiKey);
+};
+
+// Background refresh worker
+async function refreshNewsCache(apiKey) {
+    const now = Date.now();
     
+    // Source results aggregator
     const fetchPromises = RSS_SOURCES.map(async (source) => {
         try {
-            const feed = await parser.parseURL(source.url);
+            // Timeout wrapper helper
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('TIMEOUT_EXCEEDED')), 5000)
+            );
+
+            const feedPromise = parser.parseURL(source.url);
+            const feed = await Promise.race([feedPromise, timeoutPromise]);
             
-            return feed.items.map(item => {
+            return (feed.items || []).map(item => {
                 let domain = 'crypto';
                 try {
                     if (item.link) domain = new URL(item.link).hostname.replace('www.', '');
@@ -56,22 +77,20 @@ export const fetchNews = async (apiKey = null) => {
                 };
             });
         } catch (err) {
-            console.error(`[NewsService] Failed to fetch from ${source.name} via rss-parser:`, err.message);
+            console.warn(`[NewsService] Skipping ${source.name}: ${err.message}`);
             return [];
         }
     });
 
-    // Add CryptoPanic logic if apiKey provided or public feed
+    // Add CryptoPanic with strict timeout
     try {
         let cpUrl = apiKey 
             ? `https://cryptopanic.com/api/v1/posts/?auth_token=${apiKey}`
             : `https://cryptopanic.com/api/v1/posts/?public=true`;
             
         const cpPromise = axios.get(cpUrl, { 
-            timeout: 8000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-            }
+            timeout: 5000, // Reduced from 8000
+            headers: { 'User-Agent': 'SpectrTerminal/1.0' }
         }).then(res => {
             return (res.data.results || []).map(item => ({
                 title: item.title,
@@ -82,19 +101,27 @@ export const fetchNews = async (apiKey = null) => {
                 description: item.title
             }));
         }).catch(e => {
-            console.error(`[NewsService] Failed to fetch CryptoPanic:`, e.message);
+            console.warn(`[NewsService] Skipping CryptoPanic: ${e.message}`);
             return [];
         });
         
         fetchPromises.push(cpPromise);
     } catch (e) {}
 
-    const results = await Promise.all([...fetchPromises]);
-    let allItems = results.flat();
+    const results = await Promise.allSettled(fetchPromises);
+    const allItems = results
+        .filter(r => r.status === 'fulfilled')
+        .map(r => r.value)
+        .flat();
 
-    // 1. Deduplication (by title slug)
+    if (allItems.length === 0) {
+        if (newsCache.data) return newsCache.data;
+        return getMockNews().results;
+    }
+
+    // 1. Deduplication
     const seen = new Set();
-    allItems = allItems.filter(item => {
+    const uniqueItems = allItems.filter(item => {
         if (!item || !item.title) return false;
         const slug = item.title.toLowerCase().replace(/[^a-z0-9]/g, '');
         if (seen.has(slug)) return false;
@@ -102,11 +129,11 @@ export const fetchNews = async (apiKey = null) => {
         return true;
     });
 
-    // 2. Sorting by date
-    allItems.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
+    // 2. Sorting
+    uniqueItems.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
 
     // 3. Formatting
-    const formatted = allItems.slice(0, 100).map((item, index) => ({
+    const formatted = uniqueItems.slice(0, 100).map((item, index) => ({
         id: index + 1,
         title: item.title,
         url: item.url,
@@ -117,15 +144,12 @@ export const fetchNews = async (apiKey = null) => {
         currencies: extractCurrencies(item.title + ' ' + item.description)
     }));
 
-    if (formatted.length === 0) {
-        return getMockNews().results;
-    }
-
     newsCache.data = formatted;
     newsCache.lastUpdate = now;
 
     return formatted;
-};
+}
+
 
 /**
  * Helper to extract currency codes from text

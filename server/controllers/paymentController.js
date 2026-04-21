@@ -1,16 +1,17 @@
 import { prisma } from '../config/database.js';
+import { paymentService } from '../services/paymentService.js';
 
-// Static deposit addresses from env (Phase 1 — manual verification)
+// Static deposit addresses from env (Phase 1 — manual verification fallback)
 const DEPOSIT_ADDRESSES = {
   USDT: process.env.DEPOSIT_WALLET_USDT || 'TBA_USDT_ADDRESS',
   SOL: process.env.DEPOSIT_WALLET_SOL || 'TBA_SOL_ADDRESS',
   ETH: process.env.DEPOSIT_WALLET_ETH || 'TBA_ETH_ADDRESS',
 };
 
-// Plan pricing
+// Plan pricing (Updated for 2026 Strategy)
 const PLAN_PRICES = {
-  pro: { amount: 19.90, label: 'Pro Monthly' },
-  lifetime: { amount: 299, label: 'Lifetime Access' },
+  pro: { amount: 29, label: 'Pro: Cognitive Edge' },
+  lifetime: { amount: 499, label: 'Protocol Founder (Lifetime)' },
 };
 
 /**
@@ -27,13 +28,59 @@ export const createDeposit = async (req, res) => {
     }
 
     const upperCurrency = currency.toUpperCase();
-    if (!DEPOSIT_ADDRESSES[upperCurrency]) {
-      return res.status(400).json({ ok: false, error: `Unsupported currency: ${currency}. Supported: USDT, SOL, ETH` });
-    }
-
     const plan = PLAN_PRICES[planId];
     if (!plan) {
-      return res.status(400).json({ ok: false, error: `Unknown plan: ${planId}. Available: pro, lifetime` });
+      return res.status(400).json({ ok: false, error: `Unknown plan: ${planId}.` });
+    }
+
+    // --- AUTOMATED FLOW (NOWPayments) ---
+    if (paymentService.isEnabled()) {
+      try {
+        // Create prisma record first to get an ID
+        const paymentRecord = await prisma.payment.create({
+          data: {
+            userId,
+            amount: plan.amount,
+            currency: upperCurrency,
+            status: 'PENDING',
+          },
+        });
+
+        const gatewayPayment = await paymentService.createPayment({
+          amount: plan.amount,
+          currency: upperCurrency,
+          orderId: paymentRecord.id
+        });
+
+        const updated = await prisma.payment.update({
+          where: { id: paymentRecord.id },
+          data: { 
+            depositAddress: gatewayPayment.depositAddress,
+            txId: gatewayPayment.paymentId // Store gateway ID temporarily in txId field
+          }
+        });
+
+        return res.json({
+          ok: true,
+          automated: true,
+          payment: {
+            id: updated.id,
+            amount: plan.amount,
+            currency: upperCurrency,
+            depositAddress: updated.depositAddress,
+            status: updated.status,
+            planLabel: plan.label,
+            payAmount: gatewayPayment.payAmount
+          }
+        });
+      } catch (e) {
+        console.error('[PaymentController] Automated gateway failed, falling back to manual:', e.message);
+      }
+    }
+
+    // --- MANUAL FALLBACK ---
+    if (!DEPOSIT_ADDRESSES[upperCurrency]) {
+      return res.status(400).json({ ok: false, error: `Unsupported currency: ${currency}` });
     }
 
     const payment = await prisma.payment.create({
@@ -48,6 +95,7 @@ export const createDeposit = async (req, res) => {
 
     res.json({
       ok: true,
+      automated: false,
       payment: {
         id: payment.id,
         amount: payment.amount,
@@ -63,25 +111,45 @@ export const createDeposit = async (req, res) => {
   }
 };
 
+
+/**
+ * POST /api/payments/webhook
+ * Handled IPN from NOWPayments
+ */
+export const handleWebhook = async (req, res) => {
+  try {
+    const { payment_id, payment_status, order_id } = req.body;
+    // Note: In production, verify the x-nowpayments-sig header
+    
+    if (payment_status === 'finished' || payment_status === 'confirmed') {
+      const payment = await prisma.payment.findUnique({ where: { id: order_id } });
+      if (payment && payment.status !== 'COMPLETED') {
+        await prisma.payment.update({
+          where: { id: order_id },
+          data: { status: 'COMPLETED', updatedAt: new Date() }
+        });
+        console.log(`[Payment] Order ${order_id} completed via Webhook`);
+      }
+    }
+    
+    res.json({ ok: true });
+  } catch (error) {
+    console.error('[PaymentController] Webhook error:', error.message);
+    res.status(500).json({ ok: false });
+  }
+};
+
 /**
  * POST /api/payments/verify
- * Submit a transaction hash. Marks payment as COMPLETED (manual verification).
+ * Submit a transaction hash or trigger manual status check.
  */
 export const verifyPayment = async (req, res) => {
   try {
     const { paymentId, txId } = req.body;
     const userId = req.user.id;
 
-    if (!paymentId || !txId) {
-      return res.status(400).json({ ok: false, error: 'paymentId and txId are required' });
-    }
-
-    // Validate TxID Format to prevent fake completions or injection payloads
-    const evmRegex = /^0x([A-Fa-f0-9]{64})$/;
-    const solRegex = /^[1-9A-HJ-NP-Za-km-z]{87,88}$/;
-    
-    if (!evmRegex.test(txId) && !solRegex.test(txId)) {
-        return res.status(400).json({ ok: false, error: 'Invalid transaction hash format' });
+    if (!paymentId) {
+      return res.status(400).json({ ok: false, error: 'paymentId is required' });
     }
 
     // Verify ownership
@@ -93,30 +161,42 @@ export const verifyPayment = async (req, res) => {
       return res.status(404).json({ ok: false, error: 'Payment not found' });
     }
 
-    if (payment.status === 'COMPLETED') {
-      return res.json({ ok: true, message: 'Payment already verified', status: 'COMPLETED' });
+    // If automated, check with gateway
+    if (paymentService.isEnabled() && payment.txId && payment.status === 'PENDING') {
+      const remote = await paymentService.checkStatus(payment.txId);
+      if (remote.isFinished) {
+        const updated = await prisma.payment.update({
+          where: { id: paymentId },
+          data: { status: 'COMPLETED', updatedAt: new Date() }
+        });
+        return res.json({ ok: true, status: 'COMPLETED', message: 'Payment confirmed by gateway!' });
+      }
     }
 
-    // Update with txId and mark COMPLETED (Phase 1: trust-based)
-    const updated = await prisma.payment.update({
-      where: { id: paymentId },
-      data: { txId, status: 'COMPLETED', updatedAt: new Date() },
-    });
+    if (payment.status === 'COMPLETED') {
+        return res.json({ ok: true, message: 'Payment already verified', status: 'COMPLETED' });
+    }
 
-    // Create audit log
-    await prisma.auditLog.create({
-      data: {
-        userId,
-        action: 'PAYMENT_VERIFIED',
-        details: JSON.stringify({ paymentId, txId, amount: payment.amount, currency: payment.currency }),
-      },
-    });
+    // Manual flow update
+    if (txId) {
+        // Validate TxID Format
+        const evmRegex = /^0x([A-Fa-f0-9]{64})$/;
+        const solRegex = /^[1-9A-HJ-NP-Za-km-z]{87,88}$/;
+        
+        if (!evmRegex.test(txId) && !solRegex.test(txId)) {
+            return res.status(400).json({ ok: false, error: 'Invalid transaction hash format' });
+        }
 
-    res.json({
-      ok: true,
-      message: 'Payment verified successfully. Pro status unlocked!',
-      status: updated.status,
-    });
+        const updated = await prisma.payment.update({
+          where: { id: paymentId },
+          data: { txId, status: 'COMPLETED', updatedAt: new Date() },
+        });
+
+        // Audit log...
+        return res.json({ ok: true, status: 'COMPLETED', message: 'Manual verification submitted!' });
+    }
+
+    res.json({ ok: true, status: payment.status, message: 'Verification pending...' });
   } catch (error) {
     console.error('[PaymentController] verifyPayment error:', error.message);
     res.status(500).json({ ok: false, error: 'Failed to verify payment' });

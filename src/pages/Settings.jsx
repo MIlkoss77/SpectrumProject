@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Bell, Mail, MessageCircle, Moon, Sun, Globe, Shield, ShieldAlert, Zap, Brain, Receipt, History, Key, Cpu, Wallet as WalletIcon } from 'lucide-react'
+import { Bell, Mail, MessageCircle, Moon, Sun, Globe, Shield, ShieldAlert, Zap, Brain, Radio, Receipt, History, Key, Cpu, Wallet as WalletIcon } from 'lucide-react'
 
 import { useTranslation } from 'react-i18next'
 import { useTrading } from '@/context/TradingContext.jsx'
@@ -23,6 +23,14 @@ export default function Settings() {
   const [anthropicKey, setAnthropicKey] = useState('••••••••••••')
   const [cryptoPanicKey, setCryptoPanicKey] = useState(() => localStorage.getItem('cryptopanic_key') || '')
   const [polyPk, setPolyPk] = useState(() => localStorage.getItem('poly_hot_wallet') || '')
+  
+  // CEX Connectivity
+  const [cexExchange, setCexExchange] = useState('mexc')
+  const [cexApiKey, setCexApiKey] = useState('')
+  const [cexSecret, setCexSecret] = useState('')
+  const [connectedExchanges, setConnectedExchanges] = useState([])
+  const [loadingExchanges, setLoadingExchanges] = useState(false)
+
   const [isSaving, setIsSaving] = useState(false)
 
 
@@ -61,6 +69,29 @@ export default function Settings() {
     fetchPayments()
   }, [])
 
+  // Fetch connected exchanges
+  const fetchExchanges = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return
+      setLoadingExchanges(true)
+      const res = await axios.get('/api/exchange/list', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.data.ok) {
+        setConnectedExchanges(res.data.exchanges)
+      }
+    } catch {
+      // Silent fail
+    } finally {
+      setLoadingExchanges(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchExchanges()
+  }, [])
+
   const handleSaveAIKey = async (provider, key) => {
     if (!key || key.includes('•')) return;
     setIsSaving(true)
@@ -76,6 +107,29 @@ export default function Settings() {
       alert(`${provider.toUpperCase()} key updated and encrypted on server.`)
     } catch (err) {
       alert(`Failed to save key: ${err.message}`)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleSaveCEXKey = async () => {
+    if (!cexApiKey || !cexSecret) return;
+    setIsSaving(true)
+    try {
+      const token = localStorage.getItem('token')
+      await axios.post('/api/exchange/keys', {
+        exchange: cexExchange,
+        apiKey: cexApiKey,
+        secret: cexSecret
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      alert(`Success: ${cexExchange.toUpperCase()} terminal access granted and encrypted.`)
+      setCexApiKey('')
+      setCexSecret('')
+      fetchExchanges()
+    } catch (err) {
+      alert(`Failed to activate exchange: ${err.message}`)
     } finally {
       setIsSaving(false)
     }
@@ -208,6 +262,85 @@ export default function Settings() {
             <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
               Keys are encrypted and stored in the secure server-side database. They are never exposed to the client after saving.
             </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="dx-card">
+        <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Radio size={20} className="text-cyan-400" /> Exchange Terminal Connectivity
+        </h3>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          {/* Form */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: 8, fontSize: 13, color: 'var(--muted)' }}>Select Exchange</label>
+              <select 
+                value={cexExchange} 
+                onChange={e => setCexExchange(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)' }}
+              >
+                <option value="mexc">MEXC Global</option>
+                <option value="binance">Binance</option>
+                <option value="bybit">Bybit</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, color: 'var(--muted)' }}>API Key</label>
+                <input 
+                  type="password" 
+                  value={cexApiKey} 
+                  onChange={e => setCexApiKey(e.target.value)}
+                  placeholder="Paste Key"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 12 }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, color: 'var(--muted)' }}>API Secret</label>
+                <input 
+                  type="password" 
+                  value={cexSecret} 
+                  onChange={e => setCexSecret(e.target.value)}
+                  placeholder="Paste Secret"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)', fontSize: 12 }}
+                />
+              </div>
+            </div>
+
+            <button 
+              className="dx-btn" 
+              onClick={handleSaveCEXKey} 
+              disabled={isSaving || !cexApiKey || !cexSecret}
+              style={{ width: '100%', justifyContent: 'center', opacity: (isSaving || !cexApiKey || !cexSecret) ? 0.5 : 1 }}
+            >
+              {isSaving ? 'Encrypting...' : `Connect ${cexExchange.toUpperCase()} Terminal`}
+            </button>
+          </div>
+
+          {/* Connected Exchanges List */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 16, padding: 20, border: '1px solid rgba(255,255,255,0.05)' }}>
+            <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: 16 }}>Verified Connections</span>
+            
+            {loadingExchanges ? (
+              <div style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center', padding: '10px 0' }}>Syncing...</div>
+            ) : connectedExchanges.length === 0 ? (
+              <div style={{ fontSize: 12, color: 'var(--muted)', textAlign: 'center', padding: '10px 0' }}>No active terminals. Add keys to start trading.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {connectedExchanges.map(ex => (
+                  <div key={ex.exchange} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00FFFF', boxShadow: '0 0 8px rgba(0,255,255,0.5)' }} />
+                      <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase' }}>{ex.exchange}</span>
+                    </div>
+                    <span style={{ fontSize: 10, color: 'var(--muted)' }}>Synced {new Date(ex.updatedAt).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
