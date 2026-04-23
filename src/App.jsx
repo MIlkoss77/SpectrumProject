@@ -27,7 +27,7 @@ import { TradeProvider } from '@/context/TradeContext.jsx'
 import { TradingProvider } from '@/context/TradingContext.jsx'
 import TradeModal from '@/components/TradeModal.jsx'
 
-const Landing = React.lazy(() => import('@/pages/Landing.jsx'))
+
 
 export default function App() {
   return (
@@ -39,11 +39,8 @@ export default function App() {
               <TradeModal />
               <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#fff', backgroundColor: '#000' }}>Loading...</div>}>
                 <Routes>
-                  {/* Landing Page as Root */}
-                  <Route path='/' element={<Landing />} />
-
-                  {/* Main App Terminal at /app */}
-                  <Route path='/app' element={<AppShell />}>
+                  {/* Main App Terminal at Root */}
+                  <Route path='/' element={<AppShell />}>
                     <Route index element={<Overview />} />
                     <Route path='portfolio' element={<Portfolio />} />
                     <Route path='alerts' element={<Alerts />} />

@@ -31,18 +31,18 @@ export default function AppShell() {
   const location = useLocation()
 
   const NAV = [
-    { label: t('app.dashboard'), to: '/app', icon: LayoutDashboard },
-    { label: t('app.portfolio'), to: '/app/portfolio', icon: Wallet },
-    { label: t('app.polymarket'), to: '/app/polymarket', icon: Layers },
-    { label: t('app.signals'), to: '/app/signals', icon: Activity },
-    { label: t('app.alerts'), to: '/app/alerts', icon: Bell },
-    { label: t('app.news'), to: '/app/news', icon: Newspaper },
-    { label: t('app.ta'), to: '/app/analytics', icon: PieChart },
-    { label: t('app.arbitrage'), to: '/app/arbitrage', icon: Scale },
-    { label: t('app.staking'), to: '/app/staking', icon: Wallet },
-    { label: t('app.academy'), to: '/app/academy', icon: GraduationCap },
-    { label: t('app.pricing'), to: '/app/pricing', icon: CreditCard },
-    { label: t('app.settings'), to: '/app/settings', icon: Settings },
+    { label: t('app.dashboard'), to: '/', icon: LayoutDashboard },
+    { label: t('app.portfolio'), to: '/portfolio', icon: Wallet },
+    { label: t('app.polymarket'), to: '/polymarket', icon: Layers },
+    { label: t('app.signals'), to: '/signals', icon: Activity },
+    { label: t('app.alerts'), to: '/alerts', icon: Bell },
+    { label: t('app.news'), to: '/news', icon: Newspaper },
+    { label: t('app.ta'), to: '/analytics', icon: PieChart },
+    { label: t('app.arbitrage'), to: '/arbitrage', icon: Scale },
+    { label: t('app.staking'), to: '/staking', icon: Wallet },
+    { label: t('app.academy'), to: '/academy', icon: GraduationCap },
+    { label: t('app.pricing'), to: '/pricing', icon: CreditCard },
+    { label: t('app.settings'), to: '/settings', icon: Settings },
   ]
 
 
@@ -110,10 +110,10 @@ export default function AppShell() {
   }
 
   const mainMobileNav = [
-    { label: t('app.dashboard'), to: '/app', icon: LayoutDashboard },
-    { label: t('app.signals'), to: '/app/signals', icon: Activity },
-    { label: t('app.news'), to: '/app/news', icon: Newspaper },
-    { label: t('app.academy'), to: '/app/academy', icon: GraduationCap },
+    { label: t('app.dashboard'), to: '/', icon: LayoutDashboard },
+    { label: t('app.signals'), to: '/signals', icon: Activity },
+    { label: t('app.news'), to: '/news', icon: Newspaper },
+    { label: t('app.academy'), to: '/academy', icon: GraduationCap },
   ]
 
   const moreNav = NAV.filter(item => !mainMobileNav.find(m => m.to === item.to))
@@ -136,7 +136,7 @@ export default function AppShell() {
         <nav className="dx-nav">
           <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-2 px-4">{t('ui.menu') || 'Menu'}</div>
           {NAV.map(({ label, to, icon: Icon }) => (
-            <NavLink key={to} to={to} className={({ isActive }) => `dx-nav-item ${isActive ? 'active' : ''}`} end={to === '/app'}>
+            <NavLink key={to} to={to} className={({ isActive }) => `dx-nav-item ${isActive ? 'active' : ''}`} end={to === '/'}>
               {({ isActive }) => (
                 <>
                   <Icon size={18} className={isActive ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-white/40'} />
@@ -284,7 +284,7 @@ export default function AppShell() {
       {/* Mobile Bottom Navigation */}
       <nav className="dx-bottom-nav">
         {mainMobileNav.map(({ label, to, icon: Icon }) => (
-          <NavLink key={to} to={to} className={({ isActive }) => `dx-bot-item ${isActive ? 'active' : ''}`} end={to === '/app'}>
+          <NavLink key={to} to={to} className={({ isActive }) => `dx-bot-item ${isActive ? 'active' : ''}`} end={to === '/'}>
             <Icon size={24} />
             <span>{label}</span>
           </NavLink>
