@@ -1,0 +1,9 @@
+{
+  "connections": [
+    {
+      "name": "Spectr SQLite (dev.db)",
+      "driver": "SQLite",
+      "database": "${workspaceFolder}/dev.db"
+    }
+  ]
+}

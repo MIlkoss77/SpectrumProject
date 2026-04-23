@@ -52,6 +52,7 @@ model Payment {
   userId        String
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   txId          String?  @unique
+  idempotencyKey String?  @unique
   amount        Float
   currency      String
   status        String   // "PENDING", "COMPLETED", "FAILED"

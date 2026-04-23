@@ -8,15 +8,20 @@ services:
     repo: https://github.com/your/repo.git
     buildCommand: |
       npm ci
+      npx prisma generate
+      npx prisma db push --accept-data-loss
     startCommand: |
       node server/index.js
     autoDeploy: true
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION
-        value: 18
-      - key: ORIGIN
-        value: "*"
+        value: 20
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: spectr-web
+          property: host
       - key: N8N_SECRET
         generateValue: true
 

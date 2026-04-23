@@ -1,33 +1,33 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Web3Provider } from '@/context/Web3Context.jsx'
 import { WebSocketProvider } from '@/context/WebSocketContext.jsx'
 import AppShell from '@/layouts/AppShell.jsx'
 
 // Pages
-import Overview from '@/pages/Overview.jsx'
-import Alerts from '@/pages/Alerts.jsx'
-import Signals from '@/pages/Signals.jsx'
-import News from '@/pages/News.jsx'
-import Analytics from '@/pages/Analytics.jsx'
-import NotFound from '@/pages/NotFound.jsx'
-import Arbitrage from '@/pages/Arbitrage.jsx'
-import Staking from '@/pages/Staking.jsx'
-import Academy from '@/pages/Academy.jsx'
-import Settings from '@/pages/Settings.jsx'
-import Pricing from '@/pages/Pricing.jsx'
-import Portfolio from '@/pages/Portfolio.jsx'
-import TA from '@/pages/TA.jsx'
-import Calibration from '@/pages/Calibration.jsx'
-import Forecasts from '@/pages/Forecasts.jsx'
-import Events from '@/pages/Events.jsx'
-import Polymarket from '@/pages/Polymarket.jsx'
+const Overview = React.lazy(() => import('@/pages/Overview.jsx'))
+const Alerts = React.lazy(() => import('@/pages/Alerts.jsx'))
+const Signals = React.lazy(() => import('@/pages/Signals.jsx'))
+const News = React.lazy(() => import('@/pages/News.jsx'))
+const Analytics = React.lazy(() => import('@/pages/Analytics.jsx'))
+const NotFound = React.lazy(() => import('@/pages/NotFound.jsx'))
+const Arbitrage = React.lazy(() => import('@/pages/Arbitrage.jsx'))
+const Staking = React.lazy(() => import('@/pages/Staking.jsx'))
+const Academy = React.lazy(() => import('@/pages/Academy.jsx'))
+const Settings = React.lazy(() => import('@/pages/Settings.jsx'))
+const Pricing = React.lazy(() => import('@/pages/Pricing.jsx'))
+const Portfolio = React.lazy(() => import('@/pages/Portfolio.jsx'))
+const TA = React.lazy(() => import('@/pages/TA.jsx'))
+const Calibration = React.lazy(() => import('@/pages/Calibration.jsx'))
+const Forecasts = React.lazy(() => import('@/pages/Forecasts.jsx'))
+const Events = React.lazy(() => import('@/pages/Events.jsx'))
+const Polymarket = React.lazy(() => import('@/pages/Polymarket.jsx'))
 import { TradeProvider } from '@/context/TradeContext.jsx'
 
 import { TradingProvider } from '@/context/TradingContext.jsx'
 import TradeModal from '@/components/TradeModal.jsx'
 
-import Landing from '@/pages/Landing.jsx'
+const Landing = React.lazy(() => import('@/pages/Landing.jsx'))
 
 export default function App() {
   return (
@@ -37,31 +37,32 @@ export default function App() {
           <TradeProvider>
             <BrowserRouter>
               <TradeModal />
-              <Routes>
-                {/* Landing Page as Root */}
-                <Route path='/' element={<Landing />} />
+              <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: '#fff', backgroundColor: '#000' }}>Loading...</div>}>
+                <Routes>
+                  {/* Landing Page as Root */}
+                  <Route path='/' element={<Landing />} />
 
-                {/* Main App Terminal at /app */}
-                <Route path='/app' element={<AppShell />}>
-                  <Route index element={<Overview />} />
-                  <Route path='portfolio' element={<Portfolio />} />
-                  <Route path='alerts' element={<Alerts />} />
-                  <Route path='signals' element={<Signals />} />
-                  <Route path='news' element={<News />} />
-                  <Route path='arbitrage' element={<Arbitrage />} />
-                  <Route path='staking' element={<Staking />} />
-                  <Route path='academy' element={<Academy />} />
-                  <Route path='analytics' element={<Analytics />} />
-                  <Route path='pricing' element={<Pricing />} />
-                  <Route path='settings' element={<Settings />} />
-                  <Route path='forecasts' element={<Forecasts />} />
-                  <Route path='events' element={<Events />} />
-                  <Route path='polymarket' element={<Polymarket />} />
-                </Route>
+                  {/* Main App Terminal at /app */}
+                  <Route path='/app' element={<AppShell />}>
+                    <Route index element={<Overview />} />
+                    <Route path='portfolio' element={<Portfolio />} />
+                    <Route path='alerts' element={<Alerts />} />
+                    <Route path='signals' element={<Signals />} />
+                    <Route path='news' element={<News />} />
+                    <Route path='arbitrage' element={<Arbitrage />} />
+                    <Route path='staking' element={<Staking />} />
+                    <Route path='academy' element={<Academy />} />
+                    <Route path='analytics' element={<Analytics />} />
+                    <Route path='pricing' element={<Pricing />} />
+                    <Route path='settings' element={<Settings />} />
+                    <Route path='forecasts' element={<Forecasts />} />
+                    <Route path='events' element={<Events />} />
+                    <Route path='polymarket' element={<Polymarket />} />
+                  </Route>
 
-
-                <Route path='*' element={<NotFound />} />
-              </Routes>
+                  <Route path='*' element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </TradeProvider>
         </WebSocketProvider>

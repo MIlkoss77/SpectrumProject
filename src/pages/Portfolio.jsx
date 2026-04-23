@@ -89,7 +89,7 @@ export default function Portfolio() {
 
     React.useEffect(() => {
         if (!isPaper) {
-            const activeExchange = ['binance', 'bybit'].find(ex => apiKeys[ex]?.key && apiKeys[ex]?.secret);
+            const activeExchange = ['binance', 'bybit', 'mexc'].find(ex => apiKeys[ex]?.key && apiKeys[ex]?.secret);
             if (activeExchange) {
                 fetchLiveBalance(activeExchange);
             }
@@ -143,7 +143,7 @@ export default function Portfolio() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '24px' }}>
                     <div>
                         <h1 style={{ fontSize: '42px', fontWeight: 900, color: '#fff', letterSpacing: '-0.03em', margin: 0 }}>
-                            ${balance.toLocaleString()}
+                            ${(balance ?? 0).toLocaleString()}
                         </h1>
                         <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginTop: '4px', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.05em' }}>
                             {t('pages.portfolio.balance_label') || 'Total Estimated Balance'}
@@ -258,7 +258,7 @@ export default function Portfolio() {
                                             </div>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
-                                            <div style={{ fontSize: '14px', fontWeight: 900, fontFamily: 'var(--font-mono)' }}>${(h.amount * h.executedPrice).toLocaleString()}</div>
+                                            <div style={{ fontSize: '14px', fontWeight: 900, fontFamily: 'var(--font-mono)' }}>${((h.amount || 0) * (h.executedPrice || 0)).toLocaleString()}</div>
                                             <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>{h.amount} @ ${h.executedPrice}</div>
                                         </div>
                                     </div>
@@ -280,7 +280,7 @@ export default function Portfolio() {
                         </p>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {['Binance', 'Bybit'].map(ex => {
+                            {['Binance', 'Bybit', 'MEXC'].map(ex => {
                                 const lower = ex.toLowerCase();
                                 const hasKeys = apiKeys[lower]?.key && apiKeys[lower]?.secret;
                                 return (

@@ -22,7 +22,7 @@ export default function Settings() {
   const [openaiKey, setOpenaiKey] = useState('••••••••••••')
   const [anthropicKey, setAnthropicKey] = useState('••••••••••••')
   const [cryptoPanicKey, setCryptoPanicKey] = useState(() => localStorage.getItem('cryptopanic_key') || '')
-  const [polyPk, setPolyPk] = useState(() => localStorage.getItem('poly_hot_wallet') || '')
+  const [polyPk, setPolyPk] = useState('')
   
   // CEX Connectivity
   const [cexExchange, setCexExchange] = useState('mexc')
@@ -105,6 +105,26 @@ export default function Settings() {
         headers: { Authorization: `Bearer ${token}` }
       })
       alert(`${provider.toUpperCase()} key updated and encrypted on server.`)
+    } catch (err) {
+      alert(`Failed to save key: ${err.message}`)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleSavePolyKey = async (key) => {
+    if (!key || key.includes('•')) return;
+    setIsSaving(true)
+    try {
+      const token = localStorage.getItem('token')
+      await axios.post('/api/exchange/keys', {
+        exchange: 'polymarket',
+        apiKey: 'hot_wallet',
+        secret: key
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      alert(`POLYMARKET HOT WALLET key updated and encrypted on server.`)
     } catch (err) {
       alert(`Failed to save key: ${err.message}`)
     } finally {
@@ -376,7 +396,7 @@ export default function Settings() {
               type="password"
               value={polyPk}
               onChange={e => setPolyPk(e.target.value)}
-              onBlur={e => handleSaveLocalKey('poly_hot_wallet', e.target.value)}
+              onBlur={e => handleSavePolyKey(e.target.value)}
               placeholder="0x... Private Key"
               style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--accent)', fontSize: 12, fontFamily: 'var(--font-mono)' }}
             />

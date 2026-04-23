@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"name": "🚀 SPECTR TRADING (App)",
+			"path": "C:\\Users\\Admin\\Desktop\\Spectrum Project"
+		},
+		{
+			"name": "🌐 SPECTR SITE (Landing)",
+			"path": "C:\\Users\\Admin\\Desktop\\Spectr Site"
+		}
+	],
+	"settings": {
+		"sqltools.connections": [
+			{
+				"name": "Spectr SQLite (dev.db)",
+				"driver": "SQLite",
+				"database": "C:/Users/Admin/Desktop/Spectrum Project/dev.db"
+			}
+		],
+		"files.exclude": {
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/CVS": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/node_modules": true
+		}
+	},
+	"extensions": {
+		"recommendations": [
+			"mtxr.sqltools",
+			"mtxr.sqltools-driver-sqlite",
+			"dbaeumer.vscode-eslint",
+			"esbenp.prettier-vscode"
+		]
+	}
+}

@@ -33,6 +33,7 @@ router.post('/auth/login', authController.login);
 router.get('/auth/me', authMiddleware, authController.getMe);
 
 // Payment Routes
+router.post('/payments/webhook', paymentController.handleWebhook);
 router.post('/payments/deposit', authMiddleware, paymentLimiter, paymentController.createDeposit);
 router.post('/payments/verify', authMiddleware, paymentLimiter, paymentController.verifyPayment);
 router.get('/payments/history', authMiddleware, paymentController.getPaymentHistory);

@@ -5,6 +5,8 @@ dist/
 node_modules/.vite/
 
 # Local env
+.env
+.env.production
 .env.local
 .env.*.local
 

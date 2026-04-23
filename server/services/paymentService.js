@@ -30,7 +30,8 @@ class PaymentService {
                 order_id: orderId,
                 case: 'pro_upgrade'
             }, {
-                headers: { 'x-api-key': this.apiKey }
+                headers: { 'x-api-key': this.apiKey },
+                timeout: 15000
             });
 
             return {
@@ -54,7 +55,8 @@ class PaymentService {
 
         try {
             const response = await axios.get(`${this.baseUrl}/payment/${paymentId}`, {
-                headers: { 'x-api-key': this.apiKey }
+                headers: { 'x-api-key': this.apiKey },
+                timeout: 15000
             });
 
             return {

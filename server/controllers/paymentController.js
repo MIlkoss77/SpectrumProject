@@ -1,5 +1,6 @@
 import { prisma } from '../config/database.js';
 import { paymentService } from '../services/paymentService.js';
+import crypto from 'crypto';
 
 // Static deposit addresses from env (Phase 1 — manual verification fallback)
 const DEPOSIT_ADDRESSES = {
@@ -20,11 +21,31 @@ const PLAN_PRICES = {
  */
 export const createDeposit = async (req, res) => {
   try {
-    const { currency, planId } = req.body;
+    const { currency, planId, idempotencyKey } = req.body;
     const userId = req.user.id;
 
     if (!currency || !planId) {
       return res.status(400).json({ ok: false, error: 'currency and planId are required' });
+    }
+
+    if (idempotencyKey) {
+      const existing = await prisma.payment.findFirst({
+        where: { userId, idempotencyKey }
+      });
+      if (existing) {
+        return res.json({
+          ok: true,
+          automated: !!existing.txId,
+          payment: {
+            id: existing.id,
+            amount: existing.amount,
+            currency: existing.currency,
+            depositAddress: existing.depositAddress,
+            status: existing.status,
+            planLabel: PLAN_PRICES[planId]?.label
+          }
+        });
+      }
     }
 
     const upperCurrency = currency.toUpperCase();
@@ -43,6 +64,7 @@ export const createDeposit = async (req, res) => {
             amount: plan.amount,
             currency: upperCurrency,
             status: 'PENDING',
+            idempotencyKey
           },
         });
 
@@ -90,6 +112,7 @@ export const createDeposit = async (req, res) => {
         currency: upperCurrency,
         status: 'PENDING',
         depositAddress: DEPOSIT_ADDRESSES[upperCurrency],
+        idempotencyKey
       },
     });
 
@@ -118,8 +141,31 @@ export const createDeposit = async (req, res) => {
  */
 export const handleWebhook = async (req, res) => {
   try {
+    const IPN_SECRET = process.env.NOWPAYMENTS_IPN_SECRET;
+    if (!IPN_SECRET) {
+      console.error('[Webhook] NOWPAYMENTS_IPN_SECRET not configured');
+      return res.status(500).json({ ok: false });
+    }
+
+    const signature = req.headers['x-nowpayments-sig'];
+    if (!signature) {
+      return res.status(401).json({ ok: false, error: 'Missing signature' });
+    }
+
+    const sortedBody = JSON.stringify(
+      Object.keys(req.body).sort().reduce((r, k) => { r[k] = req.body[k]; return r; }, {})
+    );
+    const expectedSig = crypto
+      .createHmac('sha512', IPN_SECRET)
+      .update(sortedBody)
+      .digest('hex');
+
+    if (signature !== expectedSig) {
+      console.warn('[Webhook] Invalid signature');
+      return res.status(401).json({ ok: false, error: 'Invalid signature' });
+    }
+
     const { payment_id, payment_status, order_id } = req.body;
-    // Note: In production, verify the x-nowpayments-sig header
     
     if (payment_status === 'finished' || payment_status === 'confirmed') {
       const payment = await prisma.payment.findUnique({ where: { id: order_id } });
@@ -189,11 +235,11 @@ export const verifyPayment = async (req, res) => {
 
         const updated = await prisma.payment.update({
           where: { id: paymentId },
-          data: { txId, status: 'COMPLETED', updatedAt: new Date() },
+          data: { txId, status: 'PENDING', updatedAt: new Date() },
         });
 
         // Audit log...
-        return res.json({ ok: true, status: 'COMPLETED', message: 'Manual verification submitted!' });
+        return res.json({ ok: true, status: 'PENDING', message: 'Manual verification submitted! Pending admin approval.' });
     }
 
     res.json({ ok: true, status: payment.status, message: 'Verification pending...' });

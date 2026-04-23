@@ -82,7 +82,7 @@ export default function TechnicalBrief() {
                                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/40 font-mono">{asset.symbol}</span>
                                     </div>
                                     <div className="text-2xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60">
-                                        ${info.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                        ${(info.price ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                     </div>
                                 </div>
                                 <div className={`p-2.5 rounded-xl border border-white/5 ${isBullish ? 'bg-green-500/10 text-green-400 shadow-[0_0_15px_rgba(74,222,128,0.1)]' : 'bg-red-500/10 text-red-400 shadow-[0_0_15px_rgba(248,113,113,0.1)]'}`}>

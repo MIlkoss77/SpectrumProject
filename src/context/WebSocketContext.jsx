@@ -17,16 +17,22 @@ export const WebSocketProvider = ({ children }) => {
     const [tickers, setTickers] = useState({})
     const [depth, setDepth] = useState({})
     const [trades, setTrades] = useState({})
-    const [lastMessage, setLastMessage] = useState(null)
+    const lastMessageRef = useRef(null)
     const [throughput, setThroughput] = useState(0)
     const msgCount = useRef(0)
+    
     const wsBinance = useRef(null)
-
     const wsBybit = useRef(null)
     const wsMexc = useRef(null)
+    
     const binanceSubscribers = useRef(new Set())
     const bybitSubscribers = useRef(new Set())
     const mexcSubscribers = useRef(new Set())
+
+    const reconnectDelay = useRef({ binance: 1000, bybit: 1000, mexc: 1000 })
+    const MAX_DELAY = 60000
+    const bybitPingRef = useRef(null)
+    const mexcPingRef = useRef(null)
 
     // High performance buffers to prevent React re-render thrashing
     const tickersBuffer = useRef({})
@@ -83,6 +89,8 @@ export const WebSocketProvider = ({ children }) => {
 
         return () => {
             clearInterval(interval)
+            if (bybitPingRef.current) clearInterval(bybitPingRef.current)
+            if (mexcPingRef.current) clearInterval(mexcPingRef.current)
             if (wsBinance.current) wsBinance.current.close()
             if (wsBybit.current) wsBybit.current.close()
             if (wsMexc.current) wsMexc.current.close()
@@ -97,6 +105,7 @@ export const WebSocketProvider = ({ children }) => {
         wsBinance.current.onopen = () => {
             console.log('Binance WS Connected')
             setIsConnected(true)
+            reconnectDelay.current.binance = 1000
             const streams = Array.from(binanceSubscribers.current)
             if (streams.length > 0) {
                 wsBinance.current.send(JSON.stringify({ method: "SUBSCRIBE", params: streams, id: Date.now() }))
@@ -106,7 +115,7 @@ export const WebSocketProvider = ({ children }) => {
         wsBinance.current.onmessage = (event) => {
             msgCount.current++
             const data = JSON.parse(event.data)
-            setLastMessage(data)
+            lastMessageRef.current = data
 
 
             // Binance Ticker
@@ -144,7 +153,13 @@ export const WebSocketProvider = ({ children }) => {
 
         wsBinance.current.onclose = () => {
             setIsConnected(false)
-            setTimeout(connectBinance, 5000)
+            const delay = reconnectDelay.current.binance
+            setTimeout(connectBinance, delay)
+            reconnectDelay.current.binance = Math.min(delay * 2, MAX_DELAY)
+        }
+        
+        wsBinance.current.onerror = (err) => {
+            console.error('[Binance WS] Error:', err)
         }
     }
 
@@ -155,12 +170,14 @@ export const WebSocketProvider = ({ children }) => {
         wsBybit.current.onopen = () => {
             console.log('Bybit WS Connected')
             setIsBybitConnected(true)
+            reconnectDelay.current.bybit = 1000
             const streams = Array.from(bybitSubscribers.current)
             if (streams.length > 0) {
                 wsBybit.current.send(JSON.stringify({ op: 'subscribe', args: streams }))
             }
             // Keepalive
-            setInterval(() => {
+            if (bybitPingRef.current) clearInterval(bybitPingRef.current)
+            bybitPingRef.current = setInterval(() => {
                 if (wsBybit.current?.readyState === WebSocket.OPEN) {
                     wsBybit.current.send(JSON.stringify({ op: 'ping' }))
                 }
@@ -172,7 +189,7 @@ export const WebSocketProvider = ({ children }) => {
             const msg = JSON.parse(event.data)
             if (msg.op === 'pong') return
 
-            setLastMessage(msg)
+            lastMessageRef.current = msg
 
             // Bybit Tickers
             if (msg.topic?.startsWith('tickers.')) {
@@ -221,7 +238,14 @@ export const WebSocketProvider = ({ children }) => {
 
         wsBybit.current.onclose = () => {
             setIsBybitConnected(false)
-            setTimeout(connectBybit, 5000)
+            if (bybitPingRef.current) clearInterval(bybitPingRef.current)
+            const delay = reconnectDelay.current.bybit
+            setTimeout(connectBybit, delay)
+            reconnectDelay.current.bybit = Math.min(delay * 2, MAX_DELAY)
+        }
+        
+        wsBybit.current.onerror = (err) => {
+            console.error('[Bybit WS] Error:', err)
         }
     }
 
@@ -232,12 +256,14 @@ export const WebSocketProvider = ({ children }) => {
         wsMexc.current.onopen = () => {
             console.log('MEXC WS Connected')
             setIsMexcConnected(true)
+            reconnectDelay.current.mexc = 1000
             const streams = Array.from(mexcSubscribers.current)
             if (streams.length > 0) {
                 wsMexc.current.send(JSON.stringify({ method: "SUBSCRIPTION", params: streams }))
             }
             // Keepalive
-            setInterval(() => {
+            if (mexcPingRef.current) clearInterval(mexcPingRef.current)
+            mexcPingRef.current = setInterval(() => {
                 if (wsMexc.current?.readyState === WebSocket.OPEN) {
                     wsMexc.current.send(JSON.stringify({ method: "PING" }))
                 }
@@ -248,6 +274,8 @@ export const WebSocketProvider = ({ children }) => {
             msgCount.current++
             const msg = JSON.parse(event.data)
             if (msg.msg === 'PONG') return
+            
+            lastMessageRef.current = msg
 
             // MEXC Tickers (miniTicker)
             if (msg.c?.includes('miniTicker')) {
@@ -286,7 +314,14 @@ export const WebSocketProvider = ({ children }) => {
 
         wsMexc.current.onclose = () => {
             setIsMexcConnected(false)
-            setTimeout(connectMexc, 5000)
+            if (mexcPingRef.current) clearInterval(mexcPingRef.current)
+            const delay = reconnectDelay.current.mexc
+            setTimeout(connectMexc, delay)
+            reconnectDelay.current.mexc = Math.min(delay * 2, MAX_DELAY)
+        }
+        
+        wsMexc.current.onerror = (err) => {
+            console.error('[Mexc WS] Error:', err)
         }
     }
 
@@ -337,7 +372,7 @@ export const WebSocketProvider = ({ children }) => {
             tickers,
             depth,
             trades,
-            lastMessage,
+            lastMessage: lastMessageRef,
             throughput,
             subscribe,
             unsubscribe
@@ -347,4 +382,3 @@ export const WebSocketProvider = ({ children }) => {
         </WebSocketContext.Provider>
     )
 }
-

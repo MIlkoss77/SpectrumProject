@@ -8,10 +8,10 @@ export function TradingProvider({ children }) {
     const [apiKeys, setApiKeys] = useState(() => {
         try {
             const saved = localStorage.getItem('trading.api_keys');
-            return saved ? JSON.parse(saved) : { binance: { key: '', secret: '' }, bybit: { key: '', secret: '' } };
+            return saved ? JSON.parse(saved) : { binance: { key: '', secret: '' }, bybit: { key: '', secret: '' }, mexc: { key: '', secret: '' } };
         } catch (e) {
             console.warn("Corrupted API keys in localStorage, resetting.");
-            return { binance: { key: '', secret: '' }, bybit: { key: '', secret: '' } };
+            return { binance: { key: '', secret: '' }, bybit: { key: '', secret: '' }, mexc: { key: '', secret: '' } };
         }
     });
 

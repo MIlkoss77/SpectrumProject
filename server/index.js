@@ -39,7 +39,7 @@ console.log(`[Server] Static files directory: ${distPath}`);
 // 1. Security Headers
 app.set('trust proxy', 1); // Required for express-rate-limit behind proxies
 app.use(helmet({
-    contentSecurityPolicy: false, // Disable CSP for easier debugging of asset loading
+    contentSecurityPolicy: true, // Enabled CSP for production
     crossOriginEmbedderPolicy: false
 }));
 
@@ -104,8 +104,13 @@ app.use('/api', apiRoutes);
 app.use(express.static(distPath));
 
 // Health Check
-app.get('/api/health', (req, res) => {
-    res.json({ ok: true, status: 'Spectr API Running', ts: Date.now() });
+app.get('/api/health', async (req, res) => {
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        res.json({ ok: true, status: 'Spectr API Running', db: 'connected', ts: Date.now() });
+    } catch (error) {
+        res.status(500).json({ ok: false, status: 'Database Connection Failed', error: error.message });
+    }
 });
 
 // Catch-all for Frontend Routing (React Router)
@@ -143,7 +148,7 @@ app.use((err, req, res, next) => {
     
     res.status(err.status || 500).json({ 
         error: 'Internal Server Error', 
-        message: err.message, // Always return message for now to debug VPS
+        message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message,
         path: req.url
     });
 });

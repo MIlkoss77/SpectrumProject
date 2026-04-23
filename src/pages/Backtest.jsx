@@ -291,7 +291,7 @@ export default function Backtest() {
                                                         <td className="py-3">
                                                             <span className="px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 text-[9px] font-bold">LONG</span>
                                                         </td>
-                                                        <td className="py-3 font-mono text-white/80">${t.exitPrice.toLocaleString()}</td>
+                                                        <td className="py-3 font-mono text-white/80">${(t.exitPrice ?? 0).toLocaleString()}</td>
                                                         <td className={`py-3 font-bold ${t.pnlPct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                                             {t.pnlPct >= 0 ? '+' : ''}{t.pnlPct.toFixed(2)}%
                                                         </td>
