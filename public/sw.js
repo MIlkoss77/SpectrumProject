@@ -67,13 +67,18 @@ async function assetCacheFirst(request) {
   const cached = await cache.match(request);
   if (cached) return cached;
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { signal: controller.signal });
+    clearTimeout(timeout);
     if (response && response.ok) {
       cache.put(request, response.clone());
     }
     return response;
   } catch (error) {
+    clearTimeout(timeout);
     return Response.error();
   }
 }
