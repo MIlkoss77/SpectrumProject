@@ -46,9 +46,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor': ['react', 'react-dom', 'react-router-dom', 'framer-motion', 'lucide-react'],
-          'charts': ['recharts', 'apexcharts'],
-          'ui': ['@headlessui/react', 'clsx', 'tailwind-merge']
+          'vendor': ['react', 'react-dom', 'react-router-dom', 'framer-motion', 'lucide-react', 'axios'],
+          'tfjs': ['@tensorflow/tfjs'],
+          'trading': ['lightweight-charts', 'technicalindicators'],
+          'utils': ['i18next', 'date-fns', 'ethers']
         }
       }
     }
