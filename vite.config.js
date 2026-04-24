@@ -41,6 +41,18 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom', 'framer-motion', 'lucide-react'],
+          'charts': ['recharts', 'apexcharts'],
+          'ui': ['@headlessui/react', 'clsx', 'tailwind-merge']
+        }
+      }
+    }
+  },
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src') }
   },

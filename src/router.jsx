@@ -1,43 +1,68 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import Pricing from "./pages/Pricing.jsx";
-import Layout from "./components/Layout.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import Signals from "./pages/Signals.jsx";
-import News from "./pages/News.jsx";
-import Arbitrage from "./pages/Arbitrage.jsx";
-import CopySim from "./pages/CopySim.jsx";
-import Staking from "./pages/Staking.jsx";
-import Academy from "./pages/Academy.jsx";
-import Settings from "./pages/Settings.jsx";
-import NotFound from "./pages/NotFound.jsx";
-import Events from "./pages/Events.jsx";
-import Forecasts from "./pages/Forecasts.jsx";
-import Backtest from "./pages/Backtest.jsx";
-import TA from "./pages/TA.jsx";
-import Calibration from "./pages/Calibration.jsx";
+
+const Pricing = lazy(() => import("./pages/Pricing.jsx"));
+const Layout = lazy(() => import("./components/Layout.jsx"));
+const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
+const Signals = lazy(() => import("./pages/Signals.jsx"));
+const News = lazy(() => import("./pages/News.jsx"));
+const Arbitrage = lazy(() => import("./pages/Arbitrage.jsx"));
+const CopySim = lazy(() => import("./pages/CopySim.jsx"));
+const Staking = lazy(() => import("./pages/Staking.jsx"));
+const Academy = lazy(() => import("./pages/Academy.jsx"));
+const Settings = lazy(() => import("./pages/Settings.jsx"));
+const NotFound = lazy(() => import("./pages/NotFound.jsx"));
+const Events = lazy(() => import("./pages/Events.jsx"));
+const Forecasts = lazy(() => import("./pages/Forecasts.jsx"));
+const Backtest = lazy(() => import("./pages/Backtest.jsx"));
+const TA = lazy(() => import("./pages/TA.jsx"));
+const Calibration = lazy(() => import("./pages/Calibration.jsx"));
+
+// Lazy Loading Wrapper
+const Loadable = (Component) => (props) => (
+  <Suspense fallback={null}>
+    <Component {...props} />
+  </Suspense>
+);
+
+const PricingL = Loadable(Pricing);
+const LayoutL = Loadable(Layout);
+const DashboardL = Loadable(Dashboard);
+const SignalsL = Loadable(Signals);
+const NewsL = Loadable(News);
+const ArbitrageL = Loadable(Arbitrage);
+const CopySimL = Loadable(CopySim);
+const StakingL = Loadable(Staking);
+const AcademyL = Loadable(Academy);
+const SettingsL = Loadable(Settings);
+const NotFoundL = Loadable(NotFound);
+const EventsL = Loadable(Events);
+const ForecastsL = Loadable(Forecasts);
+const BacktestL = Loadable(Backtest);
+const TAL = Loadable(TA);
+const CalibrationL = Loadable(Calibration);
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
-    errorElement: <NotFound />,
+    element: <LayoutL />,
+    errorElement: <NotFoundL />,
     children: [
-        { index: true, element: <Dashboard /> },
-        { path: "pricing", element: <Pricing /> },
-        { path: "signals", element: <Signals /> },
-        { path: "backtest", element: <Backtest /> },
-      { path: "news", element: <News /> },
-      { path: "arbitrage", element: <Arbitrage /> },
-        { path: "copy/sim", element: <CopySim /> },
-        { path: "ta", element: <TA /> },
-        { path: "calibration", element: <Calibration /> },
-        { path: "forecasts", element: <Forecasts /> },
-      { path: "staking", element: <Staking /> },
-        { path: "academy", element: <Academy /> },
-        { path: "events", element: <Events /> },
-      { path: "settings", element: <Settings /> },
-      { path: "*", element: <NotFound /> }
+        { index: true, element: <DashboardL /> },
+        { path: "pricing", element: <PricingL /> },
+        { path: "signals", element: <SignalsL /> },
+        { path: "backtest", element: <BacktestL /> },
+      { path: "news", element: <NewsL /> },
+      { path: "arbitrage", element: <ArbitrageL /> },
+        { path: "copy/sim", element: <CopySimL /> },
+        { path: "ta", element: <TAL /> },
+        { path: "calibration", element: <CalibrationL /> },
+        { path: "forecasts", element: <ForecastsL /> },
+      { path: "staking", element: <StakingL /> },
+        { path: "academy", element: <AcademyL /> },
+        { path: "events", element: <EventsL /> },
+      { path: "settings", element: <SettingsL /> },
+      { path: "*", element: <NotFoundL /> }
     ]
   }
 ]);
