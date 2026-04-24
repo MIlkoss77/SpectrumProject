@@ -119,8 +119,8 @@ export default function AppShell() {
   const moreNav = NAV.filter(item => !mainMobileNav.find(m => m.to === item.to))
 
   return (
-    <div className={`dx-root ${navOpen ? '' : 'nav-collapsed'} mode-${tradingMode.toLowerCase()}`}>
-      <aside className="dx-sidebar">
+    <div className={`dx-root ${navOpen ? '' : 'nav-collapsed'} mode-${tradingMode.toLowerCase()}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <aside className="dx-sidebar" style={{ paddingTop: 'calc(24px + env(safe-area-inset-top))' }}>
         <div className="dx-brand" style={{ gap: '12px', marginBottom: '40px' }}>
           <div style={{ width: '32px', height: '32px', flexShrink: 0, backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <img src={logoImg} alt="Spectr Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />

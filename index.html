@@ -3,76 +3,84 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <link rel="apple-touch-icon" href="/logo.png" />
+  <link rel="manifest" href="/manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-  <title>Spectr Trading | Advanced Market Intelligence & Polymarket Agent</title>
+  <title>Spectr Trading | Neural Tactical Terminal</title>
 
   <!-- Primary Meta Tags -->
-  <meta name="title" content="Spectr Trading | Advanced Market Intelligence" />
+  <meta name="title" content="Spectr Trading | Neural Tactical Terminal" />
   <meta name="description"
-    content="Next-generation tactical terminal for crypto traders. Featuring Whale Radar and real-time sentiment analysis." />
-  <meta name="keywords"
-    content="crypto trading, crypto analytics, whale tracking, defi, sentiment analysis" />
-  <meta name="author" content="Spectr Trading" />
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://spectrtrading.com/" />
-  <meta property="og:title" content="Spectr Trading | Advanced Market Intelligence" />
-  <meta property="og:description"
-    content="Next-generation tactical terminal for crypto traders. Featuring Whale Radar and real-time sentiment analysis." />
-  <meta property="og:image" content="https://spectrtrading.com/logo.png" />
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image" />
-  <meta property="twitter:url" content="https://spectrtrading.com/" />
-  <meta property="twitter:title" content="Spectr Trading | Advanced Market Intelligence" />
-  <meta property="twitter:description"
-    content="Next-generation tactical terminal for crypto traders. Featuring real-time sentiment analysis and alerts." />
-  <meta property="twitter:image" content="https://spectrtrading.com/logo.png" />
-
-  <link rel="icon" type="image/png" href="/logo.png" />
-  <meta name="theme-color" content="#0A0A0A" />
-
-  <!-- PWA: Apple-specific meta tags -->
+    content="Next-generation tactical terminal for crypto traders. Featuring Neural Signals, Whale Radar, and institutional-grade analytics." />
+  
+  <!-- PWA: Mobile optimization -->
+  <meta name="theme-color" content="#050505" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Spectr Trading">
+  <meta name="apple-mobile-web-app-title" content="Spectr">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
 
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 
 <style>
+  :root {
+    --bg-load: #050508;
+    --accent-load: #00FFFF;
+  }
+  body {
+    background-color: var(--bg-load);
+    margin: 0;
+    padding: 0;
+    overscroll-behavior-y: none;
+  }
   @keyframes s-pulse {
-
-    0%,
-    100% {
-      transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.4);
-    }
-
-    50% {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px 0 rgba(0, 255, 255, 0.2);
-    }
+    0%, 100% { transform: scale(1); opacity: 0.8; box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); }
+    50% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 40px rgba(0, 255, 255, 0.4); }
+  }
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
   }
 </style>
+
 <div id="root">
-  <div
-    style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #050508; color: #fff; font-family: 'Inter', sans-serif; text-align: center; padding: 20px;">
-    <div
-      style="width: 48px; height: 48px; background: #00FFFF; color: #000; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; margin-bottom: 24px; animation: s-pulse 2s infinite;">
-      S</div>
-    <p style="max-width: 400px; font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.6; font-weight: 500;">
-      Spectr Trading is an informational tool for market analysis.<br />
-      It is not financial advice. All trading decisions are made independently by the user.
+  <div style="height: 100vh; height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg-load); color: #fff; font-family: 'Inter', sans-serif; position: relative; overflow: hidden;">
+    <!-- Animated background line -->
+    <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, rgba(0,255,255,0.03), transparent); height: 100px; width: 100%; animation: scanline 3s linear infinite; pointer-events: none;"></div>
+    
+    <div style="position: relative;">
+      <div style="width: 72px; height: 72px; background: #000; border: 2px solid var(--accent-load); color: var(--accent-load); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 32px; margin-bottom: 32px; animation: s-pulse 2s infinite; box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);">
+        S
+      </div>
+      <div style="position: absolute; -inset: 20px; background: var(--accent-load); border-radius: 50%; blur: 40px; opacity: 0.1; z-index: -1;"></div>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+      <h1 style="font-size: 14px; font-weight: 900; letter-spacing: 0.4em; text-transform: uppercase; color: #fff; margin: 0;">SPECTR</h1>
+      <p style="font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: var(--accent-load); margin: 8px 0 0 0; opacity: 0.8;">NEURAL TERMINAL</p>
+    </div>
+
+    <div style="width: 120px; height: 2px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden;">
+      <div style="width: 40%; height: 100%; background: var(--accent-load); border-radius: 2px; animation: loading-bar 2s ease-in-out infinite;"></div>
+    </div>
+    
+    <style>
+      @keyframes loading-bar {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(200%); }
+      }
+    </style>
+
+    <p style="position: absolute; bottom: 40px; max-width: 280px; font-size: 9px; color: rgba(255,255,255,0.3); line-height: 1.6; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">
+      Initializing Consensus Engine...
     </p>
   </div>
 </div>
