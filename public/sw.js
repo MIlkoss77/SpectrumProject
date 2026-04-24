@@ -1,6 +1,6 @@
 
-// Spectr SW v3 — Robust network-first strategy for a premium PWA experience
-const CACHE_VERSION = 'v3';
+// Spectr SW v4 — Force update and aggressive cache cleanup
+const CACHE_VERSION = 'v4';
 const STATIC_CACHE = `spectr-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `spectr-runtime-${CACHE_VERSION}`;
 const API_CACHE = `spectr-api-${CACHE_VERSION}`;
