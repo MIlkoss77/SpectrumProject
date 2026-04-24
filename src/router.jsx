@@ -3,7 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 const Pricing = lazy(() => import("./pages/Pricing.jsx"));
 const Layout = lazy(() => import("./components/Layout.jsx"));
-const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
+const Dashboard = lazy(() => import("./pages/Overview.jsx"));
 const Signals = lazy(() => import("./pages/Signals.jsx"));
 const News = lazy(() => import("./pages/News.jsx"));
 const Arbitrage = lazy(() => import("./pages/Arbitrage.jsx"));

@@ -11,7 +11,19 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-  <title>Spectr Trading | Neural Tactical Terminal</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <title>Spectr Trading | Neuro-Finance Intelligence</title>
+
+  <script>
+    // Emergency Chunk Load Error Handler
+    window.addEventListener('error', function(e) {
+      const errorText = e.message || '';
+      if (errorText.includes('Loading chunk') || errorText.includes('Failed to fetch dynamically imported module')) {
+        console.warn('Chunk load failed, forcing reload to fetch latest build...');
+        window.location.reload(true);
+      }
+    }, true);
+  </script>
 
   <!-- Primary Meta Tags -->
   <meta name="title" content="Spectr Trading | Neural Tactical Terminal" />

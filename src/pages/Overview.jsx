@@ -1,5 +1,5 @@
 // src/pages/Overview.jsx
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, lazy, Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getMarkets } from '@/services/providers/market'
 import { monitor } from '@/services/providers/market'
@@ -7,8 +7,8 @@ import { getTopActions, calculateSuperScore } from '@/services/ai/superScore'
 
 import { useWebSocket } from '@/context/WebSocketContext'
 import NumberTicker from '@/components/NumberTicker'
-import TechnicalBrief from '../components/TechnicalBrief'
-import Predictor from '../components/Predictor'
+const TechnicalBrief = lazy(() => import('../components/TechnicalBrief'));
+const Predictor = lazy(() => import('../components/Predictor'));
 import { TrendingUp, TrendingDown, Activity, Zap, Globe, Users, Shield, Loader2, ShieldCheck, Brain, Fish, BarChart3, Briefcase, Rocket } from 'lucide-react'
 import { useTrade } from '@/context/TradeContext'
 import { useTrading } from '@/context/TradingContext'
@@ -16,9 +16,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import './dashboard.css'
 import './overview.css'
 import PricePulse from '@/components/PricePulse'
-import Orderbook from '@/components/dashboard/Orderbook'
+const Orderbook = lazy(() => import('@/components/dashboard/Orderbook'));
 import Skeleton from '@/components/ui/Skeleton'
 import logoImg from '@/assets/logo.png'
+
+const WidgetSuspense = ({ children, height = '200px' }) => (
+  <Suspense fallback={<div className="dx-card skeleton-shimmer" style={{ height, minHeight: height, marginBottom: '24px' }} />}>
+    {children}
+  </Suspense>
+);
 
 function ActionCard({ action, loading, openTrade, t }) {
   if (loading) return (
@@ -201,7 +207,9 @@ export default function Overview() {
     <section className="dx-panels premium-dashboard">
 
       {/* 🔮 AI PREDICTOR (HERO) */}
-      <Predictor />
+      <WidgetSuspense height="320px">
+        <Predictor />
+      </WidgetSuspense>
 
       {/* 🔴 LIVE TICKER MARQUEE STRIP */}
       <div style={{
@@ -370,7 +378,9 @@ export default function Overview() {
             <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Live Binance Data</span>
           </div>
 
-          <TechnicalBrief />
+          <WidgetSuspense height="300px">
+            <TechnicalBrief />
+          </WidgetSuspense>
 
         </div>
 
@@ -404,7 +414,9 @@ export default function Overview() {
           </div>
 
           <div className="orderbook-wrapper mt-4">
-            <Orderbook symbol="BTCUSDT" />
+            <WidgetSuspense height="400px">
+              <Orderbook symbol="BTCUSDT" />
+            </WidgetSuspense>
           </div>
 
           <div className="quick-stats-row grid grid-cols-2 gap-4 mt-4">
