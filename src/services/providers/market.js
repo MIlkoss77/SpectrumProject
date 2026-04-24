@@ -2,9 +2,9 @@
 import { http } from '../api.js'
 
 // Получение данных через прокси бэкенда
-const BINANCE_BASE = '/proxy/binance';
-const BYBIT_BASE = '/proxy/bybit';
-const MEXC_BASE = '/proxy/mexc';
+const BINANCE_BASE = '/api/proxy/binance';
+const BYBIT_BASE = '/api/proxy/bybit';
+const MEXC_BASE = '/api/proxy/mexc';
 
 // Singleton to track data integrity
 class NetworkMonitor {

@@ -198,84 +198,85 @@ function ScannerView({ onSelect }) {
           return (
             <div
               key={item.id}
-              className="action-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-              style={{
-                borderColor: isBuy ? 'rgba(34,211,238,0.2)' : 'rgba(239,68,68,0.1)',
-                background: 'rgba(20, 20, 25, 0.7)',
-                backdropFilter: 'blur(30px)',
-                WebkitBackdropFilter: 'blur(30px)',
-                padding: '20px',
-                borderRadius: '24px',
-                display: 'flex',
-                flexDirection: 'column'
-
-              }}
+              className="action-card group relative overflow-hidden transition-all duration-300 hover:shadow-[0_0_40px_rgba(34,211,238,0.1)] cursor-pointer border border-white/5 bg-[#0a0a0c]/80 backdrop-blur-xl rounded-[28px] flex flex-col"
               onClick={() => onSelect(item.symbol, item.timeframe)}
             >
+              {/* Subtle accent glow on hover */}
+              <div className={`absolute -top-24 -right-24 w-48 h-48 blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full ${isBuy ? 'bg-cyan-400' : 'bg-red-400'}`} />
 
-              <div className={`absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl ${isBuy ? 'bg-cyan-400' : 'bg-red-400'}`} />
-
-              <div className="relative z-10 flex justify-between items-start mb-auto">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl border ${isBuy ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                    {item.symbol.substring(0, 1)}
+              <div className="relative z-10 flex flex-col h-full">
+                {/* Header: Symbol & Signal */}
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-xl font-black text-white tracking-tighter leading-none">{item.symbol.replace('USDT', '')}</h3>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-white/40 font-mono font-bold tracking-widest">USDT</span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-[9px] font-black text-cyan-400/80 uppercase tracking-[0.2em]">{item.timeframe}</span>
+                      <div className="w-1 h-1 rounded-full bg-white/10" />
+                      <span className="text-[9px] font-bold text-white/20 uppercase tracking-widest">Momentum</span>
+                    </div>
                   </div>
+                  
+                  <div className={`px-3 py-1.5 rounded-xl border text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 ${
+                    isBuy ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.1)]' : 'bg-red-500/10 border-red-500/30 text-red-400'
+                  }`}>
+                    {item.signal}
+                  </div>
+                </div>
+
+                {/* Price & Sparkline Integrated */}
+                <div className="grid grid-cols-2 gap-4 items-end mb-8">
                   <div>
-                    <div className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors tracking-tight">{item.symbol}</div>
-                    <div className="text-[10px] font-black font-mono text-white/20 uppercase tracking-widest">{item.timeframe} RANGE</div>
+                    <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-1">Last Price</div>
+                    <div className="text-2xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none">
+                      ${item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </div>
+                    <div className={`flex items-center gap-1 mt-2 text-[11px] font-black ${isPositive ? 'text-cyan-400' : 'text-red-400'}`}>
+                      {isPositive ? <TrendingUp size={12} strokeWidth={3} /> : <TrendingDown size={12} strokeWidth={3} />}
+                      <span>{isPositive ? '+' : ''}{item.change24h?.toFixed(2)}%</span>
+                    </div>
+                  </div>
+                  <div className="h-14 flex items-end">
+                    <MiniSparkline data={item.sparkline} color={accentColor} height={50} />
                   </div>
                 </div>
-                <div className="action-status font-black tracking-[0.2em] text-[9px] px-2.5 py-1 rounded-lg bg-black/40 border border-white/5"
-                  style={{ color: accentColor, borderColor: `${accentColor}40` }}>
-                  {item.signal}
+
+                {/* Confidence Bar - Sleeker */}
+                <div className="mb-8 p-4 rounded-2xl bg-white/[0.02] border border-white/5 group-hover:border-white/10 transition-colors">
+                  <div className="flex justify-between items-center mb-2.5">
+                    <div className="flex items-center gap-2">
+                      <Brain size={12} className="text-white/30" />
+                      <span className="text-[9px] font-black uppercase tracking-[0.15em] text-white/40">Neural Confidence</span>
+                    </div>
+                    <span className="text-[11px] font-mono font-bold text-white tracking-tighter" style={{ color: accentColor }}>
+                      {Math.round(item.confidence * 100)}%
+                    </span>
+                  </div>
+                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${item.confidence * 100}%` }}
+                      className="h-full rounded-full relative"
+                      style={{ background: accentColor }}
+                    >
+                      <div className="absolute inset-0 bg-white/30 blur-sm" />
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Footer Action */}
+                <div className="mt-auto">
+                  <button className="w-full group/btn relative overflow-hidden py-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/5 transition-all duration-300 flex items-center justify-center gap-2">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
+                    <Eye size={16} className="text-white/40 group-hover/btn:text-cyan-400 transition-colors" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover/btn:text-white transition-colors">
+                      {t('ui.analyze_setup') || 'Analyze Setup'}
+                    </span>
+                  </button>
                 </div>
               </div>
-
-
-              <div className="relative z-10 flex items-end justify-between mt-6 mb-6">
-                <div>
-                  <div className="text-2xl font-mono font-bold text-white tabular-nums tracking-tighter">${item.price?.toLocaleString()}</div>
-                  <div className={`flex items-center gap-1.5 text-xs font-bold leading-none mt-1 ${isPositive ? 'text-cyan-400' : 'text-red-400'}`}>
-                    {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                    <span className="tracking-widest">{item.change24h?.toFixed(2)}%</span>
-                  </div>
-                </div>
-                <div className="w-24 h-10 opacity-80 group-hover:opacity-100 transition-opacity">
-                  <MiniSparkline data={item.sparkline} color={accentColor} height={40} />
-                </div>
-              </div>
-
-
-              <div className="relative z-10 mt-auto pt-6 border-t border-white/5">
-                <div className="action-score w-full mb-6">
-                  <div className="flex justify-between text-[10px] uppercase font-black text-white/20 mb-2 tracking-widest">
-                    <span>{t('ui.ai_confidence') || 'AI Confidence'}</span>
-                    <span style={{ color: accentColor }}>{Math.round(item.confidence * 100)}%</span>
-                  </div>
-                  <div className="score-bar h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="score-fill h-full rounded-full"
-                      style={{
-                        width: `${item.confidence * 100}%`,
-                        background: accentColor,
-                        boxShadow: isBuy ? '0 0 10px rgba(34,211,238,0.6)' : 'none'
-                      }} />
-                  </div>
-                </div>
-
-
-                <button
-                  className="w-full py-3 rounded-2xl flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all duration-300 shadow-lg"
-                  style={{
-                    background: isBuy ? 'linear-gradient(90deg, rgba(34,211,238,0.15) 0%, rgba(6,182,212,0.2) 100%)' : 'rgba(255,255,255,0.05)',
-                    color: isBuy ? '#22d3ee' : '#fff',
-                    border: `1px solid ${isBuy ? 'rgba(34,211,238,0.4)' : 'rgba(255,255,255,0.1)'}`,
-                    borderRadius: '16px'
-                  }}
-                >
-                  <Eye size={16} /> {t('ui.analyze_setup') || 'ANALYZE SETUP'}
-                </button>
-              </div>
-
             </div>
           )
         })}

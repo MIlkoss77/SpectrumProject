@@ -56,11 +56,27 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 3. Static Assets Strategy: Cache-First or Network-First depending on destination
+  // 3. Static Assets Strategy: Cache-First for speed
   if (['style', 'script', 'image', 'font'].includes(request.destination)) {
-    event.respondWith(assetNetworkFirst(request));
+    event.respondWith(assetCacheFirst(request));
   }
 });
+
+async function assetCacheFirst(request) {
+  const cache = await caches.open(RUNTIME_CACHE);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    return Response.error();
+  }
+}
 
 async function navigationNetworkFirst(request) {
   const cache = await caches.open(STATIC_CACHE);
