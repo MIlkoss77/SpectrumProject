@@ -431,16 +431,25 @@ input[type=range]::-webkit-slider-runnable-track {
   border: none !important;
 }
 
-/* PWA SMOOTHNESS v5.0.0 */
+/* NUCLEAR SCROLL RESET v5.0.1 - THE ONE THAT WORKS */
 *, *::before, *::after {
+  touch-action: pan-y pinch-zoom !important;
   -webkit-tap-highlight-color: transparent;
-  outline: none !important;
 }
 
-html, body {
-  overscroll-behavior-y: contain;
-  scroll-behavior: smooth;
+html, body, #root {
+  position: static !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+.dx-main, .dx-root {
+  position: static !important;
+  overflow: visible !important;
+  display: block !important;
 }
 
 @media (min-width: 1024px) {
