@@ -193,68 +193,94 @@ function ScannerView({ onSelect }) {
 
         {items.map(item => {
           const isBuy = item.signal === 'BUY' || item.signal === 'BULLISH'
-          const accentColor = isBuy ? '#22d3ee' : '#ef4444'
+          const accentColor = isBuy ? '#00FFFF' : '#FF4560'
 
           return (
             <div
               key={item.id}
-              className="action-card group relative overflow-hidden transition-all duration-500 hover:shadow-[0_0_50px_rgba(34,211,238,0.15)] cursor-pointer border border-white/10 bg-[#0a0a0c]/60 backdrop-blur-2xl rounded-[32px] p-5 flex flex-col gap-5"
+              className="group relative overflow-hidden transition-all duration-300 hover:scale-[1.01] cursor-pointer"
+              style={{
+                background: 'rgba(10, 10, 15, 0.6)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: `1px solid ${isBuy ? 'rgba(0,255,255,0.1)' : 'rgba(255,69,96,0.1)'}`,
+                borderRadius: '16px',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px'
+              }}
               onClick={() => onSelect(item.symbol, item.timeframe)}
             >
-              <div className="flex justify-between items-start relative z-10">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-300 ${isBuy ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
-                    {isBuy ? <TrendingUp size={24} /> : <TrendingDown size={24} />}
+              {/* Background Glow */}
+              <div style={{ position: 'absolute', top: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: accentColor, filter: 'blur(40px)', opacity: 0.1, pointerEvents: 'none' }} />
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+                {/* Left: Symbol & Signal */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: isBuy ? 'rgba(0,255,255,0.1)' : 'rgba(255,69,96,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: accentColor, border: `1px solid ${isBuy ? 'rgba(0,255,255,0.2)' : 'rgba(255,69,96,0.2)'}` }}>
+                    {isBuy ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
                   </div>
-                  <div>
-                    <h3 className="text-xl font-black text-white tracking-tight leading-tight">{item.symbol.replace('USDT', '')}</h3>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] font-black text-cyan-400/80 uppercase tracking-widest">{item.timeframe}</span>
-                      <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">• Momentum</span>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '16px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>{item.symbol.replace('USDT', '')}</span>
+                      <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontWeight: 800 }}>USDT</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      <span style={{ color: accentColor }}>{item.timeframe}</span>
+                      <span style={{ color: 'rgba(255,255,255,0.3)' }}>• Momentum</span>
                     </div>
                   </div>
                 </div>
-                
-                <div className="text-right">
-                  <div className="text-lg font-mono font-bold text-white leading-tight">
-                    ${item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </div>
-                  <div className={`text-[11px] font-black tracking-tight ${item.change24h >= 0 ? 'text-cyan-400' : 'text-red-400'}`}>
+
+                {/* Right: Price */}
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <span style={{ fontSize: '14px', fontFamily: 'monospace', fontWeight: 800, color: '#fff' }}>${item.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  <span style={{ fontSize: '11px', fontWeight: 800, color: item.change24h >= 0 ? '#00FFFF' : '#FF4560' }}>
                     {item.change24h >= 0 ? '+' : ''}{item.change24h?.toFixed(2)}%
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 relative z-10">
-                <div className="bg-white/[0.03] rounded-2xl p-3 border border-white/5">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <Brain size={12} className="text-white/20" />
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/30">Confidence</span>
-                  </div>
-                  <div className="text-lg font-mono font-bold text-white">
-                    {Math.round(item.confidence * 100)}%
-                  </div>
-                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden mt-2">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${item.confidence * 100}%` }} className="h-full" style={{ background: accentColor }} />
-                  </div>
-                </div>
-                <div className="h-full flex flex-col justify-center px-2">
-                   <MiniSparkline data={item.sparkline} color={accentColor} height={40} />
-                </div>
-              </div>
-
-              <button className="w-full relative overflow-hidden group/btn py-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-400/40 transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
-                <div className="relative flex items-center justify-center gap-3">
-                  <Zap size={14} className="text-cyan-400" />
-                  <span className="text-[11px] font-black uppercase tracking-[0.25em] text-white/80 group-hover/btn:text-white transition-colors">
-                    Analyze Setup
                   </span>
-                  <div className="w-5 h-5 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                </div>
+              </div>
+
+              {/* Confidence & Button Row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10, gap: '16px' }}>
+                <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: '10px', padding: '8px 12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                       <Brain size={10} color="rgba(255,255,255,0.4)" />
+                       <span style={{ fontSize: '9px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Confidence</span>
+                     </div>
+                     <span style={{ fontSize: '10px', fontFamily: 'monospace', fontWeight: 800, color: '#fff' }}>{Math.round(item.confidence * 100)}%</span>
+                  </div>
+                  <div style={{ height: '3px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ width: `${item.confidence * 100}%`, height: '100%', background: accentColor, borderRadius: '2px' }} />
                   </div>
                 </div>
-              </button>
+
+                <button
+                  style={{
+                    padding: '10px 16px',
+                    borderRadius: '10px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    transition: 'all 0.2s',
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = 'rgba(0,255,255,0.4)'; e.currentTarget.style.color = '#00FFFF'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#fff'; }}
+                >
+                  <Zap size={14} color="#00FFFF" />
+                  Analyze Setup
+                </button>
+              </div>
             </div>
           )
         })}

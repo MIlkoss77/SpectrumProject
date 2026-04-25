@@ -28,68 +28,84 @@ const WidgetSuspense = ({ children, height = '200px' }) => (
 
 function ActionCard({ action, loading, openTrade, t }) {
   if (loading) return (
-    <div className="dx-card skeleton-shimmer" style={{ minHeight: '220px' }}>
-      <div className="flex justify-between items-center mb-6">
-        <Skeleton className="w-24 h-5" />
-        <Skeleton className="w-16 h-5" />
-      </div>
-      <Skeleton className="w-full h-2 mb-6" />
-      <Skeleton className="w-full h-12 rounded-2xl" />
+    <div className="dx-card skeleton-shimmer" style={{ padding: '16px', minHeight: '80px', marginBottom: '12px' }}>
+      <Skeleton className="w-full h-8" />
     </div>
   )
 
-  const isPositive = action.status.includes('BUY')
-  const color = isPositive ? '#00FFFF' : (action.status.includes('SELL') ? '#FF4560' : '#8899A6')
+  const isBuy = action.status.includes('BUY')
+  const color = isBuy ? '#00FFFF' : (action.status.includes('SELL') ? '#FF4560' : '#8899A6')
 
   return (
-    <div className="dx-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between"
+    <div 
+      className="group relative overflow-hidden transition-all duration-300 hover:scale-[1.01]"
       style={{ 
-        borderColor: isPositive ? 'rgba(0,255,255,0.15)' : 'rgba(255,255,255,0.05)',
-        minHeight: '220px',
-        padding: '24px'
-      }}>
+        background: 'rgba(10, 10, 15, 0.6)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: `1px solid ${isBuy ? 'rgba(0,255,255,0.15)' : 'rgba(255,69,96,0.15)'}`,
+        borderRadius: '16px',
+        padding: '16px',
+        marginBottom: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+      }}
+    >
+      {/* Background Glow */}
+      <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: color, filter: 'blur(40px)', opacity: 0.1, pointerEvents: 'none' }} />
 
-      <div className={`absolute -inset-1 opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-xl ${isPositive ? 'bg-cyan-400' : 'bg-red-400'}`} />
-
-      <div className="relative z-10 flex justify-between items-center mb-4">
-        <div className="flex flex-col gap-1">
-          <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">{t('ui.signal') || 'Signal'}</div>
-          <div className="action-symbol flex items-center gap-2 font-black text-xl tracking-tight">
-            <span className={`w-2 h-2 rounded-full ${isPositive ? 'bg-cyan-400 shadow-[0_0_8px_#00FFFF]' : 'bg-red-500 shadow-[0_0_8px_#FF4560]'}`} />
-            {action.symbol.replace('USDT', '')}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 10 }}>
+        {/* Left: Symbol & Signal */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: isBuy ? 'rgba(0,255,255,0.1)' : 'rgba(255,69,96,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: color, border: `1px solid ${isBuy ? 'rgba(0,255,255,0.2)' : 'rgba(255,69,96,0.2)'}` }}>
+            {isBuy ? <TrendingUp size={20} /> : <Activity size={20} />}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ fontSize: '16px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>{action.symbol.replace('USDT', '')}</span>
+            </div>
+            <span style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: isBuy ? '#00FFFF' : color }}>
+              {action.status}
+            </span>
           </div>
         </div>
-        <div className="action-status font-black tracking-[0.2em] text-[9px] px-2.5 py-1.5 rounded-lg bg-black/40 border border-white/5"
-          style={{ color: isPositive ? '#22d3ee' : color, borderColor: isPositive ? 'rgba(34,211,238,0.3)' : 'rgba(255,59,48,0.2)' }}>
-          {action.status}
+
+        {/* Right: Confidence */}
+        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <span style={{ fontSize: '9px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Confidence</span>
+          <span style={{ fontSize: '14px', fontFamily: 'monospace', fontWeight: 800, color: '#fff' }}>{action.score}%</span>
         </div>
       </div>
-      
-      <div className="relative z-10 mt-auto">
-        <div className="action-score w-full mb-6">
-          <div className="flex justify-between text-[10px] uppercase font-black text-white/30 mb-2 tracking-widest">
-            <span>{t('pages.dashboard.confidence') || 'Confidence'}</span>
-            <span className="font-mono" style={{ color: isPositive ? '#00FFFF' : color }}>{action.score}%</span>
-          </div>
-          <div className="score-bar h-1.5 bg-white/5 rounded-full overflow-hidden">
-            <div className="score-fill h-full rounded-full"
-              style={{ width: `${action.score}%`, background: isPositive ? '#00FFFF' : color, boxShadow: isPositive ? '0 0 10px rgba(0,255,255,0.5)' : 'none' }} />
-          </div>
-        </div>
+
+      {/* Button Row */}
+      <div style={{ display: 'flex', gap: '12px', position: 'relative', zIndex: 10 }}>
         <button
-          className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 shadow-xl overflow-hidden group/btn"
           style={{
-            background: isPositive ? 'linear-gradient(135deg, rgba(0,255,255,0.1) 0%, rgba(34,211,238,0.15) 100%)' : 'rgba(255,255,255,0.03)',
-            color: isPositive ? '#00FFFF' : '#fff',
-            border: '1px solid ' + (isPositive ? 'rgba(0,255,255,0.3)' : 'rgba(255,255,255,0.1)'),
+            flex: 1,
+            padding: '10px',
+            borderRadius: '10px',
+            background: isBuy ? 'linear-gradient(90deg, rgba(0,255,255,0.1) 0%, rgba(0,255,255,0.05) 100%)' : 'rgba(255,255,255,0.03)',
+            border: `1px solid ${isBuy ? 'rgba(0,255,255,0.3)' : 'rgba(255,255,255,0.1)'}`,
+            color: isBuy ? '#00FFFF' : '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            fontSize: '11px',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            cursor: 'pointer'
           }}
           onClick={(e) => {
              e.stopPropagation();
-             openTrade({ symbol: action.symbol.replace('USDT', ''), price: action.price, action: action.status.includes('BUY') ? 'BUY' : 'SELL' });
+             openTrade({ symbol: action.symbol.replace('USDT', ''), price: action.price, action: isBuy ? 'BUY' : 'SELL' });
           }}
         >
-          <Zap size={14} className={isPositive ? 'animate-pulse' : ''} fill={isPositive ? "currentColor" : "none"} />
-          <span className="truncate">{t('ui.execute') || 'EXECUTE'} {action.status.includes('BUY') ? 'LONG' : 'SHORT'}</span>
+          <Zap size={14} fill={isBuy ? "currentColor" : "none"} />
+          {isBuy ? 'Execute Long' : 'Execute Short'}
         </button>
       </div>
     </div>
