@@ -431,10 +431,10 @@ input[type=range]::-webkit-slider-runnable-track {
   border: none !important;
 }
 
-/* NUCLEAR SCROLL RESET v5.0.1 - THE ONE THAT WORKS */
+/* EXACT NUCLEAR RESET FROM v4.9.3 */
 *, *::before, *::after {
   touch-action: pan-y pinch-zoom !important;
-  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: auto !important;
 }
 
 html, body, #root {
@@ -442,14 +442,11 @@ html, body, #root {
   overflow-y: auto !important;
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
-  height: auto !important;
-  min-height: 100% !important;
 }
 
 .dx-main, .dx-root {
   position: static !important;
   overflow: visible !important;
-  display: block !important;
 }
 
 @media (min-width: 1024px) {
