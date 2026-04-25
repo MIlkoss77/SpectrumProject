@@ -62,11 +62,11 @@ button,
   /* Reset layout grid to single column */
   .dx-root,
   .dx-root.nav-collapsed {
-    grid-template-columns: 100% !important;
-    height: auto;
-    min-height: 100vh;
-    padding-bottom: 80px;
-    /* Space for Bottom Nav */
+    display: block !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    padding-bottom: 120px;
   }
 
   /* Show BOTTOM NAV */

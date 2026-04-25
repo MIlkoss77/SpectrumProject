@@ -185,8 +185,7 @@ export default function AppShell() {
 
       <main className="dx-main" style={{
         position: 'relative',
-        background: 'radial-gradient(circle at 50% 0%, #111 0%, var(--bg-dark) 100%)',
-        minHeight: '100vh'
+        background: 'radial-gradient(circle at 50% 0%, #111 0%, var(--bg-dark) 100%)'
       }}>
         <header className="dx-toolbar" style={{
           height: '70px',
@@ -201,7 +200,7 @@ export default function AppShell() {
           zIndex: 1000,
           background: 'rgba(5, 5, 5, 0.95)',
           backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.08)'
+          borderBottom: '1px solid yellow'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
@@ -301,48 +300,38 @@ export default function AppShell() {
       </nav>
 
       {/* More Menu Overlay */}
-      <AnimatePresence>
-        {showMore && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowMore(false)}
-              style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1001 }}
-            />
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'tween', duration: 0.3, ease: 'easeOut' }}
-              style={{
-                position: 'fixed', left: 0, right: 0, bottom: 0,
-                background: 'var(--bg)', borderTop: '1px solid var(--border)',
-                padding: '24px', zIndex: 1002, borderTopLeftRadius: 20, borderTopRightRadius: 20,
-                maxHeight: '70vh', overflowY: 'auto',
-                willChange: 'transform'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <h3 style={{ margin: 0 }}>{t('ui.menu') || 'Menu'}</h3>
-                <button onClick={() => setShowMore(false)} style={{ background: 'none', border: 'none', color: '#fff' }}><X /></button>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                {moreNav.map(({ label, to, icon: Icon }) => (
-                  <NavLink key={to} to={to} className="dx-nav-item" style={{ fontSize: 14 }}>
-                    <Icon size={18} />
-                    <span>{label}</span>
-                  </NavLink>
-                ))}
-              </div>
-              <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
-                SPECTR CORE v4.8.0 // BUILD_STABLE
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {showMore && (
+        <>
+          <div 
+            onClick={() => setShowMore(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1001 }}
+          />
+          <div
+            style={{
+              position: 'fixed', left: 0, right: 0, bottom: 0,
+              background: 'var(--bg)', borderTop: '1px solid var(--border)',
+              padding: '24px', zIndex: 1002, borderTopLeftRadius: 20, borderTopRightRadius: 20,
+              maxHeight: '70vh', overflowY: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ margin: 0 }}>{t('ui.menu') || 'Menu'}</h3>
+              <button onClick={() => setShowMore(false)} style={{ background: 'none', border: 'none', color: '#fff' }}><X /></button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {moreNav.map(({ label, to, icon: Icon }) => (
+                <NavLink key={to} to={to} className="dx-nav-item" style={{ fontSize: 14 }}>
+                  <Icon size={18} />
+                  <span>{label}</span>
+                </NavLink>
+              ))}
+            </div>
+            <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
+              SPECTR CORE v4.8.5 // BUILD_STABLE
+            </div>
+          </div>
+        </>
+      )}
       
       <OnboardingModal />
     </div >
