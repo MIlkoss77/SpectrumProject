@@ -1,15 +1,15 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import apiRoutes from './routes/apiRoutes.js';
 import limiter from './middleware/rateLimiter.js';
 import { prisma } from './config/database.js';
 import { telegramScout } from './services/telegramService.js';
-
-dotenv.config();
 
 console.log('[Server] Checking Environment Variables...');
 console.log(`- ETHERSCAN_API_KEY: ${process.env.ETHERSCAN_API_KEY ? '✅ Present' : '❌ MISSING'}`);
