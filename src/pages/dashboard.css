@@ -142,9 +142,6 @@ body {
   scroll-behavior: smooth;
 }
 
-html {
-  height: -webkit-fill-available;
-}
 
 :root {
   /* Brand Palette (from marketing_brief.md) */
@@ -427,7 +424,7 @@ input[type=range]::-webkit-slider-runnable-track {
   padding-top: 70px;
   padding-bottom: 120px;
   touch-action: pan-y !important;
-  border: 2px solid #ffffff !important; /* DIAGNOSTIC BORDER - WHITE FOR v4.8.7 */
+  border: 2px solid #ff0000 !important; /* DIAGNOSTIC BORDER - RED FOR v4.8.9 */
 }
 
 @media (min-width: 1024px) {
