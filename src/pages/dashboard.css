@@ -427,7 +427,7 @@ input[type=range]::-webkit-slider-runnable-track {
   padding-top: 70px;
   padding-bottom: 120px;
   touch-action: pan-y !important;
-  border: 2px solid #ffff00 !important; /* DIAGNOSTIC BORDER - YELLOW FOR v4.8.5 */
+  border: 2px solid #ffffff !important; /* DIAGNOSTIC BORDER - WHITE FOR v4.8.7 */
 }
 
 @media (min-width: 1024px) {

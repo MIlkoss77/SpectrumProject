@@ -46,7 +46,7 @@ body {
   /* Glow Up: Disable browser behaviors */
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  touch-action: manipulation;
+  touch-action: pan-y !important;
 }
 
 /* Allow selection for data and inputs */
