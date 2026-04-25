@@ -395,11 +395,12 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 .dx-root {
-  display: block !important; /* Simplified for mobile-first scrolling */
+  display: block !important;
   min-height: 100vh;
   background-color: var(--bg-dark);
   position: relative;
   width: 100%;
+  touch-action: pan-y !important; /* Force allow vertical scroll */
 }
 
 @media (min-width: 1024px) {
@@ -413,8 +414,10 @@ input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   display: block;
   position: relative;
-  padding-top: 70px; /* Space for FIXED header */
-  padding-bottom: 100px;
+  z-index: 10; /* Ensure it's above phantom layers */
+  padding-top: 70px;
+  padding-bottom: 120px;
+  touch-action: pan-y !important;
 }
 
 @media (min-width: 1024px) {
@@ -702,11 +705,15 @@ input[type=range]::-webkit-slider-runnable-track {
 @media (max-width: 1024px) {
   .dx-sidebar {
     transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .dx-root.nav-collapsed .dx-sidebar {
+  .dx-root:not(.nav-collapsed) .dx-sidebar {
     transform: translateX(0);
-    /* When toggle is active */
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .dx-main {
