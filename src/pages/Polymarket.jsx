@@ -213,7 +213,7 @@ export default function Polymarket() {
     };
 
     return (
-        <div className="dx-panels" style={{ padding: '0 20px', width: '100%' }}>
+        <div className="dx-panels" style={{ padding: '0 20px', width: '100%', height: '100%', overflowY: 'auto' }}>
             {/* Header / Hero */}
             <div style={{ 
                 marginTop: '20px', padding: '32px', borderRadius: '24px', 

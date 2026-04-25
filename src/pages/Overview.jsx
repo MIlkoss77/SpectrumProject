@@ -488,6 +488,7 @@ export default function Overview() {
                 maxWidth: 480,
                 width: '100%',
                 maxHeight: '90vh',
+                overflowY: 'auto',
                 background: 'linear-gradient(135deg, #0d0d0d 0%, #111118 100%)',
                 border: '1px solid rgba(0,255,255,0.2)',
                 borderRadius: 24,
