@@ -336,6 +336,9 @@ export default function AppShell() {
                   </NavLink>
                 ))}
               </div>
+              <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
+                SPECTR CORE v4.7.2 // BUILD_STABLE
+              </div>
             </motion.div>
           </>
         )}
