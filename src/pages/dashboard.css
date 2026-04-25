@@ -428,25 +428,19 @@ input[type=range]::-webkit-slider-runnable-track {
   padding-top: 70px;
   padding-bottom: 120px;
   touch-action: pan-y !important;
-  border: 2px solid #ff1493 !important; /* DIAGNOSTIC BORDER - PINK FOR v4.9.1 */
+  border: none !important;
 }
 
-/* NUCLEAR SCROLL RESET v4.9.1 */
+/* PWA SMOOTHNESS v5.0.0 */
 *, *::before, *::after {
-  touch-action: pan-y pinch-zoom !important;
-  overscroll-behavior: auto !important;
+  -webkit-tap-highlight-color: transparent;
+  outline: none !important;
 }
 
-html, body, #root {
-  position: static !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+html, body {
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch !important;
-}
-
-.dx-main, .dx-root {
-  position: static !important;
-  overflow: visible !important;
 }
 
 @media (min-width: 1024px) {
@@ -747,6 +741,7 @@ html, body, #root {
 
   .dx-main {
     margin-left: 0;
+    -webkit-overflow-scrolling: touch;
   }
 
   .dx-burger {

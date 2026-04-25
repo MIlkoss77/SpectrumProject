@@ -274,7 +274,7 @@ export default function Backtest() {
                                         <Clock size={16} className="text-cyan-400" />
                                         Recent Trades
                                     </h3>
-                                    <div className="max-h-[300px] overflow-y-auto px-6 pb-4">
+                                    <div className="px-6 pb-4">
                                         <table className="w-full text-left text-[11px]">
                                             <thead className="sticky top-0 bg-[#141419] py-2 border-b border-white/5">
                                                 <tr>

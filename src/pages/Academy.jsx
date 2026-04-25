@@ -220,7 +220,7 @@ function CourseViewer({ module, onClose, onComplete }) {
       style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
         background: 'rgba(0,0,0,0.98)', backdropFilter: 'blur(15px)',
-        zIndex: 9999, overflowY: 'auto', WebkitOverflowScrolling: 'touch',
+        zIndex: 9999, WebkitOverflowScrolling: 'touch',
         display: 'block', padding: 'env(safe-area-inset-top) 0 env(safe-area-inset-bottom)'
       }}
     >
@@ -245,7 +245,7 @@ function CourseViewer({ module, onClose, onComplete }) {
               {module.lessons.filter(l => l.completed).length}/{module.lessons.length} Lessons
             </div>
           </div>
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div style={{ flex: 1 }}>
             {module.lessons.map((l, i) => (
               <button
                 key={i}
@@ -298,8 +298,6 @@ function CourseViewer({ module, onClose, onComplete }) {
           {/* Scrollable content */}
           <div style={{
             flex: 1,
-            overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch',
             padding: '28px 28px 20px',
             minHeight: 0 // Crucial for nested flex scrolling
           }}>
