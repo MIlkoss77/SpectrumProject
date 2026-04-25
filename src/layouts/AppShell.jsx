@@ -120,6 +120,13 @@ export default function AppShell() {
 
   return (
     <div className={`dx-root ${navOpen ? '' : 'nav-collapsed'} mode-${tradingMode.toLowerCase()}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      {navOpen && (
+        <div 
+          className="dx-overlay active" 
+          onClick={() => setNavOpen(false)} 
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, backdropFilter: 'blur(4px)' }}
+        />
+      )}
       <aside className="dx-sidebar" style={{ paddingTop: 'calc(24px + env(safe-area-inset-top))' }}>
         <div className="dx-brand" style={{ gap: '12px', marginBottom: '40px' }}>
           <div style={{ width: '32px', height: '32px', flexShrink: 0, backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -337,7 +344,7 @@ export default function AppShell() {
                 ))}
               </div>
               <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
-                SPECTR CORE v4.7.2 // BUILD_STABLE
+                SPECTR CORE v4.7.7 // BUILD_STABLE
               </div>
             </motion.div>
           </>

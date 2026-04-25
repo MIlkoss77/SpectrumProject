@@ -414,10 +414,11 @@ input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   display: block;
   position: relative;
-  z-index: 10; /* Ensure it's above phantom layers */
+  z-index: 10;
   padding-top: 70px;
   padding-bottom: 120px;
   touch-action: pan-y !important;
+  border: 2px solid #ff0000 !important; /* DIAGNOSTIC BORDER */
 }
 
 @media (min-width: 1024px) {
