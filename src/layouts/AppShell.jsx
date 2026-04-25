@@ -184,9 +184,6 @@ export default function AppShell() {
       </aside>
 
       <main className="dx-main" style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
         position: 'relative',
         background: 'radial-gradient(circle at 50% 0%, #111 0%, var(--bg-dark) 100%)',
         minHeight: '100vh'
@@ -283,11 +280,7 @@ export default function AppShell() {
           </div>
         </header>
 
-        <AnimatePresence mode="wait">
-          <PageTransition>
-            <Outlet />
-          </PageTransition>
-        </AnimatePresence>
+        <Outlet />
       </main>
 
       {/* Mobile Bottom Navigation */}
@@ -344,7 +337,7 @@ export default function AppShell() {
                 ))}
               </div>
               <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
-                SPECTR CORE v4.7.7 // BUILD_STABLE
+                SPECTR CORE v4.7.8 // BUILD_STABLE
               </div>
             </motion.div>
           </>
