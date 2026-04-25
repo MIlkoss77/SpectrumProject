@@ -56,9 +56,16 @@
 
 .dx-grid-premium {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
-  gap: 24px !important;
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
   width: 100% !important;
+}
+
+@media (min-width: 768px) {
+  .dx-grid-premium {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)) !important;
+    gap: 24px !important;
+  }
 }
 
 @media (min-width: 1600px) {
@@ -109,10 +116,16 @@
    Consolidated Design Tokens
    ========================================= */
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  width: 100%;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
   min-height: 100vh;
 }
 
@@ -143,6 +156,13 @@ body {
   /* Layout */
   --sidebar-width: 260px;
   --header-height: 70px;
+  --panel-padding: 24px;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --panel-padding: 12px;
+  }
 }
 
 body {
@@ -519,10 +539,11 @@ input[type=range]::-webkit-slider-runnable-track {
 
 /* Panels container */
 .dx-panels {
-  padding: 20px 24px;
+  padding: 20px var(--panel-padding);
   width: 100%;
   max-width: 1700px;
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 
