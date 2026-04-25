@@ -52,37 +52,34 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
     const res = await http.get(`${BINANCE_BASE}/api/v3/klines`, {
       params: { symbol, interval, limit }
     });
-    const data = res.data;
-    
-    // Diagnostic logging for SYNC ISSUE
-    if (data._meta) {
-      console.log(`[Proxy Diagnostic] Source: ${data._meta.source}, Stale: ${data._meta.stale}`);
-      if (data._meta.stale) {
-        // If the proxy says it's stale, we count it as a partial failure for the monitor
-        // to keep the user informed that data is not fresh.
-        // monitor.log(false); // Uncomment if we want to force red on stale data
-      }
-    }
-    
     monitor.log(true);
-
-    // Save success to persistent storage
-    localStorage.setItem(cacheKey, JSON.stringify({ data, ts: Date.now() }));
-
-    return data.map(k => ({
-      openTime: k[0],
-      t: k[0],
-      o: Number(k[1]),
-      h: Number(k[2]),
-      l: Number(k[3]),
-      c: Number(k[4]),
-      v: Number(k[5]),
-      volume: Number(k[5]),
-      closeTime: k[6],
-      _stale: false
+    return res.data.map(k => ({
+      t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
     }));
   } catch (err) {
-    monitor.log(false);
+    console.warn(`[fetchBinanceKlines] Binance failed: ${err.message}. Trying Bybit fallback...`);
+    try {
+       const res = await http.get(`${BYBIT_BASE}/v5/market/kline`, {
+         params: { 
+           category: 'linear',
+           symbol: symbol.includes('USDT') ? symbol : `${symbol}USDT`,
+           interval: timeframe === '1h' ? '60' : (timeframe === '4h' ? '240' : 'D'),
+           limit 
+         }
+       });
+       if (res.data.result.list) {
+         monitor.log(true);
+         return res.data.result.list.map(k => ({
+           t: Number(k[0]), o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+         })).reverse();
+       }
+       throw new Error('Bybit empty response');
+    } catch (fallbackErr) {
+       monitor.log(false);
+       console.error(`[fetchBinanceKlines] Ultimate failure for ${symbol}`, fallbackErr.message);
+       throw fallbackErr;
+    }
+  }
     console.warn(`[fetchBinanceKlines] Primary fetch failed for ${symbol}. checking LKG...`, err.message);
     
     // --- LKG FALLBACK (SWR) ---
