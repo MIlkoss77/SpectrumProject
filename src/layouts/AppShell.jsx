@@ -200,7 +200,7 @@ export default function AppShell() {
           zIndex: 1000,
           background: 'rgba(5, 5, 5, 0.95)',
           backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid yellow'
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
@@ -327,7 +327,7 @@ export default function AppShell() {
               ))}
             </div>
             <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
-              SPECTR CORE v5.0.3 // BUILD_STABLE
+              SPECTR CORE v5.1.0 // BUILD_STABLE
             </div>
           </div>
         </>
