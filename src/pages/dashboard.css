@@ -428,7 +428,26 @@ input[type=range]::-webkit-slider-runnable-track {
   padding-top: 70px;
   padding-bottom: 120px;
   touch-action: pan-y !important;
-  border: 2px solid #800080 !important; /* DIAGNOSTIC BORDER - PURPLE FOR v4.9.0 */
+  border: 2px solid #ff1493 !important; /* DIAGNOSTIC BORDER - PINK FOR v4.9.1 */
+}
+
+/* NUCLEAR SCROLL RESET v4.9.1 */
+*, *::before, *::after {
+  touch-action: pan-y pinch-zoom !important;
+  overscroll-behavior: auto !important;
+}
+
+html, body, #root {
+  position: static !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.dx-main, .dx-root {
+  position: static !important;
+  overflow: visible !important;
+}
 }
 
 @media (min-width: 1024px) {
