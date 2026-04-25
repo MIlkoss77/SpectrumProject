@@ -11,13 +11,17 @@
    Palette: Per marketing_brief.md
    ========================================= */
 
-html, body, #root {
+html, body {
   height: auto !important;
   min-height: 100% !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
-  touch-action: auto !important;
+  touch-action: pan-y !important;
+}
+
+#root, .dx-root, .dx-main {
+  overflow: visible !important;
 }
 
 .overview-hero {
@@ -424,7 +428,7 @@ input[type=range]::-webkit-slider-runnable-track {
   padding-top: 70px;
   padding-bottom: 120px;
   touch-action: pan-y !important;
-  border: 2px solid #ff0000 !important; /* DIAGNOSTIC BORDER - RED FOR v4.8.9 */
+  border: 2px solid #800080 !important; /* DIAGNOSTIC BORDER - PURPLE FOR v4.9.0 */
 }
 
 @media (min-width: 1024px) {
