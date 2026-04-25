@@ -447,8 +447,6 @@ html, body, #root {
 .dx-main, .dx-root {
   position: static !important;
   overflow: visible !important;
-}
-}
 
 @media (min-width: 1024px) {
   .dx-main {
