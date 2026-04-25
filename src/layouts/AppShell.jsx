@@ -190,10 +190,12 @@ export default function AppShell() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          position: 'sticky',
+          position: window.innerWidth < 1024 ? 'fixed' : 'sticky',
           top: 0,
+          left: 0,
+          right: 0,
           zIndex: 1000,
-          background: 'rgba(5, 5, 5, 0.85)',
+          background: 'rgba(5, 5, 5, 0.95)',
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255,255,255,0.08)'
         }}>

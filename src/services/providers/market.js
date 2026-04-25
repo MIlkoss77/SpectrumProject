@@ -53,6 +53,17 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
       params: { symbol, interval, limit }
     });
     const data = res.data;
+    
+    // Diagnostic logging for SYNC ISSUE
+    if (data._meta) {
+      console.log(`[Proxy Diagnostic] Source: ${data._meta.source}, Stale: ${data._meta.stale}`);
+      if (data._meta.stale) {
+        // If the proxy says it's stale, we count it as a partial failure for the monitor
+        // to keep the user informed that data is not fresh.
+        // monitor.log(false); // Uncomment if we want to force red on stale data
+      }
+    }
+    
     monitor.log(true);
 
     // Save success to persistent storage

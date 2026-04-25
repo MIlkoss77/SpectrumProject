@@ -126,7 +126,15 @@ html, body {
 }
 
 body {
-  min-height: 100vh;
+  min-height: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+html {
+  height: -webkit-fill-available;
 }
 
 :root {
@@ -386,30 +394,27 @@ input[type=range]::-webkit-slider-runnable-track {
   filter: drop-shadow(0 0 8px var(--accent));
 }
 
-.app-shell {
-  display: flex !important;
-  min-height: 100vh !important;
-  background-color: var(--bg-dark) !important;
-  overflow-x: hidden !important;
-  position: relative !important;
+.dx-root {
+  display: block !important; /* Simplified for mobile-first scrolling */
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  position: relative;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .dx-root {
+    display: flex !important;
+  }
 }
 
 /* MAIN CONTENT AREA */
 .dx-main {
-  flex: 1;
-  margin-left: 0;
   width: 100%;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  display: block;
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto; /* Force vertical scroll */
-  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background: radial-gradient(circle at 50% 0%, #111 0%, var(--bg-dark) 100%);
-  padding-right: 0;
+  padding-top: 70px; /* Space for FIXED header */
+  padding-bottom: 100px;
 }
 
 @media (min-width: 1024px) {
