@@ -170,11 +170,22 @@ export const handleWebhook = async (req, res) => {
     if (payment_status === 'finished' || payment_status === 'confirmed') {
       const payment = await prisma.payment.findUnique({ where: { id: order_id } });
       if (payment && payment.status !== 'COMPLETED') {
+        // 1. Update Payment Status
         await prisma.payment.update({
           where: { id: order_id },
           data: { status: 'COMPLETED', updatedAt: new Date() }
         });
-        console.log(`[Payment] Order ${order_id} completed via Webhook`);
+
+        // 2. Upgrade User Subscription
+        await prisma.user.update({
+          where: { id: payment.userId },
+          data: { 
+            subscriptionStatus: 'PRO',
+            subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+          }
+        });
+        
+        console.log(`[Payment] Order ${order_id} completed. User ${payment.userId} upgraded to PRO.`);
       }
     }
     
@@ -211,11 +222,21 @@ export const verifyPayment = async (req, res) => {
     if (paymentService.isEnabled() && payment.txId && payment.status === 'PENDING') {
       const remote = await paymentService.checkStatus(payment.txId);
       if (remote.isFinished) {
-        const updated = await prisma.payment.update({
+        await prisma.payment.update({
           where: { id: paymentId },
           data: { status: 'COMPLETED', updatedAt: new Date() }
         });
-        return res.json({ ok: true, status: 'COMPLETED', message: 'Payment confirmed by gateway!' });
+
+        // Upgrade User Subscription
+        await prisma.user.update({
+          where: { id: userId },
+          data: { 
+            subscriptionStatus: 'PRO',
+            subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          }
+        });
+
+        return res.json({ ok: true, status: 'COMPLETED', message: 'Payment confirmed! Welcome to PRO.' });
       }
     }
 
@@ -286,14 +307,16 @@ export const getProStatus = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const completedPayment = await prisma.payment.findFirst({
-      where: { userId, status: 'COMPLETED' },
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscriptionStatus: true, subscriptionExpiresAt: true }
     });
-
+ 
     res.json({
       ok: true,
-      isPro: !!completedPayment,
-      since: completedPayment?.createdAt || null,
+      isPro: user?.subscriptionStatus === 'PRO',
+      status: user?.subscriptionStatus,
+      expiresAt: user?.subscriptionExpiresAt
     });
   } catch (error) {
     console.error('[PaymentController] getProStatus error:', error.message);

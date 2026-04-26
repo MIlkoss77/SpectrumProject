@@ -1,4 +1,5 @@
 import axios from 'axios';
+import crypto from 'crypto';
 
 /**
  * Service to handle automated crypto payments via NOWPayments API.
@@ -6,7 +7,8 @@ import axios from 'axios';
  */
 class PaymentService {
     constructor() {
-        this.apiKey = process.env.NOWPAYMENTS_API_KEY || ''; // Needs to be set in .env
+        this.apiKey = process.env.NOWPAYMENTS_API_KEY || '';
+        this.ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET || '';
         this.baseUrl = 'https://api.nowpayments.io/v1';
     }
 
@@ -67,6 +69,26 @@ class PaymentService {
             console.error('[PaymentService] Status check error:', error.message);
             return { status: 'error' };
         }
+    }
+
+    /**
+     * Verify the IPN signature from NOWPayments
+     * @param {Object} body - Raw request body
+     * @param {string} signature - x-nowpayments-sig header
+     */
+    verifyIpnSignature(body, signature) {
+        if (!this.ipnSecret || !signature) return false;
+        
+        const sortedBody = {};
+        Object.keys(body).sort().forEach(key => {
+            sortedBody[key] = body[key];
+        });
+
+        const hmac = crypto.createHmac('sha512', this.ipnSecret);
+        hmac.update(JSON.stringify(sortedBody));
+        const checkSig = hmac.digest('hex');
+        
+        return checkSig === signature;
     }
 }
 

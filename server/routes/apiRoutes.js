@@ -10,6 +10,8 @@ import * as notificationController from '../controllers/notificationController.j
 import * as paymentController from '../controllers/paymentController.js';
 import * as polymarketController from '../controllers/polymarketController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import passport from 'passport';
+import { generateToken } from '../services/authService.js';
 
 import rateLimit from 'express-rate-limit';
 
@@ -31,6 +33,17 @@ router.post('/solana/signatures', proxyController.solanaProxy);
 router.post('/auth/register', authController.register);
 router.post('/auth/login', authController.login);
 router.get('/auth/me', authMiddleware, authController.getMe);
+
+// Google OAuth
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login?error=oauth_failed' }),
+    (req, res) => {
+        // Successful authentication
+        const token = generateToken(req.user.id);
+        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5174'}/auth/callback?token=${token}`);
+    }
+);
 
 // Payment Routes
 router.post('/payments/webhook', paymentController.handleWebhook);

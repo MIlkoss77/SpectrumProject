@@ -9,14 +9,19 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
-  passwordHash  String
+  passwordHash  String?
+  googleId      String?         @unique
+  telegramId    String?         @unique
+  displayName   String?
+  subscriptionStatus String     @default("FREE") // "FREE", "PRO"
+  subscriptionExpiresAt DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   exchangeCreds ExchangeCreds[]

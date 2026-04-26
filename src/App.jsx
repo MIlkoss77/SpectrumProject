@@ -22,6 +22,7 @@ const Calibration = React.lazy(() => import('@/pages/Calibration.jsx'))
 const Forecasts = React.lazy(() => import('@/pages/Forecasts.jsx'))
 const Events = React.lazy(() => import('@/pages/Events.jsx'))
 const Polymarket = React.lazy(() => import('@/pages/Polymarket.jsx'))
+const AuthCallback = React.lazy(() => import('@/pages/AuthCallback.jsx'))
 import { TradeProvider } from '@/context/TradeContext.jsx'
 
 import { TradingProvider } from '@/context/TradingContext.jsx'
@@ -57,6 +58,7 @@ export default function App() {
                     <Route path='polymarket' element={<Polymarket />} />
                   </Route>
 
+                  <Route path='/auth/callback' element={<AuthCallback />} />
                   <Route path='*' element={<NotFound />} />
                 </Routes>
               </Suspense>

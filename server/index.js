@@ -10,6 +10,8 @@ import apiRoutes from './routes/apiRoutes.js';
 import limiter from './middleware/rateLimiter.js';
 import { prisma } from './config/database.js';
 import { telegramScout } from './services/telegramService.js';
+import session from 'express-session';
+import passport from './config/passport.js';
 
 console.log('[Server] Checking Environment Variables...');
 console.log(`- ETHERSCAN_API_KEY: ${process.env.ETHERSCAN_API_KEY ? '✅ Present' : '❌ MISSING'}`);
@@ -31,6 +33,16 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// 0. Session & Passport
+app.use(session({
+    secret: process.env.JWT_SECRET || 'spectr-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === 'production' }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Resolve absolute path to dist once
 const distPath = path.resolve(__dirname, '../dist');
