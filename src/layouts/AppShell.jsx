@@ -327,7 +327,7 @@ export default function AppShell() {
               ))}
             </div>
             <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
-              SPECTR CORE v5.1.6 // BUILD_STABLE
+              SPECTR CORE v5.1.7 // BUILD_STABLE
             </div>
           </div>
         </>

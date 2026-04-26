@@ -50,7 +50,11 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
   try {
     // Primary: MEXC (Extremely resilient to server IP blocks)
     const res = await http.get(`${MEXC_BASE}/api/v3/klines`, {
-      params: { symbol, interval, limit }
+      params: { 
+        symbol: symbol.includes('USDT') ? symbol : `${symbol}USDT`,
+        interval, 
+        limit 
+      }
     });
     monitor.log(true);
     return res.data.map(k => ({
