@@ -331,6 +331,21 @@ export const WebSocketProvider = ({ children }) => {
             if (wsBinance.current?.readyState === WebSocket.OPEN) {
                 wsBinance.current.send(JSON.stringify({ method: "SUBSCRIBE", params: streams, id: Date.now() }))
             }
+            
+            // SHADOW SUB: Automatically subscribe to Bybit equivalents for redundancy
+            const bybitStreams = streams.map(s => {
+                if (s.endsWith('@ticker')) return `tickers.${s.split('@')[0].toUpperCase()}`;
+                if (s.endsWith('@depth20@100ms')) return `orderbook.50.${s.split('@')[0].toUpperCase()}`;
+                if (s.endsWith('@aggTrade')) return `publicTrade.${s.split('@')[0].toUpperCase()}`;
+                return null;
+            }).filter(Boolean);
+            
+            if (bybitStreams.length > 0) {
+                bybitStreams.forEach(s => bybitSubscribers.current.add(s));
+                if (wsBybit.current?.readyState === WebSocket.OPEN) {
+                    wsBybit.current.send(JSON.stringify({ op: 'subscribe', args: bybitStreams }));
+                }
+            }
         } else if (exchange === 'bybit') {
             streams.forEach(s => bybitSubscribers.current.add(s))
             if (wsBybit.current?.readyState === WebSocket.OPEN) {

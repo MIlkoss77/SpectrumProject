@@ -180,7 +180,7 @@ function ScannerView({ onSelect }) {
             dataStatus === 'LIVE' ? 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400' : 'bg-red-500/5 border-red-500/20 text-red-400'
           }`}>
             <div className={`w-1.5 h-1.5 rounded-full ${dataStatus === 'LIVE' ? 'bg-cyan-400 shadow-[0_0_8px_#00FFFF]' : 'bg-red-500 shadow-[0_0_8px_#FF4560]'}`} />
-            {dataStatus === 'LIVE' ? 'Data Source: Verified Binance' : 'Data Source: Synthetic Simulation'}
+            {dataStatus === 'LIVE' ? 'Data Source: Multi-Exchange Core' : 'Data Source: Synthetic Simulation'}
           </div>
         </div>
         <p className="text-white/40 text-sm max-w-xl">
