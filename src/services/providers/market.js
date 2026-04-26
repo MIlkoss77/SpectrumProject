@@ -52,7 +52,7 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
     const res = await http.get(`${MEXC_BASE}/api/v3/klines`, {
       params: { 
         symbol: symbol.includes('USDT') ? symbol : `${symbol}USDT`,
-        interval, 
+        interval: interval === '1h' ? '60m' : interval, 
         limit 
       }
     });
