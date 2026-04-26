@@ -149,11 +149,14 @@ export const bybitProxy = async (req, res) => {
                 setToCache(url, response.data, response.status);
                 return res.status(response.status).json(response.data);
             } catch (e) {
+                console.error(`[Bybit Proxy Error] ${host}${req.url}:`, e.response?.data || e.message);
                 if (e.response?.status === 429) continue;
-                throw e;
+                // Try next host
             }
         }
+        res.status(502).json({ ok: false, error: 'All Bybit hosts failed' });
     } catch (error) {
+        console.error('Bybit Proxy Fatal Error:', error.message);
         res.status(500).json({ ok: false, error: error.message });
     }
 }
