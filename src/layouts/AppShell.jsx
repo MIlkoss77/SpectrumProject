@@ -271,6 +271,7 @@ export default function AppShell() {
                   )}
                 </AnimatePresence>
               </div>
+            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               {user ? (
@@ -303,8 +304,7 @@ export default function AppShell() {
               </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
         <Outlet />
       </main>
