@@ -25,6 +25,7 @@ const Events = React.lazy(() => import('@/pages/Events.jsx'))
 const Polymarket = React.lazy(() => import('@/pages/Polymarket.jsx'))
 const AuthCallback = React.lazy(() => import('@/pages/AuthCallback.jsx'))
 const AdminDashboard = React.lazy(() => import('@/pages/AdminDashboard.jsx'))
+const Login = React.lazy(() => import('@/pages/Login.jsx'))
 import { TradeProvider } from '@/context/TradeContext.jsx'
 
 import { TradingProvider } from '@/context/TradingContext.jsx'
@@ -61,6 +62,7 @@ export default function App() {
                     <Route path='polymarket' element={<Polymarket />} />
                   </Route>
 
+                  <Route path='/login' element={<Login />} />
                   <Route path='/auth/callback' element={<AuthCallback />} />
                   <Route path='/admin' element={<AdminDashboard />} />
                   <Route path='*' element={<NotFound />} />
