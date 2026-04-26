@@ -303,7 +303,8 @@ export default function AppShell() {
               </div>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
         <Outlet />
       </main>
