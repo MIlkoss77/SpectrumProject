@@ -18,6 +18,9 @@ const Backtest = lazy(() => import("./pages/Backtest.jsx"));
 const TA = lazy(() => import("./pages/TA.jsx"));
 const Calibration = lazy(() => import("./pages/Calibration.jsx"));
 
+const AuthCallback = lazy(() => import("./pages/AuthCallback.jsx"));
+const Login = lazy(() => import("./pages/Login.jsx"));
+
 // Lazy Loading Wrapper
 const Loadable = (Component) => (props) => (
   <Suspense fallback={null}>
@@ -25,6 +28,8 @@ const Loadable = (Component) => (props) => (
   </Suspense>
 );
 
+const AuthCallbackL = Loadable(AuthCallback);
+const LoginL = Loadable(Login);
 const PricingL = Loadable(Pricing);
 const LayoutL = Loadable(Layout);
 const DashboardL = Loadable(Dashboard);
@@ -43,6 +48,14 @@ const TAL = Loadable(TA);
 const CalibrationL = Loadable(Calibration);
 
 const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <LoginL />
+  },
+  {
+    path: "/auth/callback",
+    element: <AuthCallbackL />
+  },
   {
     path: "/",
     element: <LayoutL />,

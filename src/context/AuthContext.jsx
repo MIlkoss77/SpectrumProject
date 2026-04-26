@@ -6,14 +6,14 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem('spectr_auth_token'));
 
   useEffect(() => {
     if (token) {
-      localStorage.setItem('token', token);
+      localStorage.setItem('spectr_auth_token', token);
       fetchUser();
     } else {
-      localStorage.removeItem('token');
+      localStorage.removeItem('spectr_auth_token');
       setUser(null);
       setLoading(false);
     }
@@ -31,6 +31,8 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem('spectr_pro_status', 'true');
           window.dispatchEvent(new Event('proStatusChanged'));
         }
+      } else {
+        setToken(null);
       }
     } catch (err) {
       console.error('Auth check failed:', err);
@@ -41,6 +43,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = () => {
+    window.location.href = '/login';
+  };
+
+  const loginWithGoogle = () => {
     window.location.href = '/api/auth/google';
   };
 
@@ -51,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, token, setToken, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, token, setToken, login, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
