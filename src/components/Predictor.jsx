@@ -149,90 +149,85 @@ export default function Predictor() {
 
     return (
         <div className="dx-card" style={{
-            background: 'var(--card-bg)',
-            borderTop: `1px solid ${edgeColor}40`,
-            padding: '40px',
+            background: 'rgba(10, 10, 15, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: `1px solid ${edgeColor}30`,
+            padding: '20px',
             position: 'relative',
             overflow: 'hidden',
-            marginBottom: '32px'
+            borderRadius: '24px',
+            boxShadow: `0 0 40px ${edgeColor}10`
         }}>
             {/* Visual focal point glow */}
-            <div style={{ position: 'absolute', top: -100, left: '50%', transform: 'translateX(-50%)', width: '300px', height: '150px', background: `${edgeColor}10`, filter: 'blur(60px)', borderRadius: '100%', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: -50, right: -50, width: '150px', height: '150px', background: `${edgeColor}15`, filter: 'blur(60px)', borderRadius: '100%', pointerEvents: 'none' }} />
 
-            {/* Bloomberg Header Line */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ display: 'flex', gap: '4px' }}>
-                        <div style={{ width: '4px', height: '16px', background: '#fff', borderRadius: '2px' }} />
-                        <div style={{ width: '4px', height: '16px', background: edgeColor, borderRadius: '2px' }} />
+            {/* Header Line - More compact */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', gap: '3px' }}>
+                        <div style={{ width: '3px', height: '12px', background: '#fff', borderRadius: '1px' }} />
+                        <div style={{ width: '3px', height: '12px', background: edgeColor, borderRadius: '1px' }} />
                     </div>
-                    <span style={{ fontSize: '11px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.3em' }}>CONSENSUS TERMINAL v4.5</span>
-
+                    <span style={{ fontSize: '10px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.2em', opacity: 0.8 }}>CONSENSUS TERMINAL v4.5</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Radio size={10} className="animate-pulse" color={edgeColor} />
-                        <span style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>{data.status}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: edgeColor, boxShadow: `0 0 8px ${edgeColor}` }} />
+                        <span style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>{data.status}</span>
                     </div>
-                    <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontFamily: 'var(--font-mono)' }}>MS: {Date.now() % 1000}</div>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: { base: '1fr', lg: '1fr 0.8fr' }, gap: '24px' }}>
                 {/* Visual Section: The Alpha Bar */}
-                <div style={{ borderRight: '1px solid rgba(255,255,255,0.05)', paddingRight: '48px' }}>
-                    <h2 style={{ fontSize: '14px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Gap Analysis</h2>
-                    <h1 style={{ fontSize: '32px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0, marginBottom: '16px' }}>
-                        {data.verdict}
-                    </h1>
+                <div style={{ position: 'relative' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '8px' }}>
+                       <div>
+                            <h2 style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '2px' }}>Gap Analysis</h2>
+                            <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', margin: 0 }}>
+                                {data.verdict}
+                            </h1>
+                       </div>
+                       <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>Discrepancy</div>
+                            <div style={{ fontSize: '18px', fontWeight: 900, color: edgeColor, fontFamily: 'var(--font-mono)' }}>{data.valueIndex > 0 ? '+' : ''}{data.valueIndex}%</div>
+                       </div>
+                    </div>
                     
                     <AlphaGapBar polyVal={data.polyProb} aiVal={data.aiTrueProb} edgeColor={edgeColor} />
-
-                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', lineHeight: '1.6', maxWidth: '400px', fontStyle: 'italic' }}>
-                        The "Alpha Gap" represents the discrepancy between verified institutional data flows and decentralized prediction market sentiment. A wider gap indicates higher probability of arbitrage.
-                    </p>
                 </div>
 
-                {/* Data Section: Factor breakdown */}
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                        <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-                            <div style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', marginBottom: '8px' }}>Spectr Prob.</div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                                <span style={{ fontSize: '24px', fontWeight: 900, color: '#fff', fontFamily: 'var(--font-mono)' }}>{data.aiTrueProb}%</span>
-                                <TrendingUp size={14} color="#A855F7" />
+                {/* Data Section: Factor breakdown - More compact */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', justifyContent: 'center', borderLeft: '1px solid rgba(255,255,255,0.05)', paddingLeft: '24px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div style={{ padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ fontSize: '8px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: '4px' }}>Spectr AI</div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                                <span style={{ fontSize: '18px', fontWeight: 900, color: '#fff', fontFamily: 'var(--font-mono)' }}>{data.aiTrueProb}%</span>
+                                <Cpu size={12} color={edgeColor} />
                             </div>
                         </div>
-                        <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
-                            <div style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', marginBottom: '8px' }}>Market Prob.</div>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                                <span style={{ fontSize: '24px', fontWeight: 900, color: '#00FFFF', fontFamily: 'var(--font-mono)' }}>{data.polyProb}%</span>
-                                <Radio size={12} color="#00FFFF" />
+                        <div style={{ padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <div style={{ fontSize: '8px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', marginBottom: '4px' }}>Market</div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                                <span style={{ fontSize: '18px', fontWeight: 900, color: '#00FFFF', fontFamily: 'var(--font-mono)' }}>{data.polyProb}%</span>
+                                <Globe size={12} color="#00FFFF" />
                             </div>
                         </div>
                     </div>
 
-                    <div style={{ marginTop: '24px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                            <span style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.4)' }}>Alpha Discrepancy</span>
-                            <span style={{ fontSize: '12px', fontWeight: 900, color: edgeColor }}>{data.valueIndex > 0 ? '+' : ''}{data.valueIndex}%</span>
-                        </div>
-                        <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
-                            <motion.div animate={{ width: `${Math.min(Math.abs(data.valueIndex) * 2, 100)}%` }} style={{ height: '100%', background: edgeColor, borderRadius: '4px' }} />
-                        </div>
-                        <div style={{ marginTop: '16px', fontSize: '10px', color: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Cpu size={12} />
-                            <span>SOURCE: LATENCY-ADJUSTED CONSENSUS V4</span>
-                        </div>
+                    <div style={{ width: '100%', height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <motion.div animate={{ width: `${Math.min(Math.abs(data.valueIndex) * 3, 100)}%` }} style={{ height: '100%', background: edgeColor, borderRadius: '4px', boxShadow: `0 0 10px ${edgeColor}` }} />
                     </div>
                 </div>
             </div>
 
             {loading && (
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(5,5,5,0.9)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                        <Activity className="animate-spin" size={32} color={edgeColor} />
-                        <span style={{ fontSize: '11px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.4em' }}>Initializing Consensus Engine...</span>
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.95)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                        <Activity className="animate-spin" size={24} color={edgeColor} />
+                        <span style={{ fontSize: '9px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.3em' }}>Calibrating Consensus...</span>
                     </div>
                 </div>
             )}

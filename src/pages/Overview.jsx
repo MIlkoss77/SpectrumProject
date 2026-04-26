@@ -228,7 +228,7 @@ export default function Overview() {
     <section className="dx-panels premium-dashboard">
 
       {/* 🔮 AI PREDICTOR (HERO) */}
-      <WidgetSuspense height="320px">
+      <WidgetSuspense height="200px">
         <Predictor />
       </WidgetSuspense>
 
