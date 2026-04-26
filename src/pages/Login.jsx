@@ -13,7 +13,7 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     
-    const { setToken, login: googleLogin } = useAuth();
+    const { setToken, loginWithGoogle } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -151,7 +151,7 @@ export default function Login() {
 
                         <button 
                             type="button"
-                            onClick={googleLogin}
+                            onClick={loginWithGoogle}
                             className="w-full bg-white/[0.05] border border-white/10 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-white/10 transition-all active:scale-[0.98]"
                         >
                             <Chrome size={20} />
