@@ -48,48 +48,60 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
   const cacheKey = `klines_${symbol}_${interval}`;
 
   try {
-    // Primary: Bybit (More resilient to regional blocks)
-    const res = await http.get(`${BYBIT_BASE}/v5/market/kline`, {
-      params: { 
-        category: 'linear',
-        symbol: symbol.includes('USDT') ? symbol : `${symbol}USDT`,
-        interval: timeframe === '1h' ? '60' : (timeframe === '4h' ? '240' : 'D'),
-        limit 
-      }
+    // Primary: MEXC (Extremely resilient to server IP blocks)
+    const res = await http.get(`${MEXC_BASE}/api/v3/klines`, {
+      params: { symbol, interval, limit }
     });
-    if (res.data.result.list) {
-      monitor.log(true);
-      return res.data.result.list.map(k => ({
-        t: Number(k[0]), o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
-      })).reverse();
-    }
-    throw new Error('Bybit returned empty list');
-  } catch (err) {
-    console.warn(`[fetchKlines] Bybit failed or restricted: ${err.message}. Trying Binance fallback...`);
+    monitor.log(true);
+    return res.data.map(k => ({
+      t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+    }));
+  } catch (mexcErr) {
+    console.warn(`[fetchKlines] MEXC failed: ${mexcErr.message}. Trying Bybit fallback...`);
     try {
-      // Fallback: Binance
-      const res = await http.get(`${BINANCE_BASE}/api/v3/klines`, {
-        params: { symbol, interval, limit }
+      // Secondary: Bybit
+      const res = await http.get(`${BYBIT_BASE}/v5/market/kline`, {
+        params: { 
+          category: 'linear',
+          symbol: symbol.includes('USDT') ? symbol : `${symbol}USDT`,
+          interval: timeframe === '1h' ? '60' : (timeframe === '4h' ? '240' : 'D'),
+          limit 
+        }
       });
-      monitor.log(true);
-      return res.data.map(k => ({
-        t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
-      }));
-    } catch (fallbackErr) {
-       monitor.log(false);
-       console.error(`[fetchKlines] Total network failure for ${symbol}`, fallbackErr.message);
-       
-       // Last Resort: LKG from Cache
-       const local = localStorage.getItem(cacheKey);
-       if (local) {
-         try {
-           const { data } = JSON.parse(local);
-           return data.map(k => ({
-             t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
-           }));
-         } catch (e) {}
-       }
-       throw fallbackErr;
+      if (res.data.result.list) {
+        monitor.log(true);
+        return res.data.result.list.map(k => ({
+          t: Number(k[0]), o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+        })).reverse();
+      }
+      throw new Error('Bybit returned empty list');
+    } catch (bybitErr) {
+      console.warn(`[fetchKlines] Bybit failed: ${bybitErr.message}. Trying Binance fallback...`);
+      try {
+        // Fallback: Binance
+        const res = await http.get(`${BINANCE_BASE}/api/v3/klines`, {
+          params: { symbol, interval, limit }
+        });
+        monitor.log(true);
+        return res.data.map(k => ({
+          t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+        }));
+      } catch (fallbackErr) {
+         monitor.log(false);
+         console.error(`[fetchKlines] Total network failure for ${symbol}`);
+         
+         // Last Resort: LKG from Cache
+         const local = localStorage.getItem(cacheKey);
+         if (local) {
+           try {
+             const { data } = JSON.parse(local);
+             return data.map(k => ({
+               t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+             }));
+           } catch (e) {}
+         }
+         throw fallbackErr;
+      }
     }
   }
 }
