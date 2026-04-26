@@ -8,8 +8,10 @@ import * as tradeController from '../controllers/tradeController.js';
 import * as aiController from '../controllers/aiController.js';
 import * as notificationController from '../controllers/notificationController.js';
 import * as paymentController from '../controllers/paymentController.js';
+import * as adminController from '../controllers/adminController.js';
 import * as polymarketController from '../controllers/polymarketController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import adminMiddleware from '../middleware/adminMiddleware.js';
 import passport from 'passport';
 import { generateToken } from '../services/authService.js';
 
@@ -84,6 +86,12 @@ router.post('/backtest', backtestController.handleBacktest);
 router.get('/polymarket/markets', polymarketController.getMarkets);
 router.post('/polymarket/order', polymarketController.placeOrder);
 router.get('/polymarket/orders', polymarketController.getOrders);
+
+// Admin Routes (Secured)
+router.get('/admin/stats', authMiddleware, adminMiddleware, adminController.getStats);
+router.get('/admin/users', authMiddleware, adminMiddleware, adminController.getUsers);
+router.patch('/admin/users/:id/role', authMiddleware, adminMiddleware, adminController.updateUserRole);
+router.patch('/admin/users/:id/subscription', authMiddleware, adminMiddleware, adminController.updateUserSubscription);
 
 export default router;
 

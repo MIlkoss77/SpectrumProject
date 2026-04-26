@@ -16,6 +16,7 @@ import logoImg from '@/assets/logo.png'
 import OnboardingModal from '@/components/onboarding/OnboardingModal'
 import NotificationDropdown from '@/components/NotificationDropdown'
 import axios from 'axios'
+import { useAuth } from '@/context/AuthContext'
 
 export default function AppShell() {
   const { t } = useTranslation()
@@ -28,6 +29,7 @@ export default function AppShell() {
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [showNotifications, setShowNotifications] = useState(false)
+  const { user, login, logout } = useAuth()
   const location = useLocation()
 
   const NAV = [
@@ -269,6 +271,30 @@ export default function AppShell() {
                   )}
                 </AnimatePresence>
               </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {user ? (
+                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full pl-1 pr-3 py-1">
+                  <div className="w-8 h-8 rounded-full bg-[#00FFFF]/20 flex items-center justify-center text-[#00FFFF] font-bold text-xs overflow-hidden">
+                    {user.displayName?.[0] || <User size={16} />}
+                  </div>
+                  <div className="hidden sm:flex flex-col">
+                    <span className="text-[10px] font-black text-white/90 leading-none">{user.displayName || 'Trader'}</span>
+                    <span className="text-[8px] font-bold text-[#00FFFF] uppercase tracking-tighter leading-none">{user.role}</span>
+                  </div>
+                  <button onClick={logout} className="ml-2 p-1 text-white/20 hover:text-red-400 transition-colors">
+                    <LogOut size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={login}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#00FFFF]/10 hover:bg-[#00FFFF]/20 text-[#00FFFF] border border-[#00FFFF]/20 rounded-xl text-xs font-black transition-all"
+                >
+                  <User size={14} />
+                  LOGIN
+                </button>
+              )}
 
               <div onClick={connectWallet} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>

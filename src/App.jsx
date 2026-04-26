@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Web3Provider } from '@/context/Web3Context.jsx'
 import { WebSocketProvider } from '@/context/WebSocketContext.jsx'
+import { AuthProvider } from '@/context/AuthContext.jsx'
 import AppShell from '@/layouts/AppShell.jsx'
 
 // Pages
@@ -23,6 +24,7 @@ const Forecasts = React.lazy(() => import('@/pages/Forecasts.jsx'))
 const Events = React.lazy(() => import('@/pages/Events.jsx'))
 const Polymarket = React.lazy(() => import('@/pages/Polymarket.jsx'))
 const AuthCallback = React.lazy(() => import('@/pages/AuthCallback.jsx'))
+const AdminDashboard = React.lazy(() => import('@/pages/AdminDashboard.jsx'))
 import { TradeProvider } from '@/context/TradeContext.jsx'
 
 import { TradingProvider } from '@/context/TradingContext.jsx'
@@ -33,8 +35,9 @@ import TradeModal from '@/components/TradeModal.jsx'
 export default function App() {
   return (
     <Web3Provider>
-      <TradingProvider>
-        <WebSocketProvider>
+      <AuthProvider>
+        <TradingProvider>
+          <WebSocketProvider>
           <TradeProvider>
             <BrowserRouter>
               <TradeModal />
@@ -59,6 +62,7 @@ export default function App() {
                   </Route>
 
                   <Route path='/auth/callback' element={<AuthCallback />} />
+                  <Route path='/admin' element={<AdminDashboard />} />
                   <Route path='*' element={<NotFound />} />
                 </Routes>
               </Suspense>
@@ -66,6 +70,7 @@ export default function App() {
           </TradeProvider>
         </WebSocketProvider>
       </TradingProvider>
-    </Web3Provider>
+    </AuthProvider>
+  </Web3Provider>
   )
 }

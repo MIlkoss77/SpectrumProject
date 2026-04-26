@@ -141,53 +141,57 @@ bot.onText(/\/scout/, async (msg) => {
 });
 
 // ==========================================
-// Command: /check <contract>
+// Passive Monitoring: Auto-detect Contracts
 // ==========================================
-bot.onText(/\/check(?:\s+(.+))?/, async (msg, match) => {
-    const chatId = msg.chat.id;
-    const contract = match[1]?.trim();
+bot.on('message', async (msg) => {
+    // Skip if it's a command
+    if (msg.text?.startsWith('/')) return;
 
-    if (!contract) {
-        return bot.sendMessage(chatId, "🔍 *How to use:* \nSend `/check <address>` to analyze any token contract (Solana, Ethereum, Base, etc.)", { parse_mode: 'Markdown' });
+    const solRegex = /[1-9A-HJ-NP-Za-km-z]{32,44}/;
+    const evmRegex = /0x[a-fA-F0-9]{40}/;
+    
+    const match = msg.text?.match(solRegex) || msg.text?.match(evmRegex);
+    if (match) {
+        const contract = match[0];
+        // Only auto-check if it looks like a real contract (shallow validation)
+        if (contract.length >= 32) {
+             handleContractCheck(msg.chat.id, contract, msg.from.username);
+        }
     }
+});
 
-    bot.sendMessage(chatId, `🔍 Analyzing contract: \`${contract}\`...`, { parse_mode: 'Markdown' });
-
+async function handleContractCheck(chatId, contract, username) {
     try {
         const { data } = await axios.get(`https://api.dexscreener.com/latest/dex/tokens/${contract}`);
         
-        if (!data.pairs || data.pairs.length === 0) {
-            return bot.sendMessage(chatId, `❌ *No trading pairs found* for this contract on DexScreener. Ensure the address is correct.`, { parse_mode: 'Markdown' });
-        }
+        if (!data.pairs || data.pairs.length === 0) return; // Silent fail for passive check to avoid spam
 
         const pair = data.pairs[0];
         const chain = pair.chainId.toUpperCase();
-        const price = pair.priceUsd || '0.00';
-        const volume = pair.volume?.h24 || 0;
-        const fdv = pair.fdv || 0;
-        const liquidity = pair.liquidity?.usd || 0;
         
         let score = 50;
-        if (liquidity > 50000) score += 20;
-        if (volume > 100000) score += 20;
-        if (pair.priceChange?.h1 > 0) score += 10;
+        const liq = pair.liquidity?.usd || 0;
+        const vol = pair.volume?.h24 || 0;
+        
+        if (liq > 100000) score += 25;
+        if (vol > 500000) score += 20;
+        if (pair.priceChange?.h1 > 5) score += 5;
 
         const text = `
-⚡ *SPECTR INTEL: CONTRACT ANALYSIS* ⚡
-*Chain:* ${chain}
-*Pair:* ${pair.baseToken.symbol}/${pair.quoteToken.symbol}
-*Price:* $${price}
+🌌 *SPECTR INTEL: ALPHA DETECTED*
+Analysis for \`${pair.baseToken.symbol}/${pair.quoteToken.symbol}\` on *${chain}*
 
-📊 *METRICS:*
-• Liquidity: $${liquidity.toLocaleString()}
-• 24h Volume: $${volume.toLocaleString()}
-• FDV: $${fdv.toLocaleString()}
-• 1h Change: ${pair.priceChange?.h1 || 0}%
+📊 *ON-CHAIN METRICS:*
+• Price: \`$${pair.priceUsd}\`
+• Liq: \`$${liq.toLocaleString()}\`
+• Vol: \`$${vol.toLocaleString()}\`
+• 1h: \`${pair.priceChange?.h1 || 0}%\`
 
-🧠 *AI CONFIDENCE SCORE:* **${score}/100**
-${score > 80 ? '🟢 Looks solid.' : (score > 50 ? '🟡 Average risk. DYOR.' : '🔴 High Risk / Low Liquidity.')}
+🧠 *INTEL SCORE:* **${score}/100**
+${score > 75 ? '🟢 *HIGH CONVICTION:* Low risk, high liquidity.' : (score > 40 ? '🟡 *NEUTRAL:* Standard risk. Check holders.' : '🔴 *HIGH RISK:* Low liquidity or sell pressure.')}
 
-[View on DexScreener](${pair.url})
+📢 *CTA:* 
+[Unlock Full IntelScore & Academy Guides](https://app.spectrtrading.com)
         `;
 
         const opts = {
@@ -195,15 +199,65 @@ ${score > 80 ? '🟢 Looks solid.' : (score > 50 ? '🟡 Average risk. DYOR.' : 
             disable_web_page_preview: true,
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: '🚀 Unlock Full Analytics', url: 'https://app.spectrtrading.com' }]
+                    [{ text: '🚀 Open in Spectr App', url: 'https://app.spectrtrading.com' }],
+                    [{ text: '📊 DexScreener', url: pair.url }]
                 ]
             }
         };
 
         bot.sendMessage(chatId, text, opts);
-    } catch (error) {
-        console.error('Error checking contract:', error.message);
-        bot.sendMessage(chatId, `⚠️ *Analysis Failed:* \n${error.message}. Ensure it's a valid contract address.`);
+    } catch (e) {
+        // Silent fail for passive
+    }
+}
+
+// ==========================================
+// Command: /check <contract>
+// ==========================================
+bot.onText(/\/check(?:\s+(.+))?/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    const contract = match[1]?.trim();
+
+    if (!contract) {
+        return bot.sendMessage(chatId, "🔍 *QuickCheck Protocol:* \nSend a contract address to get instant AI validation.", { parse_mode: 'Markdown' });
+    }
+
+    handleContractCheck(chatId, contract, msg.from.username);
+});
+
+// ==========================================
+// Command: /admin (Restricted)
+// ==========================================
+bot.onText(/\/admin/, async (msg) => {
+    const chatId = msg.chat.id;
+    const tgId = msg.from.id.toString();
+
+    try {
+        const user = await prisma.user.findUnique({ where: { telegramId: tgId } });
+        if (user?.role !== 'ADMIN') {
+            return bot.sendMessage(chatId, "🚫 *ACCESS DENIED:* Administrative privileges required.", { parse_mode: 'Markdown' });
+        }
+
+        const userCount = await prisma.user.count();
+        const proCount = await prisma.user.count({ where: { subscriptionStatus: 'PRO' } });
+
+        const text = `
+🛠 *SPECTR ADMIN TERMINAL*
+Status: \`AUTHENTICATED\`
+
+📈 *NETWORK STATS:*
+• Total Agents: \`${userCount}\`
+• Pro Nodes: \`${proCount}\`
+• DB Status: \`CONNECTED (NEON)\`
+
+*Controls:*
+/stats - Full growth report
+/broadcast <msg> - Alert all users
+        `;
+
+        bot.sendMessage(chatId, text, { parse_mode: 'Markdown' });
+    } catch (e) {
+        bot.sendMessage(chatId, "⚠️ Admin Terminal Error.");
     }
 });
 
