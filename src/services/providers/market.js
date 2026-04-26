@@ -48,43 +48,42 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
   const cacheKey = `klines_${symbol}_${interval}`;
 
   try {
-    // Primary: Binance
-    const res = await http.get(`${BINANCE_BASE}/api/v3/klines`, {
-      params: { symbol, interval, limit }
+    // Primary: Bybit (More resilient to regional blocks)
+    const res = await http.get(`${BYBIT_BASE}/v5/market/kline`, {
+      params: { 
+        category: 'linear',
+        symbol: symbol.includes('USDT') ? symbol : `${symbol}USDT`,
+        interval: timeframe === '1h' ? '60' : (timeframe === '4h' ? '240' : 'D'),
+        limit 
+      }
     });
-    monitor.log(true);
-    return res.data.map(k => ({
-      t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
-    }));
+    if (res.data.result.list) {
+      monitor.log(true);
+      return res.data.result.list.map(k => ({
+        t: Number(k[0]), o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+      })).reverse();
+    }
+    throw new Error('Bybit returned empty list');
   } catch (err) {
-    console.warn(`[fetchBinanceKlines] Binance blocked/failed: ${err.message}. Trying Bybit...`);
+    console.warn(`[fetchKlines] Bybit failed or restricted: ${err.message}. Trying Binance fallback...`);
     try {
-       // Fallback: Bybit
-       const res = await http.get(`${BYBIT_BASE}/v5/market/kline`, {
-         params: { 
-           category: 'linear',
-           symbol: symbol.includes('USDT') ? symbol : `${symbol}USDT`,
-           interval: timeframe === '1h' ? '60' : (timeframe === '4h' ? '240' : 'D'),
-           limit 
-         }
-       });
-       if (res.data.result.list) {
-         monitor.log(true);
-         return res.data.result.list.map(k => ({
-           t: Number(k[0]), o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
-         })).reverse();
-       }
-       throw new Error('Bybit empty response');
+      // Fallback: Binance
+      const res = await http.get(`${BINANCE_BASE}/api/v3/klines`, {
+        params: { symbol, interval, limit }
+      });
+      monitor.log(true);
+      return res.data.map(k => ({
+        t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+      }));
     } catch (fallbackErr) {
        monitor.log(false);
-       console.error(`[fetchBinanceKlines] Total failure for ${symbol}`, fallbackErr.message);
+       console.error(`[fetchKlines] Total network failure for ${symbol}`, fallbackErr.message);
        
-       // Last Resort: LKG (Last Known Good) from Cache
+       // Last Resort: LKG from Cache
        const local = localStorage.getItem(cacheKey);
        if (local) {
          try {
            const { data } = JSON.parse(local);
-           console.log(`[SWR] Using cached data for ${symbol} due to total network failure`);
            return data.map(k => ({
              t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
            }));
