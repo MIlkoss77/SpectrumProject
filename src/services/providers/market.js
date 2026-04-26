@@ -45,10 +45,10 @@ const TF_MAP = { '1m': '1m', '5m': '5m', '15m': '15m', '1h': '1h', '4h': '4h', '
 
 export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) {
   const interval = TF_MAP[timeframe] || timeframe;
-  const url = `${BINANCE_BASE}/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`;
   const cacheKey = `klines_${symbol}_${interval}`;
 
   try {
+    // Primary: Binance
     const res = await http.get(`${BINANCE_BASE}/api/v3/klines`, {
       params: { symbol, interval, limit }
     });
@@ -57,8 +57,9 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
       t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
     }));
   } catch (err) {
-    console.warn(`[fetchBinanceKlines] Binance failed: ${err.message}. Trying Bybit fallback...`);
+    console.warn(`[fetchBinanceKlines] Binance blocked/failed: ${err.message}. Trying Bybit...`);
     try {
+       // Fallback: Bybit
        const res = await http.get(`${BYBIT_BASE}/v5/market/kline`, {
          params: { 
            category: 'linear',
@@ -76,37 +77,21 @@ export async function fetchBinanceKlines(symbol, timeframe = '1h', limit = 500) 
        throw new Error('Bybit empty response');
     } catch (fallbackErr) {
        monitor.log(false);
-       console.error(`[fetchBinanceKlines] Ultimate failure for ${symbol}`, fallbackErr.message);
+       console.error(`[fetchBinanceKlines] Total failure for ${symbol}`, fallbackErr.message);
+       
+       // Last Resort: LKG (Last Known Good) from Cache
+       const local = localStorage.getItem(cacheKey);
+       if (local) {
+         try {
+           const { data } = JSON.parse(local);
+           console.log(`[SWR] Using cached data for ${symbol} due to total network failure`);
+           return data.map(k => ({
+             t: k[0], o: Number(k[1]), h: Number(k[2]), l: Number(k[3]), c: Number(k[4]), v: Number(k[5])
+           }));
+         } catch (e) {}
+       }
        throw fallbackErr;
     }
-  }
-    console.warn(`[fetchBinanceKlines] Primary fetch failed for ${symbol}. checking LKG...`, err.message);
-    
-    // --- LKG FALLBACK (SWR) ---
-    const local = localStorage.getItem(cacheKey);
-    if (local) {
-      try {
-        const { data, ts } = JSON.parse(local);
-        const ageSec = Math.round((Date.now() - ts) / 1000);
-        console.log(`[SWR] Using cached data for ${symbol} (Age: ${ageSec}s)`);
-        
-        return data.map(k => ({
-          openTime: k[0],
-          t: k[0],
-          o: Number(k[1]),
-          h: Number(k[2]),
-          l: Number(k[3]),
-          c: Number(k[4]),
-          v: Number(k[5]),
-          volume: Number(k[5]),
-          closeTime: k[6],
-          _stale: true,
-          _age: ageSec
-        }));
-      } catch (e) {}
-    }
-
-    throw new Error(`[fetchBinanceKlines] Total Failure: ${err?.message || 'Network error'}`);
   }
 }
 
