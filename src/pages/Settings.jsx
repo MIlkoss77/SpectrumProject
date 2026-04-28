@@ -18,7 +18,6 @@ export default function Settings() {
   const [telegramEnabled, setTelegramEnabled] = useState(false)
 
   const [cryptoPanicKey, setCryptoPanicKey] = useState(() => localStorage.getItem('cryptopanic_key') || '')
-  const [cryptoPanicKey, setCryptoPanicKey] = useState(() => localStorage.getItem('cryptopanic_key') || '')
   const [polyPk, setPolyPk] = useState('')
   
   // CEX Connectivity
