@@ -202,7 +202,7 @@ export default function OnboardingModal() {
                                         className="flex-1 py-4.5 px-6 rounded-2xl border border-white/10 text-white/60 font-bold hover:text-white hover:bg-white/5 hover:border-white/20 transition-all flex items-center justify-center gap-2 group active:scale-95"
                                     >
                                         <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                                        <span>{t('ui.back') || 'Back'}</span>
+                                        <span>Back</span>
                                     </button>
                                 )}
                                 <button 
@@ -211,9 +211,9 @@ export default function OnboardingModal() {
                                 >
                                     <span className="relative z-10 flex items-center gap-2">
                                         {currentStep === STEPS.length - 1 ? (
-                                            <>{t('onboarding.ignite') || 'Ignite Engines'} <Sparkles size={18} /></>
+                                            <>IGNITE ENGINES <Sparkles size={18} /></>
                                         ) : (
-                                            <>{t('onboarding.next') || 'Next Protocol'} <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" /></>
+                                            <>NEXT PROTOCOL <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" /></>
                                         )}
                                     </span>
                                     
@@ -226,7 +226,7 @@ export default function OnboardingModal() {
                                 onClick={handleComplete}
                                 className="mt-8 text-[10px] font-bold text-white/20 hover:text-cyan-400/60 uppercase tracking-[0.3em] transition-all w-full text-center hover:scale-105 active:scale-95"
                             >
-                                {t('onboarding.skip') || 'Skip Introduction'}
+                                SKIP INTRODUCTION
                             </button>
                         </div>
 

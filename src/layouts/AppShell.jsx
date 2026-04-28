@@ -273,35 +273,36 @@ export default function AppShell() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="flex items-center gap-3 ml-2" style={{ flexShrink: 0 }}>
               {user ? (
                 <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full pl-1 pr-3 py-1">
-                  <div className="w-8 h-8 rounded-full bg-[#00FFFF]/20 flex items-center justify-center text-[#00FFFF] font-bold text-xs overflow-hidden">
-                    {user.displayName?.[0] || <User size={16} />}
+                  <div className="w-8 h-8 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold text-xs overflow-hidden border border-cyan-400/20">
+                    {user.displayName?.[0] || user.email?.[0]?.toUpperCase() || <User size={14} />}
                   </div>
-                  <div className="hidden sm:flex flex-col">
-                    <span className="text-[10px] font-black text-white/90 leading-none">{user.displayName || 'Trader'}</span>
-                    <span className="text-[8px] font-bold text-[#00FFFF] uppercase tracking-tighter leading-none">{user.role}</span>
+                  <div className="hidden lg:flex flex-col">
+                    <span className="text-[10px] font-black text-white/90 leading-none tracking-tight">{user.displayName || user.email?.split('@')[0]}</span>
+                    <span className="text-[8px] font-bold text-cyan-400 uppercase tracking-tighter leading-none mt-1">{user.role || 'USER'}</span>
                   </div>
-                  <button onClick={logout} className="ml-2 p-1 text-white/20 hover:text-red-400 transition-colors">
-                    <LogOut size={14} />
+                  <button onClick={logout} className="ml-1 p-1 text-white/20 hover:text-red-400 transition-colors">
+                    <LogOut size={12} />
                   </button>
                 </div>
               ) : (
                 <button 
-                  onClick={login}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#00FFFF]/10 hover:bg-[#00FFFF]/20 text-[#00FFFF] border border-[#00FFFF]/20 rounded-xl text-xs font-black transition-all"
+                  onClick={() => window.location.href = '/login'}
+                  className="flex items-center gap-2 px-4 py-2 bg-cyan-400 hover:bg-white text-black rounded-xl text-[10px] font-black transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] active:scale-95"
                 >
                   <User size={14} />
-                  LOGIN
+                  AUTHORIZE
                 </button>
               )}
-
-              <div onClick={connectWallet} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  {(account || isPro) ? <Shield size={18} color="#00FFFF" /> : <Wallet size={18} color="#8899A6" />}
-                </div>
-              </div>
+              
+              <button 
+                onClick={connectWallet} 
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group"
+              >
+                {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} className="text-white/40 group-hover:text-white" />}
+              </button>
             </div>
           </div>
         </header>
