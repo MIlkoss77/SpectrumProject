@@ -43,7 +43,11 @@ router.get('/auth/google/callback',
     (req, res) => {
         // Successful authentication
         const token = generateToken(req.user.id);
-        res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5174'}/auth/callback?token=${token}`);
+        const baseUrl = process.env.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+        // If we are behind Nginx proxy, req.get('host') might be the backend port, 
+        // but usually proxy_set_header Host $host; handles it.
+        // However, in production, we want it to go back to the frontend.
+        res.redirect(`${baseUrl}/auth/callback?token=${token}`);
     }
 );
 

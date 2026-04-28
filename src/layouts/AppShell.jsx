@@ -233,7 +233,7 @@ export default function AppShell() {
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px' }}>
             <ConnectionHub />
 
-            <div className="desktop-shield-only" style={{ alignItems: 'center', gap: '10px', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
+            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '10px', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
               <Shield size={16} color="#00FFFF" />
               <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                 <span style={{ fontSize: '8px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', lineHeight: 1 }}>Capital Shield</span>
@@ -290,10 +290,11 @@ export default function AppShell() {
               ) : (
                 <button 
                   onClick={() => window.location.href = '/login'}
-                  className="flex items-center gap-2 px-4 py-2 bg-cyan-400 hover:bg-white text-black rounded-xl text-[10px] font-black transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] active:scale-95"
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-cyan-400 hover:bg-white text-black rounded-xl text-[10px] font-black transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] active:scale-95"
                 >
                   <User size={14} />
-                  AUTHORIZE
+                  <span className="hidden sm:inline">AUTHORIZE</span>
+                  <span className="sm:hidden">LOGIN</span>
                 </button>
               )}
               

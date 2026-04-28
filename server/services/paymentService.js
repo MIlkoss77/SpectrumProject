@@ -19,19 +19,25 @@ class PaymentService {
     /**
      * Create a payment request and return the deposit address
      */
-    async createPayment({ amount, currency, orderId }) {
+    async createPayment({ amount, currency, orderId, ipnCallbackUrl }) {
         if (!this.isEnabled()) {
             throw new Error('PAYMENT_GATEWAY_NOT_CONFIGURED');
         }
 
         try {
-            const response = await axios.post(`${this.baseUrl}/payment`, {
+            const payload = {
                 price_amount: amount,
                 price_currency: 'usd',
                 pay_currency: currency.toLowerCase(),
                 order_id: orderId,
-                case: 'pro_upgrade'
-            }, {
+                order_description: 'Spectr Trading Pro Upgrade'
+            };
+
+            if (ipnCallbackUrl) {
+                payload.ipn_callback_url = ipnCallbackUrl;
+            }
+
+            const response = await axios.post(`${this.baseUrl}/payment`, payload, {
                 headers: { 'x-api-key': this.apiKey },
                 timeout: 15000
             });

@@ -17,10 +17,7 @@ export default function Settings() {
   const [emailEnabled, setEmailEnabled] = useState(true)
   const [telegramEnabled, setTelegramEnabled] = useState(false)
 
-  // AI Configuration
-  const [aiProvider, setAiProvider] = useState(() => localStorage.getItem('ai_provider') || 'openai')
-  const [openaiKey, setOpenaiKey] = useState('••••••••••••')
-  const [anthropicKey, setAnthropicKey] = useState('••••••••••••')
+  const [cryptoPanicKey, setCryptoPanicKey] = useState(() => localStorage.getItem('cryptopanic_key') || '')
   const [cryptoPanicKey, setCryptoPanicKey] = useState(() => localStorage.getItem('cryptopanic_key') || '')
   const [polyPk, setPolyPk] = useState('')
   
@@ -45,7 +42,6 @@ export default function Settings() {
   }, [lang, i18n])
 
   useEffect(() => localStorage.setItem('ui.theme', theme), [theme])
-  useEffect(() => localStorage.setItem('ai_provider', aiProvider), [aiProvider])
 
   // Fetch payment history
   useEffect(() => {
@@ -92,25 +88,6 @@ export default function Settings() {
     fetchExchanges()
   }, [])
 
-  const handleSaveAIKey = async (provider, key) => {
-    if (!key || key.includes('•')) return;
-    setIsSaving(true)
-    try {
-      const token = localStorage.getItem('token')
-      await axios.post('/api/exchange/keys', {
-        exchange: provider,
-        apiKey: key,
-        secret: 'AI_PROVIDER_KEY' // Secret not needed for LLMs but required by API
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      alert(`${provider.toUpperCase()} key updated and encrypted on server.`)
-    } catch (err) {
-      alert(`Failed to save key: ${err.message}`)
-    } finally {
-      setIsSaving(false)
-    }
-  }
 
   const handleSavePolyKey = async (key) => {
     if (!key || key.includes('•')) return;
@@ -243,48 +220,6 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="dx-card">
-        <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Brain size={20} /> {t('pages.settings.ai_config') || 'AI Analytics Configuration'}
-        </h3>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr)', gap: 16 }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: 8, fontSize: 13, color: 'var(--muted)' }}>
-              {t('pages.settings.ai_provider') || 'AI Provider'}
-            </label>
-            <select
-              value={aiProvider}
-              onChange={e => setAiProvider(e.target.value)}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)' }}
-            >
-              <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
-              <option value="anthropic">Anthropic (Claude 3.5)</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, fontSize: 13, color: 'var(--muted)' }}>
-              <span>{aiProvider === 'openai' ? 'OpenAI' : 'Anthropic'} {t('pages.settings.api_key') || 'API Key'}</span>
-              {((aiProvider === 'openai' && openaiKey) || (aiProvider === 'anthropic' && anthropicKey)) && (
-                <span style={{ color: 'var(--accent)', fontSize: 11 }}>Configured ✓</span>
-              )}
-            </label>
-            <input
-              type="password"
-              value={aiProvider === 'openai' ? openaiKey : anthropicKey}
-              onChange={e => aiProvider === 'openai' ? setOpenaiKey(e.target.value) : setAnthropicKey(e.target.value)}
-              onBlur={e => handleSaveAIKey(aiProvider, e.target.value)}
-              disabled={isSaving}
-              placeholder={`Enter your ${aiProvider === 'openai' ? 'OpenAI' : 'Anthropic'} API Key`}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid var(--line)', background: 'var(--surface-2)', color: 'var(--text)', opacity: isSaving ? 0.5 : 1 }}
-            />
-            <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 8 }}>
-              Keys are encrypted and stored in the secure server-side database. They are never exposed to the client after saving.
-            </p>
-          </div>
-        </div>
-      </div>
 
       <div className="dx-card">
         <h3 style={{ margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: 8 }}>

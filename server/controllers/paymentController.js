@@ -68,10 +68,13 @@ export const createDeposit = async (req, res) => {
           },
         });
 
+        const ipnCallbackUrl = `${req.protocol}://${req.get('host')}/api/payments/webhook`;
+        
         const gatewayPayment = await paymentService.createPayment({
           amount: plan.amount,
           currency: upperCurrency,
-          orderId: paymentRecord.id
+          orderId: paymentRecord.id,
+          ipnCallbackUrl
         });
 
         const updated = await prisma.payment.update({
