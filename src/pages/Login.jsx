@@ -13,8 +13,13 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     
-    const { setToken, loginWithGoogle } = useAuth();
+    const { loginWithGoogle } = useAuth();
     const navigate = useNavigate();
+
+    const handleGoogleLogin = () => {
+        // Direct redirect to backend to avoid 404 proxy issues
+        window.location.href = 'https://app.spectrtrading.com/api/auth/google';
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,8 +33,8 @@ export default function Login() {
             const res = await axios.post(endpoint, payload);
             
             if (res.data.token) {
-                setToken(res.data.token);
-                navigate('/');
+                localStorage.setItem('spectr_auth_token', res.data.token);
+                window.location.href = '/';
             } else {
                 setError('Authentication failed. Please check your credentials.');
             }
@@ -41,137 +46,165 @@ export default function Login() {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-[#050505] p-4 relative overflow-hidden">
-            {/* Background Glows */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full" />
+        <div style={{ 
+            minHeight: '100vh', 
+            backgroundColor: '#050505', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            padding: '20px',
+            fontFamily: "'Inter', sans-serif",
+            color: '#fff',
+            position: 'relative',
+            overflow: 'hidden'
+        }}>
+            {/* Ambient Background */}
+            <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '40%', height: '40%', background: 'rgba(0, 255, 255, 0.05)', filter: 'blur(120px)', borderRadius: '50%' }} />
+            <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '40%', height: '40%', background: 'rgba(139, 92, 246, 0.05)', filter: 'blur(120px)', borderRadius: '50%' }} />
 
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-md relative z-10"
+                style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 10 }}
             >
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-white/10 mb-4 backdrop-blur-xl">
-                        <ShieldCheck className="w-8 h-8 text-cyan-400" />
+                <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                    <div style={{ 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        width: '72px', 
+                        height: '72px', 
+                        borderRadius: '20px', 
+                        background: 'rgba(0, 255, 255, 0.1)', 
+                        border: '1px solid rgba(0, 255, 255, 0.2)',
+                        marginBottom: '20px',
+                        boxShadow: '0 0 30px rgba(0, 255, 255, 0.1)'
+                    }}>
+                        <ShieldCheck size={32} color="#00FFFF" />
                     </div>
-                    <h1 className="text-3xl font-black text-white tracking-tighter uppercase mb-2">Spectr Protocol</h1>
-                    <p className="text-white/40 text-sm font-medium tracking-wide">
-                        {isLogin ? 'Access your Neuro-Finance Terminal' : 'Initialize your trading profile'}
+                    <h1 style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                        SPECTR <span style={{ color: '#00FFFF' }}>PROTOCOL</span>
+                    </h1>
+                    <p style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '14px', fontWeight: 500 }}>
+                        {isLogin ? 'Neural Tactical Terminal v5.2.1' : 'Initialize your trading profile'}
                     </p>
                 </div>
 
-                <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 rounded-[32px] p-8 shadow-2xl relative overflow-hidden">
-                    {/* Inner Decorative Line */}
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
-
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                <div style={{ 
+                    background: 'rgba(255, 255, 255, 0.02)', 
+                    backdropFilter: 'blur(40px)', 
+                    border: '1px solid rgba(255, 255, 255, 0.08)', 
+                    borderRadius: '32px', 
+                    padding: '40px',
+                    boxShadow: '0 40px 100px rgba(0,0,0,0.5)'
+                }}>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {!isLogin && (
-                            <div className="space-y-1.5">
-                                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Full Name</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-white/20">
-                                        <ArrowRight size={16} />
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        required
-                                        value={displayName}
-                                        onChange={(e) => setDisplayName(e.target.value)}
-                                        className="w-full bg-white/[0.05] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-white/10"
-                                        placeholder="John Doe"
-                                    />
-                                </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px' }}>Display Name</label>
+                                <input 
+                                    type="text" 
+                                    value={displayName}
+                                    onChange={(e) => setDisplayName(e.target.value)}
+                                    placeholder="Enter your name"
+                                    style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '16px', color: '#fff', fontSize: '14px', outline: 'none' }}
+                                />
                             </div>
                         )}
 
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Email Address</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-white/20">
-                                    <Mail size={16} />
-                                </div>
-                                <input 
-                                    type="email" 
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-white/[0.05] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-white/10"
-                                    placeholder="your@email.com"
-                                />
-                            </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px' }}>Email Address</label>
+                            <input 
+                                type="email" 
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="your@email.com"
+                                style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '16px', color: '#fff', fontSize: '14px', outline: 'none' }}
+                            />
                         </div>
 
-                        <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Password</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-white/20">
-                                    <Lock size={16} />
-                                </div>
-                                <input 
-                                    type="password" 
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-white/[0.05] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-cyan-500/50 transition-all placeholder:text-white/10"
-                                    placeholder="••••••••"
-                                />
-                            </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <label style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px' }}>Access Key</label>
+                            <input 
+                                type="password" 
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '16px', color: '#fff', fontSize: '14px', outline: 'none' }}
+                            />
                         </div>
 
                         {error && (
-                            <motion.div 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="text-red-400 text-xs font-bold text-center bg-red-500/10 border border-red-500/20 py-3 rounded-xl"
-                            >
+                            <div style={{ color: '#ff4d4d', fontSize: '12px', fontWeight: 700, textAlign: 'center', background: 'rgba(255, 77, 77, 0.1)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255, 77, 77, 0.2)' }}>
                                 {error}
-                            </motion.div>
+                            </div>
                         )}
 
                         <button 
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black py-4 rounded-2xl shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition-all active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{ 
+                                width: '100%', 
+                                background: '#00FFFF', 
+                                color: '#000', 
+                                border: 'none', 
+                                borderRadius: '16px', 
+                                padding: '18px', 
+                                fontWeight: 900, 
+                                fontSize: '12px', 
+                                textTransform: 'uppercase', 
+                                letterSpacing: '1px', 
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                boxShadow: '0 0 20px rgba(0, 255, 255, 0.3)',
+                                opacity: loading ? 0.5 : 1
+                            }}
                         >
-                            {loading ? (
-                                <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                            ) : (
-                                <>
-                                    {isLogin ? 'AUTHORIZE ACCESS' : 'CREATE PROTOCOL NODE'}
-                                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                </>
-                            )}
+                            {loading ? 'CALIBRATING...' : (isLogin ? 'AUTHORIZE ACCESS' : 'INITIALIZE NODE')}
                         </button>
 
-                        <div className="relative py-2">
-                            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                            <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest"><span className="bg-transparent px-4 text-white/20">OR CONTINUE WITH</span></div>
+                        <div style={{ position: 'relative', height: '1px', background: 'rgba(255,255,255,0.1)', margin: '10px 0' }}>
+                            <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#050505', padding: '0 10px', fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', letterSpacing: '2px' }}>OR</span>
                         </div>
 
                         <button 
                             type="button"
-                            onClick={loginWithGoogle}
-                            className="w-full bg-white/[0.05] border border-white/10 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-white/10 transition-all active:scale-[0.98]"
+                            onClick={handleGoogleLogin}
+                            style={{ 
+                                width: '100%', 
+                                background: 'rgba(255,255,255,0.05)', 
+                                color: '#fff', 
+                                border: '1px solid rgba(255,255,255,0.1)', 
+                                borderRadius: '16px', 
+                                padding: '16px', 
+                                fontWeight: 700, 
+                                fontSize: '12px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                gap: '10px',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
                         >
-                            <Chrome size={20} />
-                            GOOGLE AUTH
+                            <Chrome size={18} />
+                            CONTINUE WITH GOOGLE
                         </button>
                     </form>
 
-                    <div className="mt-8 text-center">
-                        <button 
-                            onClick={() => setIsLogin(!isLogin)}
-                            className="text-white/40 text-xs font-bold hover:text-cyan-400 transition-colors uppercase tracking-widest"
-                        >
-                            {isLogin ? "Don't stop here. Create an account →" : "Already in the protocol? Login →"}
-                        </button>
-                    </div>
+                    <button 
+                        onClick={() => setIsLogin(!isLogin)}
+                        style={{ width: '100%', background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '12px', fontWeight: 700, marginTop: '30px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '1px' }}
+                    >
+                        {isLogin ? "Need a new node? Create account →" : "Already registered? Sign in →"}
+                    </button>
                 </div>
 
-                <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-black text-white/20 uppercase tracking-widest">
-                    <Link to="/terms" className="hover:text-white/40 transition-colors">Terms of Service</Link>
-                    <Link to="/privacy" className="hover:text-white/40 transition-colors">Privacy Shield</Link>
+                <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'center', gap: '20px', fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px' }}>
+                    <span>TERMS OF SERVICE</span>
+                    <span>PRIVACY SHIELD</span>
                 </div>
             </motion.div>
         </div>
