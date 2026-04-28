@@ -230,10 +230,12 @@ export default function AppShell() {
             </div>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px' }}>
-            <ConnectionHub />
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px' }}>
+            <div className="hidden xl:flex">
+              <ConnectionHub />
+            </div>
 
-            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '10px', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
+            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '10px', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', flexShrink: 0 }}>
               <Shield size={16} color="#00FFFF" />
               <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
                 <span style={{ fontSize: '8px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', lineHeight: 1 }}>Capital Shield</span>
@@ -242,18 +244,18 @@ export default function AppShell() {
             </div>
 
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
               <div style={{ position: 'relative' }}>
                 <button 
-                  style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', position: 'relative' }} 
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', position: 'relative', width: '40px', height: '40px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
                   onClick={() => {
                     setShowNotifications(!showNotifications);
                     setShowMore(false);
                   }}
                 >
-                  <Bell size={20} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
+                  <Bell size={18} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
                   {unreadCount > 0 && (
-                    <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #050505' }}>
                       {unreadCount}
                     </div>
                   )}
@@ -273,9 +275,9 @@ export default function AppShell() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 ml-2" style={{ flexShrink: 0 }}>
+            <div className="flex items-center gap-2 sm:gap-3" style={{ flexShrink: 0 }}>
               {user ? (
-                <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full pl-1 pr-3 py-1">
+                <div className="flex items-center gap-2 sm:gap-3 bg-white/5 border border-white/10 rounded-full pl-1 pr-2 sm:pr-3 py-1">
                   <div className="w-8 h-8 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold text-xs overflow-hidden border border-cyan-400/20">
                     {user.displayName?.[0] || user.email?.[0]?.toUpperCase() || <User size={14} />}
                   </div>
@@ -290,17 +292,17 @@ export default function AppShell() {
               ) : (
                 <button 
                   onClick={() => window.location.href = '/login'}
-                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-cyan-400 hover:bg-white text-black rounded-xl text-[10px] font-black transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] active:scale-95"
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-cyan-400 hover:bg-white text-black rounded-xl text-[10px] font-black transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] active:scale-95 whitespace-nowrap"
                 >
                   <User size={14} />
-                  <span className="hidden sm:inline">AUTHORIZE</span>
+                  <span className="hidden sm:inline uppercase">Authorize</span>
                   <span className="sm:hidden">LOGIN</span>
                 </button>
               )}
               
               <button 
                 onClick={connectWallet} 
-                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group"
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group flex-shrink-0"
               >
                 {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} className="text-white/40 group-hover:text-white" />}
               </button>

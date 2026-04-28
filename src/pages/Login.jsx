@@ -17,8 +17,8 @@ export default function Login() {
     const navigate = useNavigate();
 
     const handleGoogleLogin = () => {
-        // Direct redirect to backend to avoid 404 proxy issues
-        window.location.href = 'https://app.spectrtrading.com/api/auth/google';
+        // Use relative path for better proxy compatibility
+        window.location.href = '/api/auth/google';
     };
 
     const handleSubmit = async (e) => {
