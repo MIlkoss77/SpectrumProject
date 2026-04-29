@@ -1,6 +1,5 @@
-
-// Spectr SW v4 — Force update and aggressive cache cleanup
-const CACHE_VERSION = 'v4';
+// Spectr SW v6 — Force update and aggressive cache cleanup
+const CACHE_VERSION = 'v6';
 const STATIC_CACHE = `spectr-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `spectr-runtime-${CACHE_VERSION}`;
 const API_CACHE = `spectr-api-${CACHE_VERSION}`;
