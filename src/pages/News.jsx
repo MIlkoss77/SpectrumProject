@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { getNews, getSocialBuzz, getScoutSignals } from '@/services/providers/news'
-import { Globe, Zap, TrendingUp, TrendingDown, Minus, Clock, ExternalLink, Newspaper, Twitter, MessageCircle, Layers, Filter, Activity } from 'lucide-react'
+import { Globe, Zap, TrendingUp, TrendingDown, Minus, Clock, ExternalLink, Newspaper, Twitter, MessageCircle, Layers, Filter, Activity, Bot } from 'lucide-react'
 import Skeleton from '@/components/ui/Skeleton'
 import './dashboard.css'
 
@@ -63,41 +63,46 @@ function ClusterCard({ cluster, onSelect, isActive }) {
 
 function ViralCard({ item }) {
   const isReddit = item.source === 'Reddit';
+  const accentColor = isReddit ? '#FF4500' : '#00FFFF';
 
   return (
-    <div className="action-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+    <div className="group relative overflow-hidden transition-all duration-300 hover:scale-[1.01] cursor-pointer"
       style={{
-        width: '100%',
-        padding: '20px',
-        borderRadius: '24px',
+        background: 'rgba(10, 10, 15, 0.6)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: `1px solid ${accentColor}20`,
+        borderRadius: '16px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        border: '1px solid rgba(255,255,255,0.05)',
-        background: 'rgba(15, 15, 20, 0.8)',
-        backdropFilter: 'blur(30px)',
-        WebkitBackdropFilter: 'blur(30px)'
+        gap: '12px',
+        width: '100%'
       }}>
+      <div style={{ position: 'absolute', top: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: accentColor, filter: 'blur(40px)', opacity: 0.1, pointerEvents: 'none' }} />
 
       <div className="relative z-10 flex flex-col h-full">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-            {isReddit ? <MessageCircle size={18} className="text-[#FF4500]" /> : <Twitter size={18} className="text-cyan-400" />}
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center gap-3">
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${accentColor}10`, border: `1px solid ${accentColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {isReddit ? <MessageCircle size={16} color={accentColor} /> : <Twitter size={16} color={accentColor} />}
+            </div>
+            <div className="flex flex-col">
+              <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>{item.sub || item.source}</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>@{item.author}</span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-white/40 leading-none mb-1 uppercase tracking-widest">{item.sub || item.source}</span>
-            <span className="text-[8px] font-mono text-white/20">@{item.author}</span>
-          </div>
-          <div className="ml-auto flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 border border-white/5">
-            <Activity size={10} className="text-cyan-400" />
-            <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">{item.velocity} VEL</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.03)', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <Activity size={10} color={accentColor} />
+            <span style={{ fontSize: '9px', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{item.velocity} VEL</span>
           </div>
         </div>
 
-        <h3 className="text-sm font-bold leading-tight mb-4 group-hover:text-cyan-400 transition-colors line-clamp-4 tracking-tight">
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', lineHeight: 1.4, marginBottom: '12px' }} className="line-clamp-3">
           {item.title}
         </h3>
 
-        <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">
+        <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between">
           <div className="flex gap-4">
             <div className="flex items-center gap-1.5">
               <TrendingUp size={12} className="text-white/20" />
@@ -110,8 +115,8 @@ function ViralCard({ item }) {
           </div>
 
           <a href={item.url || '#'} target="_blank" rel="noopener noreferrer"
-            className="p-2 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-white/40 hover:text-cyan-400 transition-all border border-white/5 shadow-xl">
-            <ExternalLink size={14} />
+             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: accentColor, textDecoration: 'none' }}>
+            Source <ExternalLink size={10} />
           </a>
         </div>
       </div>
@@ -120,65 +125,59 @@ function ViralCard({ item }) {
 }
 
 function NewsCard({ item }) {
-  const impactColors = { HIGH: '#ef4444', MED: '#eab308', LOW: '#9ca3af' }
-  const sentimentColors = { BULLISH: '#22d3ee', BEARISH: '#ef4444', NEUTRAL: '#9ca3af' }
   const isPositive = item.sentiment === 'BULLISH'
+  const isNegative = item.sentiment === 'BEARISH'
+  const accentColor = isPositive ? '#00FFFF' : isNegative ? '#FF4560' : '#8899A6'
 
   return (
-    <div className="action-card group relative overflow-hidden transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+    <div className="group relative overflow-hidden transition-all duration-300 hover:scale-[1.01] cursor-pointer"
       style={{
-        width: '100%',
-        padding: '20px',
-        borderRadius: '24px',
+        background: 'rgba(10, 10, 15, 0.6)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: `1px solid ${accentColor}20`,
+        borderRadius: '16px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        borderColor: isPositive ? 'rgba(34,211,238,0.2)' : 'rgba(255,255,255,0.05)',
-        background: 'rgba(15, 15, 20, 0.8)',
-        backdropFilter: 'blur(30px)',
-        WebkitBackdropFilter: 'blur(30px)'
+        gap: '12px',
+        width: '100%'
       }}>
+      <div style={{ position: 'absolute', top: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: accentColor, filter: 'blur(40px)', opacity: 0.1, pointerEvents: 'none' }} />
 
       <div className="relative z-10 flex flex-col h-full">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-            <Newspaper size={18} className="text-white/40" />
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center gap-3">
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Newspaper size={16} color="rgba(255,255,255,0.5)" />
+            </div>
+            <div className="flex flex-col">
+              <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>{item.domain}</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>{item.time}</span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-white/40 leading-none mb-1 uppercase tracking-widest">{item.time}</span>
-            <span className="text-[8px] font-mono text-white/20">{item.domain}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+             {item.sentiment !== 'NEUTRAL' && (
+                <SentimentIcon sentiment={item.sentiment} />
+             )}
           </div>
-          <span className="ml-auto text-[9px] font-black px-2 py-0.5 rounded-md border uppercase tracking-widest"
-            style={{
-              color: impactColors[item.impact] || impactColors.MED,
-              borderColor: `${impactColors[item.impact] || impactColors.MED}20`,
-              background: `${impactColors[item.impact] || impactColors.MED}05`
-            }}>
-            {item.impact}
-          </span>
         </div>
 
-        <h3 className="text-lg font-bold leading-tight mb-4 group-hover:text-cyan-400 transition-colors line-clamp-4 tracking-tight">
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', lineHeight: 1.4, marginBottom: '12px' }} className="line-clamp-3">
           {item.title}
         </h3>
 
-        <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">
-          <div className="flex gap-2">
+        <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between">
+          <div className="flex gap-2 flex-wrap">
             {item.tags.slice(0, 2).map(tag => (
-              <span key={tag} className="text-[9px] font-black text-cyan-400/50 uppercase tracking-widest">#{tag}</span>
+              <span key={tag} style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(0,255,255,0.1)', color: '#00FFFF', padding: '2px 6px', borderRadius: '4px' }}>#{tag}</span>
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
-            {item.sentiment !== 'NEUTRAL' && (
-              <div className="flex items-center justify-center p-1.5 rounded-lg bg-white/5" style={{ color: sentimentColors[item.sentiment] }}>
-                <SentimentIcon sentiment={item.sentiment} />
-              </div>
-            )}
-            <a href={item.url || '#'} target="_blank" rel="noopener noreferrer"
-              className="p-2 rounded-xl bg-white/5 hover:bg-cyan-500/20 text-white/40 hover:text-cyan-400 transition-all border border-white/5 shadow-xl">
-              <ExternalLink size={14} />
-            </a>
-          </div>
+          <a href={item.url || '#'} target="_blank" rel="noopener noreferrer"
+             style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>
+            Read <ExternalLink size={10} />
+          </a>
         </div>
       </div>
     </div>
@@ -187,70 +186,70 @@ function NewsCard({ item }) {
 
 function ScoutCard({ item }) {
   const isHot = item.intelScore >= 80;
+  const accentColor = isHot ? '#FF4560' : '#00FFFF';
   const dex = item.dexData;
 
   return (
-    <div className="action-card group relative overflow-hidden transition-all duration-300"
-      style={{ 
-        padding: '20px',
-        borderRadius: '24px',
-        width: '100%',
+    <div className="group relative overflow-hidden transition-all duration-300 hover:scale-[1.01] cursor-pointer"
+      style={{
+        background: 'rgba(10, 10, 15, 0.6)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: `1px solid ${accentColor}20`,
+        borderRadius: '16px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        border: isHot ? '1px solid rgba(255, 69, 96, 0.3)' : '1px solid rgba(255,255,255,0.05)',
-        background: isHot ? 'rgba(255, 69, 96, 0.05)' : 'rgba(15, 15, 20, 0.8)'
+        gap: '12px',
+        width: '100%'
       }}>
-      <div className="flex justify-between mb-4">
+      <div style={{ position: 'absolute', top: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: accentColor, filter: 'blur(40px)', opacity: 0.1, pointerEvents: 'none' }} />
+
+      <div className="flex justify-between items-start mb-2">
         <div className="flex gap-3 items-center">
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-cyan-400 overflow-hidden">
-              {item.photo ? <img src={item.photo} alt="Token" className="w-full h-full object-cover" /> : 'Intel'}
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${accentColor}10`, border: `1px solid ${accentColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              {item.photo ? <img src={item.photo} alt="Token" className="w-full h-full object-cover" /> : <Bot size={16} color={accentColor} />}
             </div>
-            <div>
-              <div className="font-bold text-sm text-white uppercase">{item.channel}</div>
-              <div className="text-[10px] text-white/40 font-mono">{new Date(item.timestamp).toLocaleTimeString()}</div>
+            <div className="flex flex-col">
+              <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>{item.channel}</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>{new Date(item.timestamp).toLocaleTimeString()}</span>
             </div>
         </div>
         <div className="flex flex-col items-end">
-          <div className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest ${isHot ? 'bg-red-500 text-white shadow-[0_0_10px_#FF4560]' : 'bg-white/5 text-white/40'}`}>
+          <div style={{ padding: '2px 6px', borderRadius: '4px', background: `${accentColor}20`, border: `1px solid ${accentColor}40`, color: accentColor, fontSize: '8px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
             {isHot ? 'HIGH ALPHA' : 'SCOUT SIGNAL'}
           </div>
           {dex && (
-             <div className="text-[9px] font-black text-green-400 mt-1">
+             <div style={{ fontSize: '9px', fontWeight: 900, color: dex.change5m > 0 ? '#00FFFF' : '#FF4560', marginTop: '4px' }}>
                 {dex.change5m > 0 ? '+' : ''}{dex.change5m}% (5m)
              </div>
           )}
         </div>
       </div>
 
-      <p className="text-sm font-medium leading-relaxed mb-4 text-white/90 line-clamp-4 tracking-tight">
+      <p style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5, marginBottom: '8px' }} className="line-clamp-4">
         {item.text}
       </p>
 
       {item.tickers.length > 0 && (
-         <div className="flex gap-2 mb-4">
+         <div className="flex gap-2 flex-wrap mb-2">
             {item.tickers.map(t => (
-               <span key={t} className="px-2 py-1 rounded bg-cyan-500/10 text-cyan-400 text-[10px] font-bold">#{t}</span>
+               <span key={t} style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(0,255,255,0.1)', color: '#00FFFF', padding: '2px 6px', borderRadius: '4px' }}>#{t}</span>
             ))}
          </div>
       )}
 
       {dex && (
-        <div className="mt-auto grid grid-cols-2 gap-4 pt-4 border-t border-white/5 text-[10px] font-bold uppercase tracking-widest">
-           <div>
-             <span className="text-white/20">Vol 24h:</span>
-             <span className="text-white ml-1">${(dex.volume24h / 1e3).toFixed(1)}K</span>
+        <div style={{ marginTop: 'auto', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+           <div style={{ display: 'flex', flexDirection: 'column' }}>
+             <span style={{ fontSize: '8px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>Vol 24h</span>
+             <span style={{ fontSize: '11px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>${(dex.volume24h / 1e3).toFixed(1)}K</span>
            </div>
-           <div className="text-right">
-             <span className="text-white/20">Liq:</span>
-             <span className="text-white ml-1">${(dex.liquidity / 1e3).toFixed(1)}K</span>
+           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+             <span style={{ fontSize: '8px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>Liq</span>
+             <span style={{ fontSize: '11px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>${(dex.liquidity / 1e3).toFixed(1)}K</span>
            </div>
         </div>
-      )}
-      
-      {item.contractAddress && (
-         <div className="mt-2 text-[8px] font-mono text-white/20 break-all bg-black/40 p-1.5 rounded-lg border border-white/5">
-            {item.contractAddress.address}
-         </div>
       )}
     </div>
   )

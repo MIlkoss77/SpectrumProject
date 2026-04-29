@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export async function askAgent(prompt) {
     const provider = localStorage.getItem('ai_provider') || 'openai';
-    const token = localStorage.getItem('token'); // JWT
+    const token = localStorage.getItem('spectr_auth_token'); // JWT
 
     try {
         const response = await axios.post('/api/ai/ask', {

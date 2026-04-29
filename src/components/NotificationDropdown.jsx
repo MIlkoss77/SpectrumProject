@@ -2,6 +2,9 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, Check, X, Info, AlertTriangle, CheckCircle, AlertOctagon, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { useWebSocket } from '@/context/WebSocketContext';
+import { monitor } from '@/services/providers/market';
+import { useState, useEffect } from 'react';
 
 const TYPE_ICONS = {
     INFO: { icon: Info, color: '#3b82f6' },
@@ -11,6 +14,17 @@ const TYPE_ICONS = {
 };
 
 export default function NotificationDropdown({ notifications, unreadCount, onMarkRead, onMarkAllRead, onClose }) {
+    const { isBinanceConnected, isBybitConnected, isMexcConnected } = useWebSocket();
+    const [proxyStatus, setProxyStatus] = useState('UNKNOWN');
+
+    useEffect(() => {
+        setProxyStatus(monitor.getStatus());
+        const unsub = monitor.subscribe(status => setProxyStatus(status));
+        return unsub;
+    }, []);
+
+    const isAllGood = isBinanceConnected && isBybitConnected && isMexcConnected && proxyStatus === 'LIVE';
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -42,6 +56,17 @@ export default function NotificationDropdown({ notifications, unreadCount, onMar
                     >
                         <X size={16} />
                     </button>
+                </div>
+            </div>
+
+            {/* Network Status Inline */}
+            <div className="px-4 py-3 bg-black/40 border-b border-white/5 flex justify-between items-center">
+                <span className="text-xs font-bold text-white/50 uppercase tracking-widest">Network</span>
+                <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-black uppercase ${isAllGood ? 'text-cyan-400' : 'text-red-400'}`}>
+                        {isAllGood ? 'Verified' : 'Sync Issue'}
+                    </span>
+                    <div className={`w-2 h-2 rounded-full ${isAllGood ? 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]' : 'bg-red-400 animate-pulse'}`} />
                 </div>
             </div>
 

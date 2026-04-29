@@ -46,7 +46,7 @@ export default function Settings() {
   useEffect(() => {
     const fetchPayments = async () => {
       try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('spectr_auth_token')
         if (!token) return
         setLoadingPayments(true)
         const res = await axios.get('/api/payments/history', {
@@ -67,7 +67,7 @@ export default function Settings() {
   // Fetch connected exchanges
   const fetchExchanges = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('spectr_auth_token')
       if (!token) return
       setLoadingExchanges(true)
       const res = await axios.get('/api/exchange/list', {
@@ -92,7 +92,7 @@ export default function Settings() {
     if (!key || key.includes('•')) return;
     setIsSaving(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('spectr_auth_token')
       await axios.post('/api/exchange/keys', {
         exchange: 'polymarket',
         apiKey: 'hot_wallet',
@@ -112,7 +112,7 @@ export default function Settings() {
     if (!cexApiKey || !cexSecret) return;
     setIsSaving(true)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('spectr_auth_token')
       await axios.post('/api/exchange/keys', {
         exchange: cexExchange,
         apiKey: cexApiKey,

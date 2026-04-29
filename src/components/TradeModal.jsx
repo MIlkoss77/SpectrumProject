@@ -24,7 +24,7 @@ export default function TradeModal() {
         
         try {
             // Get token from localStorage (assuming this is where it's stored for now)
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('spectr_auth_token')
             
             const response = await axios.post('/api/trade/execute', {
                 symbol: activeAsset.symbol,

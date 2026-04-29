@@ -57,7 +57,7 @@ export default function AppShell() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('spectr_auth_token')
         if (!token) return
         const response = await axios.get('/api/notifications', {
           headers: { Authorization: `Bearer ${token}` }
@@ -115,7 +115,7 @@ export default function AppShell() {
     { label: t('app.dashboard'), to: '/', icon: LayoutDashboard },
     { label: t('app.signals'), to: '/signals', icon: Activity },
     { label: t('app.news'), to: '/news', icon: Newspaper },
-    { label: t('app.academy'), to: '/academy', icon: GraduationCap },
+    { label: t('app.polymarket'), to: '/polymarket', icon: Layers },
   ]
 
   const moreNav = NAV.filter(item => !mainMobileNav.find(m => m.to === item.to))
@@ -226,18 +226,15 @@ export default function AppShell() {
             </button>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
               <img src={logoImg} alt="Spectr" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
-              <span className="hidden sm:inline" style={{ fontWeight: 900, fontSize: '16px', color: '#fff', letterSpacing: '-0.5px' }}>
+              <span className="desktop-logo-only" style={{ display: window.innerWidth < 768 ? 'none' : 'inline', fontWeight: 900, fontSize: '16px', color: '#fff', letterSpacing: '-0.5px' }}>
                 SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
               </span>
-              <span className="sm:hidden text-cyan-400 font-black text-xl">S</span>
             </Link>
           </div>
 
           {/* MIDDLE: Spacer or Center Info */}
-          <div style={{ display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
-             <div className="hidden xl:flex">
-               <ConnectionHub />
-             </div>
+          <div style={{ display: window.innerWidth < 1280 ? 'none' : 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+             <ConnectionHub />
           </div>
 
           {/* RIGHT: Notifications, Auth, Wallet */}
@@ -361,7 +358,7 @@ export default function AppShell() {
               ))}
             </div>
             <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
-              SPECTR CORE v5.2.1 // BUILD_STABLE
+              SPECTR CORE v5.2.2-HOTFIX // BUILD_STABLE
             </div>
           </div>
         </>

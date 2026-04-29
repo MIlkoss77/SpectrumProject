@@ -84,7 +84,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
     if (step === 'deposit' && isAutomated && depositData?.id) {
       timer = setInterval(async () => {
         try {
-          const token = localStorage.getItem('token')
+          const token = localStorage.getItem('spectr_auth_token')
           const res = await axios.post('/api/payments/verify', {
             paymentId: depositData.id
           }, {
@@ -114,7 +114,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
     setLoading(true)
     setError(null)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('spectr_auth_token')
       const res = await axios.post('/api/payments/deposit', {
         currency: crypto.id,
         planId: plan.id,
@@ -144,7 +144,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
     setLoading(true)
     setError(null)
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('spectr_auth_token')
       const res = await axios.post('/api/payments/verify', {
         paymentId: depositData.id,
         txId: txId.trim(),
@@ -445,7 +445,7 @@ export default function Pricing() {
   useEffect(() => {
     const checkProStatus = async () => {
       try {
-        const token = localStorage.getItem('token')
+        const token = localStorage.getItem('spectr_auth_token')
         if (!token) return
         const res = await axios.get('/api/payments/status', {
           headers: { Authorization: `Bearer ${token}` }
