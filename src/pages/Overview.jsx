@@ -78,8 +78,16 @@ export default function Overview() {
     <div style={{ padding: '32px', maxWidth: '1600px', margin: '0 auto' }}>
       
       {/* 1. HERO: SYSTEM STATUS */}
-      <div className="dx-flex dx-items-center dx-justify-between" style={{ marginBottom: '40px', padding: '24px 32px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="dx-flex dx-items-center dx-gap-8">
+      <div className="dx-flex dx-items-center dx-justify-between" style={{ 
+        marginBottom: '40px', 
+        padding: '24px', 
+        background: 'rgba(255,255,255,0.02)', 
+        borderRadius: '24px', 
+        border: '1px solid rgba(255,255,255,0.05)',
+        flexWrap: 'wrap',
+        gap: '24px'
+      }}>
+        <div className="dx-flex dx-items-center" style={{ gap: 'clamp(16px, 4vw, 32px)', flexWrap: 'wrap' }}>
           <div className="dx-flex dx-flex-col">
             <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Neural Engine</span>
             <div className="dx-flex dx-items-center dx-gap-2">
@@ -87,13 +95,16 @@ export default function Overview() {
               <span style={{ fontSize: '16px', fontWeight: 900, color: '#fff' }}>CORE ACTIVE</span>
             </div>
           </div>
-          <div style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.1)' }} />
+          
+          <div className="sm:dx-hidden" style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.1)' }} />
+          
           <div className="dx-flex dx-flex-col">
             <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Market Sentiment</span>
             <span style={{ fontSize: '16px', fontWeight: 900, color: '#00FFFF' }}>OPTIMISTIC (68%)</span>
           </div>
         </div>
-        <div className="sm:dx-hidden dx-flex dx-gap-4">
+
+        <div style={{ display: 'flex', gap: '12px' }}>
            <button style={{ padding: '10px 20px', borderRadius: '12px', background: 'rgba(0,255,255,0.05)', border: '1px solid rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '11px', fontWeight: 900, cursor: 'pointer' }}>RECALIBRATE</button>
         </div>
       </div>
