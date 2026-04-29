@@ -164,6 +164,16 @@ button,
   .predictor-right {
     max-width: 100% !important;
   }
+
+  /* Robust fix for Protected badge hiding on mobile */
+  .desktop-shield-only {
+    display: none !important;
+  }
+
+  /* Ensure header doesn't overflow */
+  .dx-toolbar {
+    gap: 8px !important;
+  }
 }
 
 /* TA PAGE MOBILE FIXES */

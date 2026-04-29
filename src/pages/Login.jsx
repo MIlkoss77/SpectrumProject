@@ -17,8 +17,8 @@ export default function Login() {
     const navigate = useNavigate();
 
     const handleGoogleLogin = () => {
-        // Use absolute path to force browser to leave the SPA and hit Nginx
-        window.location.href = 'https://app.spectrtrading.com/api/auth/google';
+        // Use relative path to hit the current server's API
+        window.location.href = '/api/auth/google';
     };
 
     const handleSubmit = async (e) => {

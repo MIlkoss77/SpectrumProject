@@ -242,7 +242,20 @@ export default function AppShell() {
 
           {/* RIGHT: Notifications, Auth, Wallet */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
-            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '8px', padding: '4px 10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', flexShrink: 0 }}>
+            {/* Protected Badge - Hidden on small screens */}
+            <div 
+              className="desktop-shield-only"
+              style={{ 
+                display: window.innerWidth < 1024 ? 'none' : 'flex',
+                alignItems: 'center', 
+                gap: '8px', 
+                padding: '4px 10px', 
+                background: 'rgba(255,255,255,0.03)', 
+                border: '1px solid rgba(255,255,255,0.08)', 
+                borderRadius: '10px', 
+                flexShrink: 0 
+              }}
+            >
               <Shield size={14} color="#00FFFF" />
               <span style={{ fontSize: '9px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase' }}>Protected</span>
             </div>
@@ -270,7 +283,7 @@ export default function AppShell() {
               </AnimatePresence>
             </div>
 
-            <div style={{ flexShrink: 0 }}>
+            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
               {user ? (
                 <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full pl-1 pr-2 py-1">
                   <div className="w-7 h-7 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold text-[10px] border border-cyan-400/20">
@@ -283,7 +296,8 @@ export default function AppShell() {
               ) : (
                 <button 
                   onClick={() => window.location.href = '/login'}
-                  className="px-3 py-2 bg-cyan-400 hover:bg-white text-black rounded-lg text-[10px] font-black uppercase transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+                  className="px-3 py-1.5 bg-cyan-400 hover:bg-white text-black rounded-lg text-[10px] font-black uppercase transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+                  style={{ minWidth: '60px', flexShrink: 0 }}
                 >
                   Login
                 </button>
