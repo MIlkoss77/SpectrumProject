@@ -68,7 +68,8 @@ export const createDeposit = async (req, res) => {
           },
         });
 
-        const ipnCallbackUrl = `${req.protocol}://${req.get('host')}/api/payments/webhook`;
+        const publicBase = process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
+        const ipnCallbackUrl = `${publicBase}/api/payments/webhook`;
         
         const gatewayPayment = await paymentService.createPayment({
           amount: plan.amount,
