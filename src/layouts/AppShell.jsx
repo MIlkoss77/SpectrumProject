@@ -210,7 +210,7 @@ export default function AppShell() {
           </div>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-            <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', padding: '0 16px' }}>Terminal v5.2</div>
+            <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', padding: '0 16px' }}>v5.2.4-STABLE-v7</div>
             {NAV.map(({ label, to, icon: Icon }) => (
               <NavLink key={to} to={to} className={({ isActive }) => `dx-nav-item ${isActive ? 'active' : ''}`} end={to === '/'}>
                 <Icon size={18} />
@@ -222,6 +222,9 @@ export default function AppShell() {
 
         <header className="dx-header">
            <div className="dx-flex dx-items-center dx-gap-4">
+              <div style={{ padding: '6px 12px', borderRadius: '8px', background: 'rgba(0,255,255,0.05)', border: '1px solid rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '10px', fontWeight: 900, textTransform: 'uppercase' }}>
+                NEURAL CORE v5.2.4-v7
+              </div>
               <button onClick={() => setNavOpen(true)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '10px', borderRadius: '12px' }} className="lg:dx-flex dx-items-center dx-justify-center">
                 <Menu size={20} />
               </button>
