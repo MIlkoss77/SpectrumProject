@@ -192,9 +192,10 @@ export default function AppShell() {
         <header className="dx-toolbar" style={{
           height: '70px',
           padding: '0 16px',
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: 'auto 1fr auto',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          gap: '12px',
           position: window.innerWidth < 1024 ? 'fixed' : 'sticky',
           top: 0,
           left: 0,
@@ -204,7 +205,8 @@ export default function AppShell() {
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* LEFT: Burger & Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               className="dx-burger hidden md:flex"
               onClick={() => setNavOpen(v => !v)}
@@ -212,101 +214,88 @@ export default function AppShell() {
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 color: '#fff',
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer'
               }}
             >
-              {navOpen ? <X size={20} /> : <Menu size={20} />}
+              {navOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
-            <div className="mobile-logo-only" style={{ alignItems: 'center', gap: '8px' }}>
-              <img src={logoImg} alt="Spectr" style={{ width: '22px', height: '22px', objectFit: 'contain' }} />
-              <span style={{ fontWeight: 900, fontSize: '16px', color: '#fff', letterSpacing: '-0.3px', lineHeight: 1 }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+              <img src={logoImg} alt="Spectr" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
+              <span className="hidden sm:inline" style={{ fontWeight: 900, fontSize: '16px', color: '#fff', letterSpacing: '-0.5px' }}>
                 SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
               </span>
-            </div>
+              <span className="sm:hidden text-cyan-400 font-black text-xl">S</span>
+            </Link>
           </div>
 
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '12px' }}>
-            <div className="hidden xl:flex">
-              <ConnectionHub />
+          {/* MIDDLE: Spacer or Center Info */}
+          <div style={{ display: 'flex', justifyContent: 'center', overflow: 'hidden' }}>
+             <div className="hidden xl:flex">
+               <ConnectionHub />
+             </div>
+          </div>
+
+          {/* RIGHT: Notifications, Auth, Wallet */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '8px', padding: '4px 10px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', flexShrink: 0 }}>
+              <Shield size={14} color="#00FFFF" />
+              <span style={{ fontSize: '9px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase' }}>Protected</span>
             </div>
 
-            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '10px', padding: '6px 12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', flexShrink: 0 }}>
-              <Shield size={16} color="#00FFFF" />
-              <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
-                <span style={{ fontSize: '8px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', lineHeight: 1 }}>Capital Shield</span>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', lineHeight: 1 }}>PROTECTED</span>
-              </div>
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <button 
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
+                onClick={() => { setShowNotifications(!showNotifications); setShowMore(false); }}
+              >
+                <Bell size={18} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
+                {unreadCount > 0 && (
+                  <div style={{ position: 'absolute', top: -2, right: -2, width: '12px', height: '12px', background: '#00FFFF', borderRadius: '50%', border: '2px solid #050505' }} />
+                )}
+              </button>
+              <AnimatePresence>
+                {showNotifications && (
+                  <NotificationDropdown 
+                    notifications={notifications}
+                    unreadCount={unreadCount}
+                    onMarkRead={markNotificationRead}
+                    onMarkAllRead={markAllNotificationsRead}
+                    onClose={() => setShowNotifications(false)}
+                  />
+                )}
+              </AnimatePresence>
             </div>
 
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-              <div style={{ position: 'relative' }}>
-                <button 
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', position: 'relative', width: '40px', height: '40px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
-                  onClick={() => {
-                    setShowNotifications(!showNotifications);
-                    setShowMore(false);
-                  }}
-                >
-                  <Bell size={18} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
-                  {unreadCount > 0 && (
-                    <div style={{ position: 'absolute', top: -4, right: -4, width: '14px', height: '14px', background: '#00FFFF', color: '#000', borderRadius: '50%', fontSize: '9px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #050505' }}>
-                      {unreadCount}
-                    </div>
-                  )}
-                </button>
-
-                <AnimatePresence>
-                  {showNotifications && (
-                    <NotificationDropdown 
-                      notifications={notifications}
-                      unreadCount={unreadCount}
-                      onMarkRead={markNotificationRead}
-                      onMarkAllRead={markAllNotificationsRead}
-                      onClose={() => setShowNotifications(false)}
-                    />
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-3" style={{ flexShrink: 0 }}>
+            <div style={{ flexShrink: 0 }}>
               {user ? (
-                <div className="flex items-center gap-2 sm:gap-3 bg-white/5 border border-white/10 rounded-full pl-1 pr-2 sm:pr-3 py-1">
-                  <div className="w-8 h-8 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold text-xs overflow-hidden border border-cyan-400/20">
-                    {user.displayName?.[0] || user.email?.[0]?.toUpperCase() || <User size={14} />}
+                <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full pl-1 pr-2 py-1">
+                  <div className="w-7 h-7 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold text-[10px] border border-cyan-400/20">
+                    {user.displayName?.[0] || <User size={12} />}
                   </div>
-                  <div className="hidden lg:flex flex-col">
-                    <span className="text-[10px] font-black text-white/90 leading-none tracking-tight">{user.displayName || user.email?.split('@')[0]}</span>
-                    <span className="text-[8px] font-bold text-cyan-400 uppercase tracking-tighter leading-none mt-1">{user.role || 'USER'}</span>
-                  </div>
-                  <button onClick={logout} className="ml-1 p-1 text-white/20 hover:text-red-400 transition-colors">
+                  <button onClick={logout} className="p-1 text-white/20 hover:text-red-400">
                     <LogOut size={12} />
                   </button>
                 </div>
               ) : (
                 <button 
                   onClick={() => window.location.href = '/login'}
-                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-cyan-400 hover:bg-white text-black rounded-xl text-[10px] font-black transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] active:scale-95 whitespace-nowrap"
+                  className="px-3 py-2 bg-cyan-400 hover:bg-white text-black rounded-lg text-[10px] font-black uppercase transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)]"
                 >
-                  <User size={14} />
-                  <span className="hidden sm:inline uppercase">Authorize</span>
-                  <span className="sm:hidden">LOGIN</span>
+                  Login
                 </button>
               )}
-              
-              <button 
-                onClick={connectWallet} 
-                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group flex-shrink-0"
-              >
-                {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} className="text-white/40 group-hover:text-white" />}
-              </button>
             </div>
+            
+            <button 
+              onClick={connectWallet} 
+              className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all flex-shrink-0"
+            >
+              {(account || isPro) ? <Shield size={16} className="text-cyan-400" /> : <Wallet size={16} className="text-white/40" />}
+            </button>
           </div>
         </header>
 
