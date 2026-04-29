@@ -121,6 +121,7 @@ export default function AppShell() {
   const moreNav = NAV.filter(item => !mainMobileNav.find(m => m.to === item.to))
 
   return (
+    <>
         <style>{`
           .dx-flex { display: flex; }
           .dx-items-center { align-items: center; }
@@ -445,6 +446,6 @@ export default function AppShell() {
       )}
       
       <OnboardingModal />
-    </div>
+    </>
   )
 }
