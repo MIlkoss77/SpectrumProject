@@ -19,6 +19,10 @@ import rateLimit from 'express-rate-limit';
 
 const router = express.Router();
 
+router.get('/debug', (req, res) => {
+    res.json({ ok: true, message: 'API is reachable', time: new Date() });
+});
+
 const paymentLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // Limit each IP to 5 payment requests per windowMs
