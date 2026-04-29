@@ -208,8 +208,8 @@ export default function AppShell() {
           zIndex: 10000,
           background: 'rgba(5, 5, 5, 0.98)',
           backdropFilter: 'blur(30px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-        }}          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               style={{
                 display: window.innerWidth < 1024 ? 'flex' : 'none',
