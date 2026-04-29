@@ -330,14 +330,14 @@ export default function AppShell() {
                 </NavLink>
               ))}
             </div>
-            <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.2, fontSize: '10px', letterSpacing: '2px' }}>
-              SPECTR CORE v5.2.2-HOTFIX // BUILD_STABLE
+            <div style={{ marginTop: '24px', textAlign: 'center', opacity: 0.1, fontSize: '9px', letterSpacing: '4px' }}>
+              SPECTR TERMINAL v5.2.4-STABLE
             </div>
           </div>
         </>
       )}
       
       <OnboardingModal />
-    </div >
+    </div>
   )
 }
