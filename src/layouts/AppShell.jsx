@@ -191,6 +191,7 @@ export default function AppShell() {
 
       <main className="dx-main" style={{
         position: 'relative',
+        paddingTop: '70px',
         background: 'radial-gradient(circle at 50% 0%, #111 0%, var(--bg-dark) 100%)'
       }}>
         <header className="dx-toolbar" style={{
@@ -200,14 +201,14 @@ export default function AppShell() {
           gridTemplateColumns: 'auto 1fr auto',
           alignItems: 'center',
           gap: '12px',
-          position: window.innerWidth < 1024 ? 'fixed' : 'sticky',
+          position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 1000,
-          background: 'rgba(5, 5, 5, 0.95)',
-          backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+          zIndex: 10000,
+          background: 'rgba(5, 5, 5, 0.98)',
+          backdropFilter: 'blur(30px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
