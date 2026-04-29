@@ -11,7 +11,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['logo.png'],
       workbox: {
-        cacheId: 'spectr-v5.2.4-hotfix',
+        cacheId: 'spectr-v5.2.4-STABLE-v6',
         maximumFileSizeToCacheInBytes: 7 * 1024 * 1024, 
         skipWaiting: true,
         clientsClaim: true,
@@ -119,7 +119,7 @@ export default defineConfig({
 
       // Local Backend Proxy (Vercel API simulator)
       '/api': {
-        target: 'http://127.0.0.1:3000',
+        target: 'http://127.0.0.1:8787',
         changeOrigin: true,
         secure: false
       }
