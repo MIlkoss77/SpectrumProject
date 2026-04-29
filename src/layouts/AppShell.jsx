@@ -121,79 +121,94 @@ export default function AppShell() {
   const moreNav = NAV.filter(item => !mainMobileNav.find(m => m.to === item.to))
 
   return (
-    <div className={`dx-root ${navOpen ? '' : 'nav-collapsed'} mode-${tradingMode.toLowerCase()}`} style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-      {navOpen && (
-        <div 
-          className="dx-overlay active" 
-          onClick={() => setNavOpen(false)} 
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, backdropFilter: 'blur(4px)' }}
-        />
-      )}
-      <aside className="dx-sidebar" style={{ paddingTop: 'calc(24px + env(safe-area-inset-top))' }}>
-        <div className="dx-brand" style={{ gap: '12px', marginBottom: '40px' }}>
-          <div style={{ width: '32px', height: '32px', flexShrink: 0, backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img src={logoImg} alt="Spectr Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </div>
-          {navOpen && (
-            <span style={{ fontWeight: 800, fontSize: '20px', letterSpacing: '-0.5px', display: 'flex', alignItems: 'center' }}>
-              <span style={{ color: '#fff' }}>SPECTR</span>
-              <span style={{ color: '#00FFFF', marginLeft: '6px' }}>Trading</span>
-            </span>
-          )}
-        </div>
+        <style>{`
+          .dx-flex { display: flex; }
+          .dx-items-center { align-items: center; }
+          .dx-justify-between { justify-content: space-between; }
+          .dx-justify-center { justify-content: center; }
+          .dx-flex-col { flex-direction: column; }
+          .dx-gap-2 { gap: 8px; }
+          .dx-gap-4 { gap: 16px; }
+          .dx-gap-8 { gap: 32px; }
+          .dx-w-full { width: 100%; }
+          .dx-grid { display: grid; }
+          .dx-grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+          .dx-grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+          .dx-hidden { display: none; }
+          @media (min-width: 768px) { .md\\:dx-flex { display: flex; } .md\\:dx-hidden { display: none; } }
+          @media (max-width: 767px) { .sm\\:dx-hidden { display: none; } }
+          
+          .dx-sidebar {
+            width: 260px;
+            background: #050505;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 50;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+          }
+          @media (max-width: 1023px) { .dx-sidebar { transform: translateX(-100%); } .dx-sidebar.open { transform: translateX(0); } }
+          
+          .dx-main {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding-top: 70px;
+            background: #050505;
+          }
+          @media (max-width: 1023px) { .dx-main { margin-left: 0; } }
+          
+          .dx-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+          }
+          .dx-nav-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+          .dx-nav-item.active { background: rgba(0,255,255,0.05); color: #00FFFF; }
+        `}</style>
 
-        <nav className="dx-nav">
-          <div className="text-[10px] font-bold text-white/20 uppercase tracking-widest mb-2 px-4">{t('ui.menu') || 'Menu'}</div>
-          {NAV.map(({ label, to, icon: Icon }) => (
-            <NavLink key={to} to={to} className={({ isActive }) => `dx-nav-item ${isActive ? 'active' : ''}`} end={to === '/'}>
-              {({ isActive }) => (
-                <>
-                  <Icon size={18} className={isActive ? 'text-cyan-400 drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]' : 'text-white/40'} />
-                  {navOpen && <span>{label}</span>}
-                  {navOpen && isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_5px_rgba(34,211,238,1)]" />}
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
+        {navOpen && (
+          <div 
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 40, backdropFilter: 'blur(10px)' }}
+            onClick={() => setNavOpen(false)} 
+          />
+        )}
 
-        <div className="mt-auto p-6 pointer-events-none opacity-20">
-           <span className="text-[8px] font-black text-white uppercase tracking-[0.4em]">Spectr OS v5.2.4-STABLE</span>
-        </div>
-
-        <div className={`mt-auto px-4 pb-6 ${!navOpen ? 'hidden' : ''}`}>
-          {(!proPlanDismissed && !isPro) && (
-            <div className="sidebar-upgrade-card group cursor-pointer transition-all duration-300 hover:scale-[1.02]" style={{ position: 'relative' }}>
-              <button
-                onClick={(e) => { e.stopPropagation(); setProPlanDismissed(true); localStorage.setItem('proPlanDismissed', '1'); }}
-                style={{
-                  position: 'absolute', top: 8, right: 8, zIndex: 20,
-                  background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%',
-                  width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 12, lineHeight: 1,
-                }}
-                aria-label="Dismiss"
-              >✕</button>
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,1)]" />
-                  <h4 className="font-bold text-xs uppercase tracking-widest text-white/90">Pro Plan</h4>
-                </div>
-                <p className="text-[10px] text-white/40 mb-4 leading-relaxed font-medium">Unlock Neural Signals &<br />Advanced Strategy Analytics.</p>
-                <button className="w-full py-2 bg-cyan-500 hover:bg-cyan-400 text-black font-black text-[10px] uppercase tracking-tighter rounded-lg shadow-[0_0_20px_rgba(34,211,238,0.3)] transition-all">
-                  Upgrade Now <ChevronRight size={12} style={{ display: 'inline', verticalAlign: 'middle' }} />
-                </button>
-              </div>
+        <aside className={`dx-sidebar ${navOpen ? 'open' : ''}`}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
+            <div style={{ width: '32px', height: '32px', backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,255,255,0.2)' }}>
+              <img src={logoImg} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
-          )}
-        </div>
-      </aside>
+            <span style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-1px', color: '#fff' }}>
+              SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
+            </span>
+          </div>
 
-      <main className="dx-main" style={{
-        position: 'relative',
-        paddingTop: '70px',
-        background: 'radial-gradient(circle at 50% 0%, #111 0%, var(--bg-dark) 100%)'
-      }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+            <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px', padding: '0 16px' }}>Terminal v5.2</div>
+            {NAV.map(({ label, to, icon: Icon }) => (
+              <NavLink key={to} to={to} className={({ isActive }) => `dx-nav-item ${isActive ? 'active' : ''}`} end={to === '/'}>
+                <Icon size={18} />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </nav>
+
+          <div style={{ marginTop: 'auto', padding: '24px 0', borderTop: '1px solid rgba(255,255,255,0.05)', opacity: 0.1, textAlign: 'center' }}>
+             <span style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '4px' }}>SPECTR OS v5.2.4</span>
+          </div>
+        </aside>
+
+        <main className="dx-main">
         <header className="dx-toolbar" style={{
           height: '70px',
           padding: '0 16px',
