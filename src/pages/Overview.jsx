@@ -257,8 +257,8 @@ export default function Overview() {
             </div>
           </div>
 
-          <div className="flex items-center gap-8">
-             <div style={{ width: '100px', height: '100px', position: 'relative' }}>
+          <div className="flex items-center gap-6 md:gap-8">
+             <div className="relative w-24 h-24 flex-shrink-0">
                 <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                   <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
                   <motion.circle
@@ -273,16 +273,19 @@ export default function Overview() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span style={{ fontSize: '24px', fontWeight: 900, color: '#fff' }}>{mainScore?.score || '--'}</span>
-                  <span style={{ fontSize: '8px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Index</span>
+                  <span className="text-2xl font-black text-white">{mainScore?.score || '--'}</span>
+                  <span className="text-[8px] font-black text-white/30 uppercase tracking-widest">Index</span>
                 </div>
              </div>
-             <div className="flex-1 flex flex-col gap-3">
-                <div className="text-sm font-bold text-white uppercase tracking-tight">{mainScore?.status || 'Analyzing...'}</div>
-                <div className="flex flex-col gap-1.5">
+             
+             <div className="flex-1 min-w-0">
+                <div className="text-xs font-black text-white uppercase tracking-wider mb-3 truncate">
+                  {mainScore?.status || 'Analyzing Market...'}
+                </div>
+                <div className="space-y-2">
                    {['Sentiment', 'Whales', 'Technical'].map((label, idx) => (
-                      <div key={label} className="flex flex-col gap-1">
-                        <div className="flex justify-between text-[8px] font-black uppercase text-white/30 tracking-widest">
+                      <div key={label} className="w-full">
+                        <div className="flex justify-between text-[8px] font-black uppercase text-white/30 tracking-widest mb-1">
                           <span>{label}</span>
                           <span>{[mainScore?.details?.sentiment, mainScore?.details?.whales, mainScore?.details?.ta][idx] || 50}%</span>
                         </div>
@@ -290,7 +293,7 @@ export default function Overview() {
                            <motion.div 
                              initial={{ width: 0 }}
                              animate={{ width: `${[mainScore?.details?.sentiment, mainScore?.details?.whales, mainScore?.details?.ta][idx] || 50}%` }}
-                             className="h-full bg-cyan-400/40" 
+                             className={`h-full ${mainScore?.score > 60 ? 'bg-cyan-400' : 'bg-white/40'}`}
                            />
                         </div>
                       </div>

@@ -157,8 +157,8 @@ export default function AppShell() {
           ))}
         </nav>
 
-        <div className="mt-auto p-4 opacity-20">
-           <span className="text-[8px] font-black text-white uppercase tracking-[0.3em]">Spectr OS v5.2.4-HOTFIX</span>
+        <div className="mt-auto p-6 pointer-events-none opacity-20">
+           <span className="text-[8px] font-black text-white uppercase tracking-[0.4em]">Spectr OS v5.2.4-STABLE</span>
         </div>
 
         <div className={`mt-auto px-4 pb-6 ${!navOpen ? 'hidden' : ''}`}>
