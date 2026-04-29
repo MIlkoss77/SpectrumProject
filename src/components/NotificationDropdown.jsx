@@ -30,98 +30,61 @@ export default function NotificationDropdown({ notifications, unreadCount, onMar
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="absolute right-0 mt-2 w-80 md:w-96 bg-[#0d1117] border border-white/10 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-[1100] overflow-hidden"
+            style={{
+                width: window.innerWidth < 768 ? 'calc(100vw - 32px)' : '380px',
+                background: '#0d1117',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '24px',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.8)',
+                overflow: 'hidden',
+                zIndex: 10000
+            }}
         >
-            <div className="p-4 border-bottom border-white/5 flex items-center justify-between bg-white/5">
-                <div className="flex items-center gap-2">
-                    <Bell size={18} className="text-cyan-400" />
-                    <h3 className="font-bold text-sm uppercase tracking-widest text-white/90">Notifications</h3>
+            <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <Bell size={18} style={{ color: '#00FFFF' }} />
+                    <h3 style={{ margin: 0, fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px', color: '#fff' }}>Intelligence</h3>
                     {unreadCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 text-[10px] font-black">
-                            {unreadCount} NEW
-                        </span>
+                        <span style={{ padding: '2px 8px', borderRadius: '20px', background: 'rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '9px', fontWeight: 900 }}>{unreadCount} NEW</span>
                     )}
                 </div>
-                <div className="flex items-center gap-2">
-                    <button 
-                        onClick={onMarkAllRead}
-                        className="p-1.5 hover:bg-white/5 rounded-lg text-white/40 hover:text-white/80 transition-colors"
-                        title="Mark all as read"
-                    >
-                        <Check size={16} />
-                    </button>
-                    <button 
-                        onClick={onClose}
-                        className="p-1.5 hover:bg-white/5 rounded-lg text-white/40 hover:text-white/80 transition-colors"
-                    >
-                        <X size={16} />
-                    </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={onMarkAllRead} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer' }}><Check size={16} /></button>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer' }}><X size={16} /></button>
                 </div>
             </div>
 
-            {/* Network Status Inline */}
-            <div className="px-4 py-3 bg-black/40 border-b border-white/5 flex justify-between items-center">
-                <span className="text-xs font-bold text-white/50 uppercase tracking-widest">Network</span>
-                <div className="flex items-center gap-2">
-                    <span className={`text-[10px] font-black uppercase ${isAllGood ? 'text-cyan-400' : 'text-red-400'}`}>
-                        {isAllGood ? 'Verified' : 'Sync Issue'}
-                    </span>
-                    <div className={`w-2 h-2 rounded-full ${isAllGood ? 'bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]' : 'bg-red-400 animate-pulse'}`} />
+            <div style={{ padding: '12px 20px', background: 'rgba(0,0,0,0.4)', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase' }}>Network Status</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 900, color: isAllGood ? '#00FFFF' : '#FF4560' }}>{isAllGood ? 'VERIFIED' : 'SYNC ISSUE'}</span>
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: isAllGood ? '#00FFFF' : '#FF4560', boxShadow: isAllGood ? '0 0 10px #00FFFF' : 'none' }} />
                 </div>
             </div>
 
-            <div className="max-height-[400px] overflow-y-auto custom-scrollbar">
+            <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px' }}>
                 {notifications.length === 0 ? (
-                    <div className="p-12 text-center">
-                        <Bell size={40} className="mx-auto mb-4 text-white/5" />
-                        <p className="text-white/30 text-sm italic font-medium">No notifications yet</p>
+                    <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                        <Bell size={40} style={{ color: 'rgba(255,255,255,0.05)', marginBottom: '16px' }} />
+                        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>No active intelligence data</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-white/5">
-                        {notifications.map((n) => {
-                            const { icon: Icon, color } = TYPE_ICONS[n.type] || TYPE_ICONS.INFO;
-                            return (
-                                <div 
-                                    key={n.id}
-                                    onClick={() => !n.isRead && onMarkRead(n.id)}
-                                    className={`p-4 hover:bg-white/[0.02] transition-colors cursor-pointer group relative ${!n.isRead ? 'bg-cyan-400/[0.02]' : ''}`}
-                                >
-                                    <div className="flex gap-3">
-                                        <div 
-                                            className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center"
-                                            style={{ background: `${color}15`, border: `1px solid ${color}30` }}
-                                        >
-                                            <Icon size={20} color={color} />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h4 className={`text-sm font-bold truncate ${!n.isRead ? 'text-white' : 'text-white/60'}`}>
-                                                    {n.title}
-                                                </h4>
-                                                {!n.isRead && <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_5px_rgba(34,211,238,1)]" />}
-                                            </div>
-                                            <p className={`text-xs leading-relaxed mb-2 ${!n.isRead ? 'text-white/70' : 'text-white/40'}`}>
-                                                {n.message}
-                                            </p>
-                                            <span className="text-[10px] font-bold text-white/20 uppercase tracking-tighter">
-                                                {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                    notifications.map(n => (
+                        <div key={n.id} onClick={() => !n.isRead && onMarkRead(n.id)} style={{ padding: '16px', borderRadius: '16px', marginBottom: '8px', background: n.isRead ? 'transparent' : 'rgba(0,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer' }}>
+                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff' }}>{n.title}</span>
+                                {!n.isRead && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#00FFFF' }} />}
+                             </div>
+                             <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: '0 0 8px', lineHeight: '1.4' }}>{n.message}</p>
+                             <span style={{ fontSize: '9px', fontWeight: 700, color: 'rgba(255,255,255,0.2)' }}>{formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}</span>
+                        </div>
+                    ))
                 )}
             </div>
 
-            {notifications.length > 0 && (
-                <div className="p-3 border-top border-white/5 text-center bg-white/5">
-                    <button className="text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-cyan-400 transition-colors">
-                        View Audit History
-                    </button>
-                </div>
-            )}
+            <div style={{ padding: '16px', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '1px' }}>Audit History Protocol</span>
+            </div>
         </motion.div>
     );
 }

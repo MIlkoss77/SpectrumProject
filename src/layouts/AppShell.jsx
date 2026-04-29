@@ -123,49 +123,54 @@ export default function AppShell() {
   return (
     <>
         <style>{`
-          .dx-flex { display: flex; }
-          .dx-items-center { align-items: center; }
-          .dx-justify-between { justify-content: space-between; }
-          .dx-justify-center { justify-content: center; }
-          .dx-flex-col { flex-direction: column; }
-          .dx-gap-2 { gap: 8px; }
-          .dx-gap-4 { gap: 16px; }
-          .dx-gap-8 { gap: 32px; }
-          .dx-w-full { width: 100%; }
-          .dx-grid { display: grid; }
-          .dx-grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-          .dx-grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-          .dx-hidden { display: none; }
-          @media (min-width: 768px) { .md\\:dx-flex { display: flex; } .md\\:dx-hidden { display: none; } }
-          @media (max-width: 767px) { .sm\\:dx-hidden { display: none; } }
-          
           .dx-sidebar {
-            width: 260px;
-            background: #050505;
+            width: 280px;
+            background: #080808;
             border-right: 1px solid rgba(255,255,255,0.05);
             position: fixed;
             top: 0; bottom: 0; left: 0;
-            z-index: 50;
-            padding: 24px;
+            z-index: 2000;
+            padding: 32px 24px;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 20px 0 80px rgba(0,0,0,0.5);
           }
-          @media (max-width: 1023px) { .dx-sidebar { transform: translateX(-100%); } .dx-sidebar.open { transform: translateX(0); } }
+          @media (max-width: 1023px) { 
+            .dx-sidebar { transform: translateX(-100%); } 
+            .dx-sidebar.open { transform: translateX(0); } 
+          }
           
           .dx-main {
-            margin-left: 260px;
+            margin-left: 280px;
             min-height: 100vh;
-            padding-top: 70px;
+            padding-top: 80px;
             background: #050505;
+            transition: margin-left 0.4s ease;
           }
           @media (max-width: 1023px) { .dx-main { margin-left: 0; } }
           
+          .dx-header {
+            position: fixed;
+            top: 0; right: 0; left: 280px;
+            height: 80px;
+            background: rgba(5,5,5,0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            transition: left 0.4s ease;
+          }
+          @media (max-width: 1023px) { .dx-header { left: 0; padding: 0 16px; } }
+
           .dx-nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-radius: 12px;
             color: rgba(255,255,255,0.4);
             text-decoration: none;
@@ -175,27 +180,37 @@ export default function AppShell() {
           }
           .dx-nav-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
           .dx-nav-item.active { background: rgba(0,255,255,0.05); color: #00FFFF; }
+
+          .dx-flex { display: flex; }
+          .dx-items-center { align-items: center; }
+          .dx-gap-3 { gap: 12px; }
+          .dx-gap-4 { gap: 16px; }
         `}</style>
 
         {navOpen && (
           <div 
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 40, backdropFilter: 'blur(10px)' }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1500, backdropFilter: 'blur(10px)' }}
             onClick={() => setNavOpen(false)} 
           />
         )}
 
         <aside className={`dx-sidebar ${navOpen ? 'open' : ''}`}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px' }}>
-            <div style={{ width: '32px', height: '32px', backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(0,255,255,0.2)' }}>
-              <img src={logoImg} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '48px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '32px', height: '32px', backgroundColor: '#00FFFF', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={logoImg} alt="L" style={{ width: '20px', height: '20px', filter: 'brightness(0)' }} />
+                </div>
+                <span style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-1px', color: '#fff' }}>
+                  SPECTR<span style={{ color: '#00FFFF' }}>OS</span>
+                </span>
             </div>
-            <span style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-1px', color: '#fff' }}>
-              SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
-            </span>
+            <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)' }} onClick={() => setNavOpen(false)} className="lg:dx-hidden">
+                <X size={20} />
+            </button>
           </div>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
-            <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px', padding: '0 16px' }}>Terminal v5.2</div>
+            <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px', padding: '0 16px' }}>Terminal v5.2</div>
             {NAV.map(({ label, to, icon: Icon }) => (
               <NavLink key={to} to={to} className={({ isActive }) => `dx-nav-item ${isActive ? 'active' : ''}`} end={to === '/'}>
                 <Icon size={18} />
@@ -203,101 +218,55 @@ export default function AppShell() {
               </NavLink>
             ))}
           </nav>
-
-          <div style={{ marginTop: 'auto', padding: '24px 0', borderTop: '1px solid rgba(255,255,255,0.05)', opacity: 0.1, textAlign: 'center' }}>
-             <span style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '4px' }}>SPECTR OS v5.2.4</span>
-          </div>
         </aside>
 
-        <main className="dx-main">
-        <header className="dx-toolbar" style={{
-          height: '70px',
-          padding: '0 16px',
-          display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto',
-          alignItems: 'center',
-          gap: '12px',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 10000,
-          background: 'rgba(5, 5, 5, 0.98)',
-          backdropFilter: 'blur(30px)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button
-              style={{
-                display: window.innerWidth < 1024 ? 'flex' : 'none',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: '#fff'
-              }}
-              onClick={() => setNavOpen(v => !v)}
-            >
-              {navOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-              <img src={logoImg} alt="Spectr" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
-              <span style={{ 
-                display: window.innerWidth < 640 ? 'none' : 'block',
-                fontWeight: 900,
-                fontSize: '18px',
-                color: '#fff',
-                letterSpacing: '-0.05em'
-              }}>
-                SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
-              </span>
-            </Link>
-          </div>
-
-          {/* RIGHT: Notifications, Auth, Wallet */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end' }}>
-            
-            <div style={{ position: 'relative' }}>
-              <button 
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '12px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: unreadCount > 0 ? '#00FFFF' : 'rgba(255,255,255,0.5)',
-                  transition: 'all 0.2s',
-                  cursor: 'pointer'
-                }}
-                onClick={() => { setShowNotifications(!showNotifications); setShowMore(false); }}
-              >
-                <Bell size={18} />
-                {unreadCount > 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: '#00FFFF',
-                    boxShadow: '0 0 10px #00FFFF',
-                    border: '1.5px solid #000'
-                  }} />
-                )}
+        <header className="dx-header">
+           <div className="dx-flex dx-items-center dx-gap-4">
+              <button onClick={() => setNavOpen(true)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '10px', borderRadius: '12px' }} className="lg:dx-flex dx-items-center dx-justify-center">
+                <Menu size={20} />
               </button>
-              
-              <AnimatePresence>
-                {showNotifications && (
-                  <div style={{ position: 'fixed', top: '80px', right: '16px', zIndex: 9999 }}>
-                    <NotificationDropdown 
-                      notifications={notifications}
-                      unreadCount={unreadCount}
+           </div>
+           
+           <div className="dx-flex dx-items-center dx-gap-3">
+              <div style={{ position: 'relative' }}>
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: showNotifications ? '#00FFFF' : 'rgba(255,255,255,0.4)', transition: 'all 0.2s', cursor: 'pointer' }}>
+                  <Bell size={20} fill={unreadCount > 0 ? 'currentColor' : 'none'} />
+                  {unreadCount > 0 && <div style={{ position: 'absolute', top: '12px', right: '12px', width: '6px', height: '6px', background: '#00FFFF', borderRadius: '50%', boxShadow: '0 0 10px #00FFFF' }} />}
+                </button>
+                <AnimatePresence>
+                  {showNotifications && (
+                    <div style={{ position: 'fixed', top: '90px', right: '16px', zIndex: 3000 }}>
+                      <NotificationDropdown 
+                        notifications={notifications}
+                        unreadCount={unreadCount}
+                        onMarkRead={markNotificationRead}
+                        onMarkAllRead={markAllNotificationsRead}
+                        onClose={() => setShowNotifications(false)}
+                      />
+                    </div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {!user && (
+                <button 
+                  onClick={() => window.location.href = '/login'}
+                  style={{ height: '44px', padding: '0 24px', borderRadius: '12px', background: '#00FFFF', color: '#000', fontWeight: 900, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', border: 'none', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,255,255,0.2)' }}>
+                  Sign In
+                </button>
+              )}
+
+              <button 
+                onClick={connectWallet}
+                style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: (account || isPro) ? '#00FFFF' : 'rgba(255,255,255,0.4)', cursor: 'pointer' }}>
+                <Wallet size={20} />
+              </button>
+           </div>
+        </header>
+
+        <main className="dx-main">
                       onMarkRead={markNotificationRead}
                       onMarkAllRead={markAllNotificationsRead}
                       onClose={() => setShowNotifications(false)}

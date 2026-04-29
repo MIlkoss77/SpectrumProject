@@ -65,75 +65,94 @@ export default function Overview() {
     getTopActions().then(setTopActions)
   }, [])
 
-  const coins = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'AVAX', 'ADA']
+  const coins = [
+    { sym: 'BTC', status: 'Whale Accumulation', sentiment: 'BULLISH', strength: 84 },
+    { sym: 'ETH', status: 'Volatility Squeeze', sentiment: 'NEUTRAL', strength: 52 },
+    { sym: 'SOL', status: 'Institutional Buy', sentiment: 'BULLISH', strength: 76 },
+    { sym: 'BNB', status: 'Resistance Test', sentiment: 'NEUTRAL', strength: 48 },
+    { sym: 'XRP', status: 'Distribution', sentiment: 'BEARISH', strength: 31 },
+    { sym: 'DOGE', status: 'Retail Surge', sentiment: 'BULLISH', strength: 65 }
+  ]
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1600px', margin: '0 auto' }}>
+    <div style={{ padding: '32px', maxWidth: '1600px', margin: '0 auto' }}>
       
-      {/* 1. TOP BAR: Market Intelligence Strip */}
-      <div className="dx-flex dx-items-center dx-justify-between" style={{ marginBottom: '32px', padding: '16px 24px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="dx-flex dx-items-center dx-gap-4">
-          <div className="dx-flex dx-items-center dx-gap-2">
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00FFFF', boxShadow: '0 0 10px #00FFFF', animation: 'pulse 2s infinite' }} />
-            <span style={{ fontSize: '10px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: '2px' }}>Neural Core Online</span>
+      {/* 1. HERO: SYSTEM STATUS */}
+      <div className="dx-flex dx-items-center dx-justify-between" style={{ marginBottom: '40px', padding: '24px 32px', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="dx-flex dx-items-center dx-gap-8">
+          <div className="dx-flex dx-flex-col">
+            <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Neural Engine</span>
+            <div className="dx-flex dx-items-center dx-gap-2">
+              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00FFFF', boxShadow: '0 0 15px #00FFFF' }} />
+              <span style={{ fontSize: '16px', fontWeight: 900, color: '#fff' }}>CORE ACTIVE</span>
+            </div>
           </div>
-          <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)' }} />
-          <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>Uptime: 99.98% | Latency: 14ms</span>
+          <div style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.1)' }} />
+          <div className="dx-flex dx-flex-col">
+            <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Market Sentiment</span>
+            <span style={{ fontSize: '16px', fontWeight: 900, color: '#00FFFF' }}>OPTIMISTIC (68%)</span>
+          </div>
         </div>
         <div className="sm:dx-hidden dx-flex dx-gap-4">
-           {['BINANCE', 'BYBIT', 'MEXC'].map(ex => (
-             <span key={ex} style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)' }}>{ex} <span style={{ color: '#00FFFF' }}>●</span></span>
-           ))}
+           <button style={{ padding: '10px 20px', borderRadius: '12px', background: 'rgba(0,255,255,0.05)', border: '1px solid rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '11px', fontWeight: 900, cursor: 'pointer' }}>RECALIBRATE</button>
         </div>
       </div>
 
-      {/* 2. MAIN CONTENT GRID */}
-      <div className="dx-grid" style={{ gridTemplateColumns: window.innerWidth > 1200 ? '1fr 380px' : '1fr', gap: '32px' }}>
+      {/* 2. MAIN GRID */}
+      <div className="dx-grid" style={{ gridTemplateColumns: window.innerWidth > 1200 ? '1fr 400px' : '1fr', gap: '40px' }}>
         
-        {/* LEFT COLUMN: Heatmap & Signals */}
+        {/* LEFT: Intelligence Cards */}
         <div className="dx-flex dx-flex-col dx-gap-8">
-          
-          {/* NEURAL HEATMAP */}
           <section>
-            <div className="dx-flex dx-items-center dx-justify-between" style={{ marginBottom: '16px' }}>
-              <div className="dx-flex dx-items-center dx-gap-2">
-                <Brain size={18} className="text-cyan-400" />
-                <h2 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '1px' }}>Neural Heatmap</h2>
-              </div>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.3)' }}>H4 PROBABILITY MAP</span>
+            <div className="dx-flex dx-items-center dx-gap-3" style={{ marginBottom: '24px' }}>
+               <Brain size={20} style={{ color: '#00FFFF' }} />
+               <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>Neural Intelligence</h2>
             </div>
             
-            <div className="dx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '16px' }}>
-              {coins.map(sym => {
-                const ticker = tickers[`${sym.toLowerCase()}usdt`]
-                const isBull = ticker?.changePercent >= 0
+            <div className="dx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+              {coins.map(c => {
+                const ticker = tickers[`${c.sym.toLowerCase()}usdt`]
+                const color = c.sentiment === 'BULLISH' ? '#00FFFF' : c.sentiment === 'BEARISH' ? '#FF4560' : '#fff'
                 return (
-                  <div key={sym} className="dx-card" style={{ padding: '20px', background: isBull ? 'rgba(0,255,255,0.03)' : 'rgba(255,69,96,0.03)', border: isBull ? '1px solid rgba(0,255,255,0.1)' : '1px solid rgba(255,69,96,0.1)', transition: 'transform 0.2s' }}>
-                    <div className="dx-flex dx-justify-between dx-items-start" style={{ marginBottom: '12px' }}>
-                      <span style={{ fontSize: '16px', fontWeight: 900, color: '#fff' }}>{sym}</span>
-                      <span style={{ fontSize: '10px', fontWeight: 800, color: isBull ? '#00FFFF' : '#FF4560' }}>
-                        {isBull ? '+' : ''}{ticker?.changePercent || '0.00'}%
-                      </span>
+                  <div key={c.sym} style={{ padding: '24px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px', transition: 'all 0.3s' }}>
+                    <div className="dx-flex dx-justify-between dx-items-start" style={{ marginBottom: '20px' }}>
+                      <div className="dx-flex dx-flex-col">
+                        <span style={{ fontSize: '20px', fontWeight: 900, color: '#fff' }}>{c.sym}</span>
+                        <span style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>USDT PERPETUAL</span>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '14px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>${ticker?.price?.toLocaleString() || '---'}</div>
+                        <div style={{ fontSize: '10px', fontWeight: 900, color: ticker?.changePercent >= 0 ? '#00FFFF' : '#FF4560' }}>
+                           {ticker?.changePercent >= 0 ? '+' : ''}{ticker?.changePercent || '0.00'}%
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', marginBottom: '8px', overflow: 'hidden' }}>
-                      <div style={{ width: `${60 + Math.random() * 30}%`, height: '100%', background: isBull ? '#00FFFF' : '#FF4560' }} />
+
+                    <div style={{ marginBottom: '20px' }}>
+                       <div className="dx-flex dx-justify-between" style={{ marginBottom: '6px' }}>
+                         <span style={{ fontSize: '10px', fontWeight: 800, color: 'rgba(255,255,255,0.2)' }}>PROBABILITY</span>
+                         <span style={{ fontSize: '10px', fontWeight: 900, color: color }}>{c.strength}% {c.sentiment}</span>
+                       </div>
+                       <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                          <div style={{ width: `${c.strength}%`, height: '100%', background: color, boxShadow: `0 0 10px ${color}` }} />
+                       </div>
                     </div>
-                    <span style={{ fontSize: '9px', fontWeight: 800, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>
-                      {isBull ? 'Accumulation' : 'Distribution'}
-                    </span>
+
+                    <div style={{ padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                       <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>{c.status}</span>
+                    </div>
                   </div>
                 )
               })}
             </div>
           </section>
 
-          {/* TACTICAL SIGNALS */}
           <section>
-            <div className="dx-flex dx-items-center dx-gap-2" style={{ marginBottom: '16px' }}>
-              <Zap size={18} className="text-cyan-400" />
-              <h2 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '1px' }}>Tactical Execution</h2>
+            <div className="dx-flex dx-items-center dx-gap-3" style={{ marginBottom: '24px' }}>
+               <Zap size={20} style={{ color: '#00FFFF' }} />
+               <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>Top Alpha Actions</h2>
             </div>
-            <div className="dx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '16px' }}>
+            <div className="dx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
               {topActions.slice(0, 4).map((action, i) => (
                 <ActionCard key={i} action={action} openTrade={openTrade} />
               ))}
@@ -141,35 +160,33 @@ export default function Overview() {
           </section>
         </div>
 
-        {/* RIGHT COLUMN: Intelligence Stream */}
-        <aside className="dx-flex dx-flex-col dx-gap-8">
-           <section style={{ height: '100%', minHeight: '600px', background: 'rgba(10,10,15,0.6)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '24px', padding: '24px', display: 'flex', flexDirection: 'column' }}>
-             <div className="dx-flex dx-items-center dx-justify-between" style={{ marginBottom: '24px' }}>
-               <div className="dx-flex dx-items-center dx-gap-2">
-                 <Activity size={18} className="text-cyan-400" />
-                 <h3 style={{ fontSize: '12px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '1px' }}>Alpha Stream</h3>
+        {/* RIGHT: Feed */}
+        <aside>
+           <div style={{ position: 'sticky', top: '120px', padding: '32px', background: 'rgba(10,10,15,0.6)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '32px', height: 'calc(100vh - 160px)', display: 'flex', flexDirection: 'column' }}>
+             <div className="dx-flex dx-items-center dx-justify-between" style={{ marginBottom: '32px' }}>
+               <div className="dx-flex dx-items-center dx-gap-3">
+                 <Activity size={20} style={{ color: '#00FFFF' }} />
+                 <h3 style={{ fontSize: '14px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '1px' }}>Alpha Pulse</h3>
                </div>
-               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00FFFF' }} />
+               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00FFFF', animation: 'pulse 2s infinite' }} />
              </div>
 
-             <div className="dx-flex dx-flex-col dx-gap-4" style={{ flex: 1, overflowY: 'auto' }}>
+             <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
                {intelStream.map(item => (
-                 <div key={item.id} style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', borderLeft: `3px solid ${item.type === 'BULLISH' ? '#00FFFF' : item.type === 'BEARISH' ? '#FF4560' : 'rgba(255,255,255,0.2)'}` }}>
-                   <div className="dx-flex dx-justify-between" style={{ marginBottom: '8px' }}>
-                     <span style={{ fontSize: '10px', fontWeight: 900, color: item.type === 'BULLISH' ? '#00FFFF' : item.type === 'BEARISH' ? '#FF4560' : 'rgba(255,255,255,0.4)' }}>{item.type}</span>
-                     <span style={{ fontSize: '9px', fontWeight: 600, color: 'rgba(255,255,255,0.2)' }}>{item.time}</span>
-                   </div>
-                   <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', lineHeight: '1.5', margin: 0 }}>{item.msg}</p>
+                 <div key={item.id} style={{ marginBottom: '24px', paddingLeft: '16px', borderLeft: '2px solid rgba(255,255,255,0.05)' }}>
+                    <div className="dx-flex dx-justify-between" style={{ marginBottom: '6px' }}>
+                      <span style={{ fontSize: '10px', fontWeight: 900, color: item.type === 'BULLISH' ? '#00FFFF' : '#FF4560' }}>{item.type}</span>
+                      <span style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.2)' }}>{item.time}</span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: '1.6', margin: 0 }}>{item.msg}</p>
                  </div>
                ))}
              </div>
-             
-             <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                <button style={{ width: '100%', padding: '12px', borderRadius: '12px', background: 'rgba(0,255,255,0.05)', border: '1px solid rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px', cursor: 'pointer' }}>
-                  Connect to Neural Core
-                </button>
+
+             <div style={{ marginTop: '32px' }}>
+                <button style={{ width: '100%', padding: '16px', borderRadius: '16px', background: 'linear-gradient(135deg, #00FFFF 0%, #0088FF 100%)', color: '#000', fontWeight: 900, fontSize: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,255,255,0.2)' }}>UPGRADE TO PRO ALPHA</button>
              </div>
-           </section>
+           </div>
         </aside>
 
       </div>
