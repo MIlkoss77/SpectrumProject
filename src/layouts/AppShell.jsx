@@ -281,7 +281,7 @@ export default function AppShell() {
             >
               {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} className="text-white/40" />}
             </button>
-          </div>v>
+          </div>
         </header>
 
         <Outlet />
