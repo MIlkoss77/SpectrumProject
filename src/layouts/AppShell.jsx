@@ -209,33 +209,70 @@ export default function AppShell() {
           background: 'rgba(5, 5, 5, 0.98)',
           backdropFilter: 'blur(30px)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        }}          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-white"
+              style={{
+                display: window.innerWidth < 1024 ? 'flex' : 'none',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#fff'
+              }}
               onClick={() => setNavOpen(v => !v)}
             >
               {navOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <img src={logoImg} alt="Spectr" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
-              <span className="hidden sm:block font-black text-lg text-white tracking-tighter">
-                SPECTR<span className="text-cyan-400">Trading</span>
+              <span style={{ 
+                display: window.innerWidth < 640 ? 'none' : 'block',
+                fontWeight: 900,
+                fontSize: '18px',
+                color: '#fff',
+                letterSpacing: '-0.05em'
+              }}>
+                SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
               </span>
             </Link>
           </div>
 
           {/* RIGHT: Notifications, Auth, Wallet */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'flex-end' }}>
             
             <div style={{ position: 'relative' }}>
               <button 
-                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: unreadCount > 0 ? '#00FFFF' : 'rgba(255,255,255,0.5)',
+                  transition: 'all 0.2s',
+                  cursor: 'pointer'
+                }}
                 onClick={() => { setShowNotifications(!showNotifications); setShowMore(false); }}
               >
-                <Bell size={18} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
+                <Bell size={18} />
                 {unreadCount > 0 && (
-                  <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00FFFF] border border-black" />
+                  <div style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#00FFFF',
+                    boxShadow: '0 0 10px #00FFFF',
+                    border: '1.5px solid #000'
+                  }} />
                 )}
               </button>
               
@@ -255,13 +292,43 @@ export default function AppShell() {
             </div>
 
             {user ? (
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-white/5 border border-white/10">
-                <div className="w-8 h-8 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400 text-[10px] font-black">
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 8px',
+                borderRadius: '12px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  background: 'rgba(0,255,255,0.1)',
+                  border: '1px solid rgba(0,255,255,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#00FFFF',
+                  fontSize: '10px',
+                  fontWeight: 900
+                }}>
                   {user.displayName?.[0]?.toUpperCase() || <User size={12} />}
                 </div>
                 <button 
                   onClick={logout}
-                  className="w-8 h-8 flex items-center justify-center text-white/20 hover:text-red-400 transition-colors"
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'rgba(255,255,255,0.2)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
                 >
                   <LogOut size={14} />
                 </button>
@@ -269,7 +336,20 @@ export default function AppShell() {
             ) : (
               <button 
                 onClick={() => window.location.href = '/login'}
-                className="h-10 px-6 rounded-xl bg-cyan-400 text-black font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                style={{
+                  height: '40px',
+                  padding: '0 24px',
+                  borderRadius: '12px',
+                  background: '#00FFFF',
+                  color: '#000',
+                  fontWeight: 900,
+                  fontSize: '11px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 20px rgba(0,255,255,0.2)'
+                }}
               >
                 Login
               </button>
@@ -277,9 +357,20 @@ export default function AppShell() {
             
             <button 
               onClick={connectWallet} 
-              className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all flex-shrink-0"
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
             >
-              {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} className="text-white/40" />}
+              {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} style={{ color: 'rgba(255,255,255,0.4)' }} />}
             </button>
           </div>
         </header>
