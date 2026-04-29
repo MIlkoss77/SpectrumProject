@@ -267,101 +267,11 @@ export default function AppShell() {
         </header>
 
         <main className="dx-main">
-                      onMarkRead={markNotificationRead}
-                      onMarkAllRead={markAllNotificationsRead}
-                      onClose={() => setShowNotifications(false)}
-                    />
-                  </div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {user ? (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 8px',
-                borderRadius: '12px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)'
-              }}>
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '8px',
-                  background: 'rgba(0,255,255,0.1)',
-                  border: '1px solid rgba(0,255,255,0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#00FFFF',
-                  fontSize: '10px',
-                  fontWeight: 900
-                }}>
-                  {user.displayName?.[0]?.toUpperCase() || <User size={12} />}
-                </div>
-                <button 
-                  onClick={logout}
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'rgba(255,255,255,0.2)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <LogOut size={14} />
-                </button>
-              </div>
-            ) : (
-              <button 
-                onClick={() => window.location.href = '/login'}
-                style={{
-                  height: '40px',
-                  padding: '0 24px',
-                  borderRadius: '12px',
-                  background: '#00FFFF',
-                  color: '#000',
-                  fontWeight: 900,
-                  fontSize: '11px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  border: 'none',
-                  cursor: 'pointer',
-                  boxShadow: '0 0 20px rgba(0,255,255,0.2)'
-                }}
-              >
-                Login
-              </button>
-            )}
-            
-            <button 
-              onClick={connectWallet} 
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} style={{ color: 'rgba(255,255,255,0.4)' }} />}
-            </button>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <Outlet />
           </div>
-        </header>
+        </main>
 
-        <Outlet />
-      </main>
 
       {/* Mobile Bottom Navigation */}
       <nav className="dx-bottom-nav">
