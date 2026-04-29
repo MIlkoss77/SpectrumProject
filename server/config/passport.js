@@ -5,7 +5,7 @@ import { prisma } from './database.js';
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID || 'dummy',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy',
-    callbackURL: "/api/auth/google/callback",
+    callbackURL: "https://app.spectrtrading.com/api/auth/google/callback",
     scope: ['profile', 'email']
   },
   async (accessToken, refreshToken, profile, done) => {
