@@ -321,29 +321,16 @@ export default function News() {
   }, [rows, selectedCluster])
 
   return (
-    <div className="w-full animate-in flex flex-col gap-6" style={{ padding: '0 20px 100px 20px' }}>
+    <div className="w-full animate-in flex flex-col gap-6" style={{ padding: '20px 20px 100px 20px' }}>
       
-      {/* Top Controller */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-[24px] bg-white/[0.02] border border-white/5 backdrop-blur-xl mt-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
-            <Newspaper size={20} className="text-cyan-400" />
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-xl font-black tracking-tighter text-white uppercase">Intelligence Hub</h1>
-            <div className="flex items-center gap-2">
-               <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-               <span className="text-[10px] font-black text-cyan-400/60 uppercase tracking-widest">Aggregating 10+ Sources</span>
-            </div>
-          </div>
-        </div>
-
+      {/* Tab Switcher Only */}
+      <div className="flex justify-center mt-2 mb-4">
         <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/5 gap-1">
           {['ARTICLES', 'SOCIAL', 'DEGEN'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                 activeTab === tab 
                   ? 'bg-cyan-400 text-black shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
                   : 'text-white/40 hover:text-white hover:bg-white/5'

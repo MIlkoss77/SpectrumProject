@@ -224,12 +224,9 @@ export default function AppShell() {
             </Link>
           </div>
 
-
-
           {/* RIGHT: Notifications, Auth, Wallet */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
-
-
+            
             <div style={{ position: 'relative' }}>
               <button 
                 className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all"
@@ -237,18 +234,21 @@ export default function AppShell() {
               >
                 <Bell size={18} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
                 {unreadCount > 0 && (
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00FFFF] border border-black" />
+                  <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00FFFF] border border-black" />
                 )}
               </button>
+              
               <AnimatePresence>
                 {showNotifications && (
-                  <NotificationDropdown 
-                    notifications={notifications}
-                    unreadCount={unreadCount}
-                    onMarkRead={markNotificationRead}
-                    onMarkAllRead={markAllNotificationsRead}
-                    onClose={() => setShowNotifications(false)}
-                  />
+                  <div style={{ position: 'fixed', top: '80px', right: '16px', zIndex: 9999 }}>
+                    <NotificationDropdown 
+                      notifications={notifications}
+                      unreadCount={unreadCount}
+                      onMarkRead={markNotificationRead}
+                      onMarkAllRead={markAllNotificationsRead}
+                      onClose={() => setShowNotifications(false)}
+                    />
+                  </div>
                 )}
               </AnimatePresence>
             </div>
@@ -276,11 +276,11 @@ export default function AppShell() {
             
             <button 
               onClick={connectWallet} 
-              className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all flex-shrink-0"
+              className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all flex-shrink-0"
             >
-              {(account || isPro) ? <Shield size={16} className="text-cyan-400" /> : <Wallet size={16} className="text-white/40" />}
+              {(account || isPro) ? <Shield size={18} className="text-cyan-400" /> : <Wallet size={18} className="text-white/40" />}
             </button>
-          </div>
+          </div>v>
         </header>
 
         <Outlet />
