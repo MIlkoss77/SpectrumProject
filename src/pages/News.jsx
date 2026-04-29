@@ -261,9 +261,7 @@ export default function News() {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const [activeTab, setActiveTab] = useState('ARTICLES') // ARTICLES | SOCIAL | DEGEN
-  const [lang, setLang] = useState('ALL')
-  const [impact, setImpact] = useState('ALL')
+  const [activeTab, setActiveTab] = useState('ARTICLES')
   const [selectedCluster, setSelectedCluster] = useState(null)
 
   const [socialBuzz, setSocialBuzz] = useState([])
@@ -273,26 +271,22 @@ export default function News() {
   const [scoutLoading, setScoutLoading] = useState(false)
 
   useEffect(() => {
-    // 1. Instant load from cache
     const cache = localStorage.getItem('sp_news_cache');
     if (cache) {
       try {
         const parsed = JSON.parse(cache);
         setRows(parsed.items || []);
         setClusters(parsed.clusters || []);
-        setLoading(false); // Hide skeletons immediately if cache exists
+        setLoading(false);
       } catch (e) {}
     }
 
-    // 2. Background fresh fetch
-    getNews()
-      .then(r => {
+    getNews().then(r => {
         setRows(r.items)
         setClusters(r.clusters || [])
         setLoading(false)
-      })
-      .catch(e => {
-        if (!cache) { // Only show error if we have no cached data at all
+      }).catch(e => {
+        if (!cache) {
           setError(e?.message || 'Failed to load news')
           setLoading(false)
         }
@@ -319,116 +313,103 @@ export default function News() {
   const filtered = useMemo(() => {
     return rows.filter(r => {
       if (selectedCluster) {
-        // Simple cluster filter by primary tag
         const tag = selectedCluster.split('-')[1];
         if (!r.tags?.includes(tag)) return false;
       }
-      if (lang !== 'ALL' && r.lang && r.lang !== lang) return false
-      if (impact !== 'ALL' && r.impact && r.impact !== impact) return false
       return true
     })
-  }, [rows, lang, impact, selectedCluster])
+  }, [rows, selectedCluster])
 
   return (
-    <div className="dx-panels w-full animate-in">
-
-      <div className="overview-hero">
-        <div className="hero-header">
-          <div className="hero-title">
+    <div className="w-full animate-in flex flex-col gap-6" style={{ padding: '0 20px 100px 20px' }}>
+      
+      {/* Top Controller */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-[24px] bg-white/[0.02] border border-white/5 backdrop-blur-xl mt-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-[0_0_20px_rgba(34,211,238,0.1)]">
             <Newspaper size={20} className="text-cyan-400" />
-            <span className="tracking-widest font-bold text-sm uppercase">Spectr Terminal [NEWS]</span>
           </div>
-          <div className="flex gap-2">
-            <button className={`dx-tag transition-all ${activeTab === 'ARTICLES' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40' : 'bg-white/5 text-white/40 border-white/5'}`} onClick={() => setActiveTab('ARTICLES')}>FIREHOSE</button>
-            <button className={`dx-tag transition-all ${activeTab === 'SOCIAL' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40' : 'bg-white/5 text-white/40 border-white/5'}`} onClick={() => setActiveTab('SOCIAL')}>SOCIAL RADAR</button>
-            <button className={`dx-tag transition-all ${activeTab === 'DEGEN' ? 'bg-red-500/20 text-red-400 border-red-500/40' : 'bg-white/5 text-white/40 border-white/5'}`} onClick={() => setActiveTab('DEGEN')}>DEGEN INTEL</button>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className="text-white/40 text-sm max-w-3xl">
-            {activeTab === 'DEGEN' ? 'Real-time Telegram scraping for high-alpha meme coin listings and whale alerts.' : 'High-volume real-time ingestion from 10+ global sources. Multi-narrative clustering analysis.'}
-          </p>
-
-          <div className="flex gap-3">
-             {selectedCluster && (
-               <button 
-                 onClick={() => setSelectedCluster(null)}
-                 className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 text-red-400 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase"
-               >
-                 Clear Cluster: {selectedCluster.split('-')[1]}
-               </button>
-             )}
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold ${activeTab === 'DEGEN' ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-white/5 border border-white/10 text-cyan-400'}`}>
-               <Zap size={10} /> {activeTab === 'DEGEN' ? 'ALIVE' : 'LIVE'}
+          <div className="flex flex-col">
+            <h1 className="text-xl font-black tracking-tighter text-white uppercase">Intelligence Hub</h1>
+            <div className="flex items-center gap-2">
+               <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+               <span className="text-[10px] font-black text-cyan-400/60 uppercase tracking-widest">Aggregating 10+ Sources</span>
             </div>
           </div>
         </div>
+
+        <div className="flex bg-black/40 p-1.5 rounded-2xl border border-white/5 gap-1">
+          {['ARTICLES', 'SOCIAL', 'DEGEN'].map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                activeTab === tab 
+                  ? 'bg-cyan-400 text-black shadow-[0_0_20px_rgba(34,211,238,0.3)]' 
+                  : 'text-white/40 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {tab === 'ARTICLES' ? 'News' : tab === 'SOCIAL' ? 'Buzz' : 'Alpha'}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Narrative Clusters */}
+      {/* Clusters - Horizontal Scroll */}
       {!loading && activeTab === 'ARTICLES' && clusters.length > 0 && (
-        <div className="mb-8">
-
-          <div className="flex items-center gap-3 mb-4">
-            <Layers size={16} className="text-cyan-400" />
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white/60">Trending Narratives</h3>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-2">
+              <Layers size={14} className="text-cyan-400" />
+              <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Trending Narratives</span>
+            </div>
+            {selectedCluster && (
+               <button onClick={() => setSelectedCluster(null)} className="text-[10px] font-black text-red-400 uppercase tracking-widest hover:underline">Clear Filter</button>
+            )}
           </div>
-          <div className="dx-grid-premium">
-
-            {clusters.slice(0, 8).map(c => (
-              <ClusterCard 
-                key={c.id} 
-                cluster={c} 
-                onSelect={setSelectedCluster} 
-                isActive={selectedCluster === c.id} 
-              />
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide no-scrollbar" style={{ scrollSnapType: 'x mandatory' }}>
+            {clusters.slice(0, 10).map(c => (
+              <div key={c.id} style={{ minWidth: '300px', scrollSnapAlign: 'start' }}>
+                <ClusterCard 
+                  cluster={c} 
+                  onSelect={setSelectedCluster} 
+                  isActive={selectedCluster === c.id} 
+                />
+              </div>
             ))}
           </div>
         </div>
       )}
 
-      {(loading || (activeTab === 'SOCIAL' && socialLoading) || (activeTab === 'DEGEN' && scoutLoading)) && (
-        <div className="dx-grid-premium">
-          {[...Array(12)].map((_, i) => (
-            <div key={i} className="action-card" style={{ background: 'rgba(255,255,255,0.02)', padding: '12px', minHeight: '160px' }}>
-              <Skeleton style={{ width: '40%', height: '10px', marginBottom: '12px' }} />
-              <Skeleton style={{ width: '100%', height: '20px', marginBottom: '8px' }} />
-              <Skeleton style={{ width: '80%', height: '20px' }} />
+      {/* Grid Content */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {(loading || (activeTab === 'SOCIAL' && socialLoading) || (activeTab === 'DEGEN' && scoutLoading)) ? (
+          [...Array(8)].map((_, i) => (
+            <div key={i} className="p-6 rounded-[24px] bg-white/[0.02] border border-white/5 h-[180px]">
+              <Skeleton style={{ width: '40%', height: '10px', marginBottom: '16px' }} />
+              <Skeleton style={{ width: '90%', height: '24px', marginBottom: '12px' }} />
+              <Skeleton style={{ width: '70%', height: '24px' }} />
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        ) : error ? (
+           <div className="col-span-full p-12 rounded-[32px] border border-red-500/20 bg-red-500/5 text-center">
+             <span className="text-red-400 font-bold uppercase tracking-widest text-xs">{error}</span>
+           </div>
+        ) : (
+          <>
+            {activeTab === 'ARTICLES' ? (
+              filtered.map(n => <NewsCard key={n.id} item={n} />)
+            ) : activeTab === 'SOCIAL' ? (
+              socialBuzz.map(item => <ViralCard key={item.id} item={item} />)
+            ) : (
+              scoutSignals.map(item => <ScoutCard key={item.id} item={item} />)
+            )}
+          </>
+        )}
+      </div>
 
-      {error && <div className="dx-error p-6 rounded-2xl border border-red-500/20 bg-red-500/5 text-red-400 text-sm font-bold">{error}</div>}
-
-      {!(loading || (activeTab === 'SOCIAL' && socialLoading) || (activeTab === 'DEGEN' && scoutLoading)) && !error && (
-        <div className="dx-grid-premium" style={{ 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '24px'
-        }}>
-
-          {activeTab === 'ARTICLES' ? (
-            <>
-              {filtered.length === 0 && <div className="col-span-full py-20 text-center text-white/20 font-bold italic">No data matched your filters</div>}
-              {filtered.map(n => <NewsCard key={n.id} item={n} />)}
-            </>
-          ) : activeTab === 'SOCIAL' ? (
-            <>
-              {socialBuzz.length === 0 && <div className="col-span-full py-20 text-center text-white/20 font-bold italic">Gathering social velocity...</div>}
-              {socialBuzz.map(item => <ViralCard key={item.id} item={item} />)}
-            </>
-          ) : (
-            <>
-              {scoutSignals.length === 0 && <div className="col-span-full py-20 text-center text-white/20 font-bold italic">Searching for high-alpha plays...</div>}
-              {scoutSignals.map(item => <ScoutCard key={item.id} item={item} />)}
-            </>
-          )}
-        </div>
-      )}
-
-      <div className="mt-12 text-center text-[10px] font-black text-white/10 uppercase tracking-[0.2em] border-t border-white/5 pt-8">
-        Spectr Intelligence Engine v4.5 // Aggregating 10+ Sources // Hot Load Multi-Cluster
+      <div className="mt-12 text-center py-12 border-t border-white/5">
+        <span className="text-[9px] font-black text-white/10 uppercase tracking-[0.4em]">Spectr Neural Engine v5.2 // Full Spectrum Intel</span>
       </div>
     </div>
   )

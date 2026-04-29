@@ -157,6 +157,10 @@ export default function AppShell() {
           ))}
         </nav>
 
+        <div className="mt-auto p-4 opacity-20">
+           <span className="text-[8px] font-black text-white uppercase tracking-[0.3em]">Spectr OS v5.2.4-HOTFIX</span>
+        </div>
+
         <div className={`mt-auto px-4 pb-6 ${!navOpen ? 'hidden' : ''}`}>
           {(!proPlanDismissed && !isPro) && (
             <div className="sidebar-upgrade-card group cursor-pointer transition-all duration-300 hover:scale-[1.02]" style={{ position: 'relative' }}>
@@ -205,66 +209,35 @@ export default function AppShell() {
           backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
         }}>
-          {/* LEFT: Burger & Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
-              className="dx-burger hidden md:flex"
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-white"
               onClick={() => setNavOpen(v => !v)}
-              style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: '#fff',
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer'
-              }}
             >
-              {navOpen ? <X size={18} /> : <Menu size={18} />}
+              {navOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-              <img src={logoImg} alt="Spectr" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
-              <span className="desktop-logo-only" style={{ display: window.innerWidth < 768 ? 'none' : 'inline', fontWeight: 900, fontSize: '16px', color: '#fff', letterSpacing: '-0.5px' }}>
-                SPECTR<span style={{ color: '#00FFFF' }}>Trading</span>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+              <img src={logoImg} alt="Spectr" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+              <span className="hidden sm:block font-black text-lg text-white tracking-tighter">
+                SPECTR<span className="text-cyan-400">Trading</span>
               </span>
             </Link>
           </div>
 
-          {/* MIDDLE: Spacer or Center Info */}
-          <div style={{ display: window.innerWidth < 1280 ? 'none' : 'flex', justifyContent: 'center', overflow: 'hidden' }}>
-             <ConnectionHub />
-          </div>
+
 
           {/* RIGHT: Notifications, Auth, Wallet */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
-            {/* Protected Badge - Hidden on small screens */}
-            <div 
-              className="desktop-shield-only"
-              style={{ 
-                display: window.innerWidth < 1024 ? 'none' : 'flex',
-                alignItems: 'center', 
-                gap: '8px', 
-                padding: '4px 10px', 
-                background: 'rgba(255,255,255,0.03)', 
-                border: '1px solid rgba(255,255,255,0.08)', 
-                borderRadius: '10px', 
-                flexShrink: 0 
-              }}
-            >
-              <Shield size={14} color="#00FFFF" />
-              <span style={{ fontSize: '9px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase' }}>Protected</span>
-            </div>
 
-            <div style={{ position: 'relative', flexShrink: 0 }}>
+
+            <div style={{ position: 'relative' }}>
               <button 
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', width: '36px', height: '36px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all"
                 onClick={() => { setShowNotifications(!showNotifications); setShowMore(false); }}
               >
                 <Bell size={18} className={unreadCount > 0 ? 'text-cyan-400' : ''} />
                 {unreadCount > 0 && (
-                  <div style={{ position: 'absolute', top: -2, right: -2, width: '12px', height: '12px', background: '#00FFFF', borderRadius: '50%', border: '2px solid #050505' }} />
+                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00FFFF] border border-black" />
                 )}
               </button>
               <AnimatePresence>
@@ -280,26 +253,26 @@ export default function AppShell() {
               </AnimatePresence>
             </div>
 
-            <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-              {user ? (
-                <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full pl-1 pr-2 py-1">
-                  <div className="w-7 h-7 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-400 font-bold text-[10px] border border-cyan-400/20">
-                    {user.displayName?.[0] || <User size={12} />}
-                  </div>
-                  <button onClick={logout} className="p-1 text-white/20 hover:text-red-400">
-                    <LogOut size={12} />
-                  </button>
+            {user ? (
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-white/5 border border-white/10">
+                <div className="w-8 h-8 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400 text-[10px] font-black">
+                  {user.displayName?.[0]?.toUpperCase() || <User size={12} />}
                 </div>
-              ) : (
                 <button 
-                  onClick={() => window.location.href = '/login'}
-                  className="px-3 py-1.5 bg-cyan-400 hover:bg-white text-black rounded-lg text-[10px] font-black uppercase transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)]"
-                  style={{ minWidth: '60px', flexShrink: 0 }}
+                  onClick={logout}
+                  className="w-8 h-8 flex items-center justify-center text-white/20 hover:text-red-400 transition-colors"
                 >
-                  Login
+                  <LogOut size={14} />
                 </button>
-              )}
-            </div>
+              </div>
+            ) : (
+              <button 
+                onClick={() => window.location.href = '/login'}
+                className="h-10 px-6 rounded-xl bg-cyan-400 text-black font-black text-[10px] uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+              >
+                Login
+              </button>
+            )}
             
             <button 
               onClick={connectWallet} 

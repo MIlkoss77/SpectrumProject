@@ -11,7 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['logo.png'],
       workbox: {
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+        cacheId: 'spectr-v5.2.4-hotfix',
+        maximumFileSizeToCacheInBytes: 7 * 1024 * 1024, 
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,

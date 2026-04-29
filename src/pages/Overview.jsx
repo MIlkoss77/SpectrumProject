@@ -225,236 +225,204 @@ export default function Overview() {
   }, [])
 
   return (
-    <section className="dx-panels premium-dashboard">
-
-      {/* 🔮 AI PREDICTOR (HERO) */}
-      <WidgetSuspense height="200px">
-        <Predictor />
-      </WidgetSuspense>
-
-      {/* 🔴 LIVE TICKER MARQUEE STRIP */}
-      <div style={{
-        overflow: 'hidden', borderBottom: '1px solid rgba(255,255,255,0.05)',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        background: 'rgba(0,0,0,0.3)', padding: '8px 0', marginBottom: 24,
-        backdropFilter: 'blur(10px)'
-      }}>
-        <div style={{
-          display: 'flex', gap: 48, animation: 'ticker-scroll 30s linear infinite',
-          whiteSpace: 'nowrap',
-        }}>
-          {[...Array(3)].map((_, rep) => (
-            ['BTC', 'ETH', 'BNB', 'SOL', 'XRP', 'DOGE', 'ADA', 'AVAX'].map(sym => {
-              const key = `${sym.toLowerCase()}usdt`
-              const ticker = tickers[key]
-              const price = ticker?.price
-              const change = ticker?.changePercent
-              return (
-                <span key={`${rep}-${sym}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 12, fontSize: 11, fontFamily: 'var(--font-mono)', minWidth: '220px' }}>
-                  <span style={{ fontWeight: 900, color: '#fff', letterSpacing: 1, width: '40px' }}>{sym}</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: '100px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.15)', fontWeight: 900, letterSpacing: 1 }}>BIN</span>
-                      <span style={{ color: '#fff', fontWeight: 800 }}>
-                        {Number.isFinite(price) ? `$${price.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}` : '---'}
-                      </span>
-                    </div>
-                  </div>
-                  {Number.isFinite(change) && (
-                    <span style={{ color: change >= 0 ? '#00FFFF' : '#FF4560', fontWeight: 900, minWidth: '60px', textAlign: 'right', textShadow: change >= 0 ? '0 0 10px rgba(0,255,255,0.2)' : 'none' }}>
-                      {change >= 0 ? '▲' : '▼'}{Math.abs(change).toFixed(2)}%
-                    </span>
-                  )}
-                </span>
-              )
-            })
-          ))}
+    <div className="p-4 lg:p-6" style={{ background: '#050505', minHeight: '100vh' }}>
+      
+      {/* 1. Header & AI Hero Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+           <WidgetSuspense height="240px">
+              <Predictor />
+           </WidgetSuspense>
         </div>
-      </div>
-
-      {/* 🤖 AutoPilot Status Banner */}
-      {isAutoPilotActive && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="action-card mb-6"
+        
+        {/* Market Score Gauge */}
+        <div className="group relative overflow-hidden transition-all duration-300"
           style={{
-            background: 'linear-gradient(90deg, rgba(0,255,255,0.05) 0%, rgba(34,211,238,0.1) 100%)',
-            borderColor: 'rgba(0,255,255,0.2)',
+            background: 'rgba(10, 10, 15, 0.6)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '24px',
+            padding: '24px',
             display: 'flex',
-            alignItems: 'center',
-            gap: 16,
-            padding: '16px 24px'
-          }}
-        >
-          <div className="relative">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
-              <Zap size={22} fill="currentColor" />
-            </div>
-            <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-green-500 border-2 border-[#0a0a0f] animate-pulse" />
-          </div>
-          <div className="flex-1">
-            <div className="text-[10px] font-black text-cyan-400 uppercase tracking-widest mb-0.5">{t('ui.engine_active') || 'Engine Active'}</div>
-            <div className="text-sm font-bold text-white">{t('ui.auto_pilot_msg') || 'AI Auto-Pilot is managing your portfolio'}</div>
-          </div>
-          <div className="hidden md:flex items-center gap-4 text-[10px] font-bold text-white/40 uppercase tracking-widest">
-            <div className="flex items-center gap-1.5"><Activity size={12} className="text-cyan-400" /> 24/7 Monitoring</div>
-            <div className="flex items-center gap-1.5"><Shield size={12} className="text-cyan-400" /> Risk Shield ON</div>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Top Section: Actionable Insights */}
-      <div className="overview-hero">
-        <div className="hero-header">
-          <div className="hero-title">
-            <div className={`px-2 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${
-              dataStatus === 'LIVE' ? 'bg-cyan-500/5 border-cyan-500/20 text-cyan-400' : 'bg-red-500/5 border-red-500/20 text-red-400'
-            }`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${dataStatus === 'LIVE' ? 'bg-cyan-400 shadow-[0_0_8px_#00FFFF]' : 'bg-red-500 shadow-[0_0_8px_#FF4560]'}`} />
-              {dataStatus === 'LIVE' ? 'Verified Live Binance Data' : 'Synthetic Data Active'}
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}>
+          <div style={{ position: 'absolute', top: -40, right: -40, width: 120, height: 120, background: mainScore?.score > 60 ? '#00FFFF10' : '#FF456010', filter: 'blur(50px)', borderRadius: '50%' }} />
+          
+          <div className="flex justify-between items-center mb-6">
+            <span style={{ fontSize: '11px', fontWeight: 900, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Market Sentiment</span>
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20 text-[9px] font-bold text-cyan-400">
+               <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" /> LIVE
             </div>
           </div>
-          <span className="dx-tag bg-cyan-500/10 text-cyan-400 border-cyan-500/30">{t('ui.ai_filtered') || 'AI FILTERED'}</span>
 
-        </div>
-        {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Skeleton className="h-40" />
-            <Skeleton className="h-40" />
-            <Skeleton className="h-40" />
-            <Skeleton className="h-40" />
-          </div>
-        ) : (
-          <div className="dx-grid-premium">
-            {topActions.map((action, i) => (
-              <ActionCard key={i} action={action} loading={false} openTrade={openTrade} t={t} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Main Grid */}
-      <div className="premium-grid-main">
-        {/* Left Column: Core Analytics */}
-        <div className="analytics-col">
-          <div className="dx-card score-card-premium relative overflow-hidden border-cyan-500/20" style={{ padding: '24px' }}>
-            <div className="absolute top-0 right-0 w-40 h-40 bg-cyan-500/5 blur-[80px] rounded-full pointer-events-none" />
-
-            <div className="card-header relative z-10" style={{ marginBottom: '20px' }}>
-              <h3 className="text-cyan-400/80" style={{ fontSize: '14px', margin: 0 }}>{t('pages.dashboard.market_score') || 'BTC MARKET SCORE'}</h3>
-              <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-cyan-900/20 border border-cyan-500/20 text-[10px] font-bold text-cyan-400"><span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00FFFF]"></span> {t('ui.live') || 'LIVE'}</div>
-            </div>
-            <div className="score-main relative z-10" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-              <div className="score-gauge-lg" style={{ width: '130px', height: '130px', position: 'relative', flexShrink: 0 }}>
-                <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="6" />
-                  <circle
+          <div className="flex items-center gap-8">
+             <div style={{ width: '100px', height: '100px', position: 'relative' }}>
+                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="8" />
+                  <motion.circle
                     cx="50" cy="50" r="45" fill="none"
                     stroke={mainScore?.score > 60 ? '#00FFFF' : mainScore?.score < 40 ? '#FF4560' : '#FEB019'}
-                    strokeWidth="6"
-                    strokeDasharray={`${((mainScore?.score || 50) / 100) * 283} 283`}
+                    strokeWidth="8"
+                    strokeDasharray="283"
+                    initial={{ strokeDashoffset: 283 }}
+                    animate={{ strokeDashoffset: 283 - ((mainScore?.score || 50) / 100) * 283 }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
                     strokeLinecap="round"
-                    style={{ transition: 'stroke-dasharray 1s ease' }}
                   />
                 </svg>
-                <div className="score-center" style={{
-                  position: 'absolute', top: '50%', left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  width: '100%', textAlign: 'center'
-                }}>
-                  <span className="score-num text-white" style={{ fontSize: '32px', fontWeight: 900, lineHeight: 1 }}>{mainScore?.score || '--'}</span>
-                  <span className="score-label text-cyan-400/60" style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>{mainScore?.status || 'ANALYZING'}</span>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span style={{ fontSize: '24px', fontWeight: 900, color: '#fff' }}>{mainScore?.score || '--'}</span>
+                  <span style={{ fontSize: '8px', fontWeight: 800, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>Index</span>
                 </div>
-              </div>
-              <div className="score-breakdown" style={{ flex: 1, minWidth: '150px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div className="breakdown-item">
-                  <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>Sentiment</span>
-                  <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '100%', marginTop: '4px' }}>
-                    <div style={{ height: '100%', background: 'rgba(0,255,255,0.5)', borderRadius: '2px', width: `${mainScore?.details?.sentiment || 50}%` }} />
-                  </div>
+             </div>
+             <div className="flex-1 flex flex-col gap-3">
+                <div className="text-sm font-bold text-white uppercase tracking-tight">{mainScore?.status || 'Analyzing...'}</div>
+                <div className="flex flex-col gap-1.5">
+                   {['Sentiment', 'Whales', 'Technical'].map((label, idx) => (
+                      <div key={label} className="flex flex-col gap-1">
+                        <div className="flex justify-between text-[8px] font-black uppercase text-white/30 tracking-widest">
+                          <span>{label}</span>
+                          <span>{[mainScore?.details?.sentiment, mainScore?.details?.whales, mainScore?.details?.ta][idx] || 50}%</span>
+                        </div>
+                        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                           <motion.div 
+                             initial={{ width: 0 }}
+                             animate={{ width: `${[mainScore?.details?.sentiment, mainScore?.details?.whales, mainScore?.details?.ta][idx] || 50}%` }}
+                             className="h-full bg-cyan-400/40" 
+                           />
+                        </div>
+                      </div>
+                   ))}
                 </div>
-                <div className="breakdown-item">
-                  <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>Whales</span>
-                  <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '100%', marginTop: '4px' }}>
-                    <div style={{ height: '100%', background: 'rgba(0,255,255,0.5)', borderRadius: '2px', width: `${mainScore?.details?.whales || 50}%` }} />
-                  </div>
-                </div>
-                <div className="breakdown-item">
-                  <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 800, color: 'rgba(255,255,255,0.3)' }}>Technical</span>
-                  <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', width: '100%', marginTop: '4px' }}>
-                    <div style={{ height: '100%', background: 'rgba(0,255,255,0.5)', borderRadius: '2px', width: `${mainScore?.details?.ta || 50}%` }} />
-                  </div>
-                </div>
-              </div>
-            </div>
+             </div>
           </div>
+        </div>
+      </div>
 
-          <div className="section-header mt-6">
-            <div className="flex items-center gap-2">
-              <Activity size={18} className="text-cyan-400" />
-              <h2 className="dx-h3 text-white">Technical Brief (1H)</h2>
-            </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Live Binance Data</span>
+      {/* 2. Live Marquee Strip */}
+      <div className="relative overflow-hidden mb-8 border-y border-white/5 bg-white/[0.02] backdrop-blur-md py-3 -mx-4 lg:-mx-6">
+        <div className="flex gap-12 animate-ticker-scroll whitespace-nowrap px-4">
+           {[...Array(2)].map((_, i) => (
+             <React.Fragment key={i}>
+                {['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'DOGE', 'AVAX', 'ADA'].map(sym => {
+                  const ticker = tickers[`${sym.toLowerCase()}usdt`]
+                  const change = ticker?.changePercent
+                  return (
+                    <div key={`${sym}-${i}`} className="flex items-center gap-4 min-w-[180px]">
+                      <span className="text-xs font-black text-white tracking-widest">{sym}</span>
+                      <span className="text-xs font-mono font-bold text-white/80">
+                        ${ticker?.price?.toLocaleString(undefined, { minimumFractionDigits: 1 }) || '---'}
+                      </span>
+                      {change != null && (
+                        <span className={`text-[10px] font-bold ${change >= 0 ? 'text-cyan-400' : 'text-red-400'}`}>
+                          {change >= 0 ? '▲' : '▼'}{Math.abs(change).toFixed(2)}%
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
+             </React.Fragment>
+           ))}
+        </div>
+      </div>
+
+      {/* 3. Main Dashboard Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        {/* Column 1: Actionable Signals */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between px-1">
+             <div className="flex items-center gap-2">
+               <Zap size={16} className="text-cyan-400" />
+               <h3 className="text-sm font-black text-white uppercase tracking-widest">Active Signals</h3>
+             </div>
+             <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest">{dataStatus === 'LIVE' ? 'Real-time' : 'Delayed'}</span>
           </div>
-
-          <WidgetSuspense height="300px">
-            <TechnicalBrief />
-          </WidgetSuspense>
-
+          <div className="flex flex-col gap-3">
+             {loading ? [...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 rounded-2xl" />) : 
+              topActions.map((action, i) => (
+                <ActionCard key={i} action={action} loading={false} openTrade={openTrade} t={t} />
+              ))
+             }
+          </div>
         </div>
 
-        {/* Right Column: Market Data */}
-        <div className="market-col">
-          <div className="dx-card price-ticker-card border-none bg-black/40">
-            <div className="ticker-row">
-              <div className="ticker-info">
-                <span className="ticker-symbol text-lg font-bold">BTC/USDT</span>
-                <span className="ticker-name text-white/40 text-[10px] uppercase font-black tracking-tighter flex items-center gap-2">
-                  Bitcoin 
-                  <span className={`px-1 rounded border ${tickers['btcusdt']?.exchange === 'bybit' ? 'border-cyan-500/50 text-cyan-400' : 'border-white/20 text-white/40'}`}>
-                    {tickers['btcusdt']?.exchange?.toUpperCase() || 'BINANCE'} WS
-                  </span>
-                </span>
-              </div>
-              <div className="ticker-price-group text-right">
-                <div className="ticker-price text-2xl font-mono font-bold">
-                  <PricePulse value={tickers['btcusdt']?.price}>
-                    <NumberTicker value={tickers['btcusdt']?.price} prefix="$" />
-                  </PricePulse>
+        {/* Column 2: Technical Analysis Brief */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2 px-1">
+             <BarChart3 size={16} className="text-cyan-400" />
+             <h3 className="text-sm font-black text-white uppercase tracking-widest">Technical Brief</h3>
+          </div>
+          <WidgetSuspense height="400px">
+             <TechnicalBrief />
+          </WidgetSuspense>
+        </div>
+
+        {/* Column 3: Live Market Pulse */}
+        <div className="flex flex-col gap-4">
+           <div className="flex items-center gap-2 px-1">
+             <Activity size={16} className="text-cyan-400" />
+             <h3 className="text-sm font-black text-white uppercase tracking-widest">Market Pulse</h3>
+          </div>
+          
+          {/* Price Card */}
+          <div className="dx-card group relative overflow-hidden"
+            style={{
+              background: 'rgba(10, 10, 15, 0.6)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255,255,255,0.05)',
+              borderRadius: '24px',
+              padding: '20px'
+            }}>
+             <div className="flex justify-between items-start mb-4">
+                <div>
+                   <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Bitcoin / USDT</div>
+                   <div className="text-2xl font-mono font-bold text-white">
+                      <PricePulse value={tickers['btcusdt']?.price}>
+                        <NumberTicker value={tickers['btcusdt']?.price} prefix="$" />
+                      </PricePulse>
+                   </div>
                 </div>
-                <div className={`text-sm font-bold ${tickers['btcusdt']?.changePercent >= 0 ? 'text-cyan-400' : 'text-red-400'} `}>
-                  {tickers['btcusdt']?.changePercent >= 0 ? '+' : ''}{tickers['btcusdt']?.changePercent}%
+                <div className={`px-2 py-1 rounded-lg text-[10px] font-black ${tickers['btcusdt']?.changePercent >= 0 ? 'bg-cyan-500/10 text-cyan-400' : 'bg-red-500/10 text-red-400'}`}>
+                   {tickers['btcusdt']?.changePercent >= 0 ? '+' : ''}{tickers['btcusdt']?.changePercent}%
                 </div>
-              </div>
-            </div>
-            <div className="ticker-chart opacity-50">
-              <MiniChart data={chartData} color="#00FFFF" height={80} />
-            </div>
+             </div>
+             <div className="h-20 opacity-50 -mx-4">
+                <MiniChart data={chartData} color="#00FFFF" height={80} />
+             </div>
           </div>
 
-          <div className="orderbook-wrapper mt-4">
-            <WidgetSuspense height="400px">
-              <Orderbook symbol="BTCUSDT" />
-            </WidgetSuspense>
-          </div>
-
-          <div className="quick-stats-row grid grid-cols-2 gap-4 mt-4">
-            <div className="mini-stat-card bg-black/40 p-3 rounded-xl border border-white/5">
-              <span className="block text-[10px] text-white/30 uppercase font-bold">BTC 24h Volume</span>
-              <span className="block text-lg font-mono font-bold text-white">{tickers['btcusdt']?.volume ? `$${(tickers['btcusdt'].volume * tickers['btcusdt'].price / 1e9).toFixed(1)}B` : '--'}</span>
-            </div>
-            <div className="mini-stat-card bg-black/40 p-3 rounded-xl border border-white/5">
-              <span className="block text-[10px] text-white/30 uppercase font-bold">24h Change</span>
-              <span className="block text-lg font-mono font-bold" style={{ color: (tickers['btcusdt']?.changePercent || 0) >= 0 ? '#22d3ee' : '#ef4444' }}>
-                {tickers['btcusdt']?.changePercent != null ? `${tickers['btcusdt'].changePercent >= 0 ? '+' : ''}${tickers['btcusdt'].changePercent}%` : '--'}
-              </span>
-            </div>
-          </div>
+          {/* Orderbook */}
+          <WidgetSuspense height="350px">
+             <Orderbook symbol="BTCUSDT" />
+          </WidgetSuspense>
         </div>
 
       </div>
+
+      {/* 🤖 AutoPilot Status (Floating/Fixed at bottom if active) */}
+      <AnimatePresence>
+        {isAutoPilotActive && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-20 left-4 right-4 md:left-auto md:right-8 md:w-80 z-50 p-4 rounded-2xl border border-cyan-500/30 bg-black/80 backdrop-blur-xl shadow-2xl flex items-center gap-4"
+          >
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+               <Zap size={20} fill="currentColor" className="animate-pulse" />
+            </div>
+            <div>
+               <div className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">Auto-Pilot Active</div>
+               <div className="text-xs font-bold text-white">AI is managing your positions</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 🎉 ONBOARDING WELCOME MODAL */}
       <AnimatePresence>
         {showWelcome && (
@@ -467,7 +435,7 @@ export default function Overview() {
               style={{
                 position: 'fixed',
                 top: 0, left: 0, bottom: 0, right: 0,
-                background: 'rgba(0,0,0,0.9)',
+                background: 'rgba(0,0,0,0.95)',
                 zIndex: 10000,
                 backdropFilter: 'blur(12px)',
                 cursor: 'pointer',
@@ -483,62 +451,81 @@ export default function Overview() {
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: 'spring', damping: 22, stiffness: 300 }}
               style={{
-                position: 'relative',
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
                 zIndex: 10001,
-                maxWidth: 480,
-                width: '100%',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                background: 'linear-gradient(135deg, #0d0d0d 0%, #111118 100%)',
+                maxWidth: 400,
+                width: 'calc(100% - 32px)',
+                background: '#0d0d0d',
                 border: '1px solid rgba(0,255,255,0.2)',
-                borderRadius: 24,
-                padding: '32px 24px',
-                boxShadow: '0 0 100px rgba(0,255,255,0.15)',
-                margin: 'auto'
+                borderRadius: 32,
+                padding: '40px 32px',
+                boxShadow: '0 0 80px rgba(0,255,255,0.15)',
+                textAlign: 'center'
               }}
             >
-              <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div style={{
-                  width: 48, height: 48, margin: '0 auto 12px',
-                  background: 'rgba(0,255,255,0.08)', borderRadius: 12,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  border: '1px solid rgba(0,255,255,0.2)'
-                }}>
-                  <img src={logoImg} alt="Spectr" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-                </div>
-                <h2 style={{ fontSize: 20, fontWeight: 900, margin: '0 0 6px', letterSpacing: -0.5 }}>
-                  Welcome to <span style={{ color: '#00FFFF' }}>Spectr Trading</span>
-                </h2>
-                <p style={{ color: 'var(--muted)', fontSize: 13, lineHeight: 1.5, margin: 0 }}>
-                  Your AI-powered crypto intelligence terminal is ready.
-                </p>
+              <div style={{
+                width: 64, height: 64, margin: '0 auto 24px',
+                background: 'rgba(0,255,255,0.05)', borderRadius: 20,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: '1px solid rgba(0,255,255,0.1)'
+              }}>
+                <Rocket size={32} className="text-cyan-400" />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-                {[
-                  { icon: Brain, text: 'AI Predictor — ML directional signals', color: '#00FFFF' },
-                  { icon: Fish, text: 'Whale Radar — Track big money', color: '#4F46E5' },
-                  { icon: BarChart3, text: 'Technical Brief — Live Binance data', color: '#00E396' },
-                  { icon: Briefcase, text: 'Portfolio — Connect your keys', color: '#FEB019' },
-                ].map(({ icon: Icon, text, color }) => (
-                  <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)', fontSize: 12 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}15`, border: `1px solid ${color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <Icon size={16} color={color} />
-                    </div>
-                    <span style={{ color: 'rgba(255,255,255,0.7)' }}>{text}</span>
-                  </div>
-                ))}
+              
+              <h2 style={{ fontSize: 24, fontWeight: 900, color: '#fff', margin: '0 0 12px', letterSpacing: '-0.03em' }}>
+                Protocol <span className="text-cyan-400">Initialized</span>
+              </h2>
+              
+              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, lineHeight: 1.6, marginBottom: 32 }}>
+                Welcome to Spectr. Your neural-powered tactical terminal is ready. Experience institutional-grade intelligence.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <button
+                  onClick={() => { setShowWelcome(false); localStorage.setItem('spectr_welcomed', '1') }}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    borderRadius: '16px',
+                    background: '#00FFFF',
+                    color: '#000',
+                    fontSize: '12px',
+                    fontWeight: 900,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 10px 20px rgba(0,255,255,0.2)'
+                  }}
+                >
+                  Enter Terminal
+                </button>
+                <button
+                  onClick={() => { setShowWelcome(false); localStorage.setItem('spectr_welcomed', '1') }}
+                  style={{
+                    width: '100%',
+                    padding: '16px',
+                    borderRadius: '16px',
+                    background: 'transparent',
+                    color: 'rgba(255,255,255,0.4)',
+                    fontSize: '11px',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Skip Briefing
+                </button>
               </div>
-              <button
-                className="dx-btn"
-                style={{ width: '100%', justifyContent: 'center', background: '#00FFFF', color: '#000', fontWeight: 900, letterSpacing: 0.5, cursor: 'pointer' }}
-                onClick={() => { setShowWelcome(false); localStorage.setItem('spectr_welcomed', '1') }}
-              >
-                <Rocket size={14} /> Launch Dashboard
-              </button>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-    </section>
+    </div>
   )
 }

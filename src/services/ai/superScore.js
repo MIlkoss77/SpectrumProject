@@ -20,7 +20,7 @@ export async function calculateSuperScore(symbol = 'BTCUSDT') {
         ]);
 
         // --- A. Sentiment Score (0-100) ---
-        const sentimentScore = calculateSentimentContribution(newsRes.items, symbol);
+        const sentimentScore = calculateSentimentContribution(newsRes?.items || [], symbol);
 
         // --- B. Whale Score (0-100) ---
         const whaleScore = calculateWhaleContribution(whaleRes, symbol);

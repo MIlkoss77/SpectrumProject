@@ -224,10 +224,10 @@ export default function Predictor() {
             </div>
 
             {loading && (
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.95)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(10px)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                        <Activity className="animate-spin" size={24} color={edgeColor} />
-                        <span style={{ fontSize: '9px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.3em' }}>Calibrating Consensus...</span>
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(10,10,15,0.8)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.4)', padding: '12px 24px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <Activity className="animate-spin" size={16} color={edgeColor} />
+                        <span style={{ fontSize: '10px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.2em' }}>Calibrating...</span>
                     </div>
                 </div>
             )}

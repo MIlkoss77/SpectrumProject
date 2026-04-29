@@ -37,7 +37,9 @@ export const getOHLC = async (req, res) => {
         if (cachedData) return res.json(cachedData);
 
         const url = `https://api.binance.com/api/v3/klines?symbol=${binSymbol}&interval=${tf || '1h'}&limit=${limit || 500}`;
-        const response = await axios.get(url);
+        const response = await axios.get(url, { timeout: 5000 });
+        if (!response.data || !Array.isArray(response.data)) throw new Error('Invalid Binance Data');
+        
         const formatted = response.data.map(k => ({
             t: k[0], o: parseFloat(k[1]), h: parseFloat(k[2]), l: parseFloat(k[3]), c: parseFloat(k[4]), v: parseFloat(k[5]),
             openTime: k[0], volume: parseFloat(k[5])
