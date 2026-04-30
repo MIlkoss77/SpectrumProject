@@ -106,7 +106,7 @@ export default function Overview() {
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'space-between' }}>
            <div className="dx-flex dx-flex-col">
              <span style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase' }}>Build Version</span>
-             <span style={{ fontSize: '11px', fontWeight: 900, color: 'rgba(255,255,255,0.4)' }}>v5.2.4-STABLE-v7</span>
+             <span style={{ fontSize: '11px', fontWeight: 900, color: 'rgba(255,255,255,0.4)' }}>v5.2.4-STABLE-v8</span>
            </div>
            <button style={{ padding: '10px 24px', borderRadius: '12px', background: 'rgba(0,255,255,0.05)', border: '1px solid rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '11px', fontWeight: 900, cursor: 'pointer' }}>SYNC STATUS</button>
         </div>
