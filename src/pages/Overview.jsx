@@ -78,35 +78,37 @@ export default function Overview() {
     <div style={{ padding: '32px', maxWidth: '1600px', margin: '0 auto' }}>
       
       {/* 1. HERO: SYSTEM STATUS */}
-      <div className="dx-flex dx-items-center dx-justify-between" style={{ 
+      <div style={{ 
         marginBottom: '40px', 
-        padding: '20px', 
+        padding: '24px', 
         background: 'rgba(255,255,255,0.02)', 
         borderRadius: '24px', 
         border: '1px solid rgba(255,255,255,0.05)',
-        flexWrap: 'wrap',
-        gap: '20px'
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+        gap: '24px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-          <div className="dx-flex dx-flex-col" style={{ minWidth: '120px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Neural Engine</span>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'center' }}>
+          <div className="dx-flex dx-flex-col">
+            <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '6px' }}>Neural Engine</span>
             <div className="dx-flex dx-items-center dx-gap-2">
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00FFFF', boxShadow: '0 0 15px #00FFFF' }} />
               <span style={{ fontSize: '14px', fontWeight: 900, color: '#fff' }}>CORE ACTIVE</span>
             </div>
           </div>
           
-          <div className="sm:dx-hidden" style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.1)' }} />
-          
-          <div className="dx-flex dx-flex-col" style={{ minWidth: '120px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>Market Sentiment</span>
+          <div className="dx-flex dx-flex-col">
+            <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '6px' }}>Market Sentiment</span>
             <span style={{ fontSize: '14px', fontWeight: 900, color: '#00FFFF' }}>OPTIMISTIC (68%)</span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-           <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', marginRight: '10px' }}>v5.2.4-v7</span>
-           <button style={{ padding: '8px 16px', borderRadius: '10px', background: 'rgba(0,255,255,0.05)', border: '1px solid rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '10px', fontWeight: 900, cursor: 'pointer' }}>SYNC</button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'space-between' }}>
+           <div className="dx-flex dx-flex-col">
+             <span style={{ fontSize: '9px', fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase' }}>Build Version</span>
+             <span style={{ fontSize: '11px', fontWeight: 900, color: 'rgba(255,255,255,0.4)' }}>v5.2.4-STABLE-v7</span>
+           </div>
+           <button style={{ padding: '10px 24px', borderRadius: '12px', background: 'rgba(0,255,255,0.05)', border: '1px solid rgba(0,255,255,0.1)', color: '#00FFFF', fontSize: '11px', fontWeight: 900, cursor: 'pointer' }}>SYNC STATUS</button>
         </div>
       </div>
 
