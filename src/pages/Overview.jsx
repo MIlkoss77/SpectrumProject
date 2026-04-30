@@ -165,7 +165,7 @@ export default function Overview() {
                <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#fff', letterSpacing: '-0.5px' }}>Top Alpha Actions</h2>
             </div>
             <div className="dx-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '20px' }}>
-              {topActions.slice(0, 4).map((action, i) => (
+              {(topActions || []).slice(0, 4).map((action, i) => (
                 <ActionCard key={i} action={action} openTrade={openTrade} />
               ))}
             </div>
@@ -184,7 +184,7 @@ export default function Overview() {
              </div>
 
              <div style={{ flex: 1, overflowY: 'auto' }} className="custom-scrollbar">
-               {intelStream.map(item => (
+               {(intelStream || []).map(item => (
                  <div key={item.id} style={{ marginBottom: '24px', paddingLeft: '16px', borderLeft: '2px solid rgba(255,255,255,0.05)' }}>
                     <div className="dx-flex dx-justify-between" style={{ marginBottom: '6px' }}>
                       <span style={{ fontSize: '10px', fontWeight: 900, color: item.type === 'BULLISH' ? '#00FFFF' : '#FF4560' }}>{item.type}</span>

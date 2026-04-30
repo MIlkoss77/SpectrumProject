@@ -169,7 +169,7 @@ function NewsCard({ item }) {
 
         <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between">
           <div className="flex gap-2 flex-wrap">
-            {item.tags.slice(0, 2).map(tag => (
+            {(item.tags || []).slice(0, 2).map(tag => (
               <span key={tag} style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(0,255,255,0.1)', color: '#00FFFF', padding: '2px 6px', borderRadius: '4px' }}>#{tag}</span>
             ))}
           </div>
@@ -231,9 +231,9 @@ function ScoutCard({ item }) {
         {item.text}
       </p>
 
-      {item.tickers.length > 0 && (
+      {(item.tickers || []).length > 0 && (
          <div className="flex gap-2 flex-wrap mb-2">
-            {item.tickers.map(t => (
+            {(item.tickers || []).map(t => (
                <span key={t} style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(0,255,255,0.1)', color: '#00FFFF', padding: '2px 6px', borderRadius: '4px' }}>#{t}</span>
             ))}
          </div>
@@ -282,7 +282,7 @@ export default function News() {
     }
 
     getNews().then(r => {
-        setRows(r.items)
+        setRows(r.items || [])
         setClusters(r.clusters || [])
         setLoading(false)
       }).catch(e => {
@@ -311,7 +311,7 @@ export default function News() {
   }, [activeTab])
 
   const filtered = useMemo(() => {
-    return rows.filter(r => {
+    return (rows || []).filter(r => {
       if (selectedCluster) {
         const tag = selectedCluster.split('-')[1];
         if (!r.tags?.includes(tag)) return false;
