@@ -113,21 +113,48 @@ function DepositModal({ plan, onClose, onSuccess }) {
     setSelectedCrypto(crypto)
     setLoading(true)
     setError(null)
+
+    const token = localStorage.getItem('spectr_auth_token')
+    if (!token) {
+      setError('You must be logged in to make a payment. Please log in and try again.')
+      setLoading(false)
+      return
+    }
+
     try {
-      const token = localStorage.getItem('spectr_auth_token')
+      console.log('[Payment] Initiating deposit — plan:', plan.id, 'currency:', crypto.id)
+
       const res = await axios.post('/api/payments/deposit', {
         currency: crypto.id,
         planId: plan.id,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       })
+
+      console.log('[Payment] Deposit response:', res.data)
+
       if (res.data.ok) {
         setDepositData(res.data.payment)
         setIsAutomated(res.data.automated)
         setStep('deposit')
+      } else {
+        setError(res.data.error || 'Unknown error from server')
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create deposit. Please log in.')
+      const status = err.response?.status
+      const serverMsg = err.response?.data?.error
+
+      console.error('[Payment] Deposit failed — HTTP', status, ':', serverMsg || err.message)
+
+      if (status === 401) {
+        // JWT expired or invalid — clear stale token
+        localStorage.removeItem('spectr_auth_token')
+        setError('Session expired. Please log in again to continue.')
+      } else if (status === 429) {
+        setError('Too many requests. Please wait a moment and try again.')
+      } else {
+        setError(serverMsg || 'Failed to create deposit. Please try again.')
+      }
     } finally {
       setLoading(false)
     }

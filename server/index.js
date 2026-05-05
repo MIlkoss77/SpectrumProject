@@ -86,10 +86,15 @@ app.use('/api', cors({
     credentials: true
 }));
 
+// Webhook MUST receive raw Buffer — HMAC-SHA512 is computed on the raw body
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+// All other API routes use JSON parser
 app.use('/api', express.json());
 
 // Basic XSS Sanitization Middleware
+// NOTE: Webhook route is excluded — body must remain untouched for HMAC verification
 app.use('/api', (req, res, next) => {
+    if (req.path === '/payments/webhook') return next();
     const sanitize = (obj) => {
         for (let key in obj) {
             if (typeof obj[key] === 'string') {

@@ -24,15 +24,19 @@ export const createDeposit = async (req, res) => {
     const { currency, planId, idempotencyKey } = req.body;
     const userId = req.user.id;
 
+    console.log(`[PaymentController] createDeposit — user=${userId} planId=${planId} currency=${currency}`);
+
     if (!currency || !planId) {
       return res.status(400).json({ ok: false, error: 'currency and planId are required' });
     }
 
+    // Idempotency check — prevent duplicate payment records
     if (idempotencyKey) {
       const existing = await prisma.payment.findFirst({
         where: { userId, idempotencyKey }
       });
       if (existing) {
+        console.log(`[PaymentController] Returning existing payment record ${existing.id} (idempotency)`);
         return res.json({
           ok: true,
           automated: !!existing.txId,
@@ -57,32 +61,41 @@ export const createDeposit = async (req, res) => {
     // --- AUTOMATED FLOW (NOWPayments) ---
     if (paymentService.isEnabled()) {
       try {
-        // Create prisma record first to get an ID
+        // Build the IPN callback URL from PUBLIC_URL env var (required for production)
+        const publicBase = process.env.PUBLIC_URL
+          ? process.env.PUBLIC_URL.replace(/\/$/, '')
+          : `${req.protocol}://${req.get('host')}`;
+
+        const ipnCallbackUrl = `${publicBase}/api/payments/webhook`;
+        console.log(`[PaymentController] IPN callback URL: ${ipnCallbackUrl}`);
+
+        // Create Prisma record first to obtain a stable order_id
         const paymentRecord = await prisma.payment.create({
           data: {
             userId,
             amount: plan.amount,
             currency: upperCurrency,
             status: 'PENDING',
-            idempotencyKey
+            idempotencyKey: idempotencyKey || null,
           },
         });
 
-        const publicBase = process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
-        const ipnCallbackUrl = `${publicBase}/api/payments/webhook`;
-        
+        console.log(`[PaymentController] Created payment record ${paymentRecord.id}`);
+
         const gatewayPayment = await paymentService.createPayment({
           amount: plan.amount,
           currency: upperCurrency,
           orderId: paymentRecord.id,
-          ipnCallbackUrl
+          ipnCallbackUrl,
         });
+
+        console.log(`[PaymentController] Gateway payment created — paymentId=${gatewayPayment.paymentId} address=${gatewayPayment.depositAddress}`);
 
         const updated = await prisma.payment.update({
           where: { id: paymentRecord.id },
-          data: { 
+          data: {
             depositAddress: gatewayPayment.depositAddress,
-            txId: gatewayPayment.paymentId // Store gateway ID temporarily in txId field
+            txId: gatewayPayment.paymentId, // Store NOWPayments payment_id for status polling
           }
         });
 
@@ -96,7 +109,7 @@ export const createDeposit = async (req, res) => {
             depositAddress: updated.depositAddress,
             status: updated.status,
             planLabel: plan.label,
-            payAmount: gatewayPayment.payAmount
+            payAmount: gatewayPayment.payAmount,
           }
         });
       } catch (e) {
@@ -116,9 +129,11 @@ export const createDeposit = async (req, res) => {
         currency: upperCurrency,
         status: 'PENDING',
         depositAddress: DEPOSIT_ADDRESSES[upperCurrency],
-        idempotencyKey
+        idempotencyKey: idempotencyKey || null,
       },
     });
+
+    console.log(`[PaymentController] Manual payment record created ${payment.id}`);
 
     res.json({
       ok: true,
@@ -141,62 +156,89 @@ export const createDeposit = async (req, res) => {
 
 /**
  * POST /api/payments/webhook
- * Handled IPN from NOWPayments
+ * Handle IPN from NOWPayments.
+ *
+ * CRITICAL: This route must be registered with express.raw() in index.js
+ * BEFORE express.json() — otherwise raw Buffer is lost.
  */
 export const handleWebhook = async (req, res) => {
+  const step = { received: true };
   try {
+    console.log('[Webhook] IPN received — headers:', JSON.stringify({
+      'x-nowpayments-sig': req.headers['x-nowpayments-sig'],
+      'content-type': req.headers['content-type'],
+      'content-length': req.headers['content-length'],
+    }));
+
     const IPN_SECRET = process.env.NOWPAYMENTS_IPN_SECRET;
     if (!IPN_SECRET) {
-      console.error('[Webhook] NOWPAYMENTS_IPN_SECRET not configured');
-      return res.status(500).json({ ok: false });
+      console.error('[Webhook] NOWPAYMENTS_IPN_SECRET not configured — cannot verify webhook');
+      return res.status(500).json({ ok: false, error: 'Server misconfiguration' });
     }
 
     const signature = req.headers['x-nowpayments-sig'];
     if (!signature) {
+      console.warn('[Webhook] Missing x-nowpayments-sig header — rejected');
       return res.status(401).json({ ok: false, error: 'Missing signature' });
     }
 
-    const sortedBody = JSON.stringify(
-      Object.keys(req.body).sort().reduce((r, k) => { r[k] = req.body[k]; return r; }, {})
-    );
-    const expectedSig = crypto
-      .createHmac('sha512', IPN_SECRET)
-      .update(sortedBody)
-      .digest('hex');
-
-    if (signature !== expectedSig) {
-      console.warn('[Webhook] Invalid signature');
+    // req.body is a Buffer when express.raw() is used for this route
+    // Verify HMAC before any parsing
+    const isValid = paymentService.verifyIpnSignature(req.body, signature);
+    if (!isValid) {
+      // Log the mismatch for debugging but return 401
+      console.warn('[Webhook] HMAC verification failed — possible replay/spoofing attack');
       return res.status(401).json({ ok: false, error: 'Invalid signature' });
     }
 
-    const { payment_id, payment_status, order_id } = req.body;
-    
+    // Parse after verification
+    const bodyStr = req.body instanceof Buffer ? req.body.toString('utf8') : String(req.body);
+    const payload = JSON.parse(bodyStr);
+
+    const { payment_id, payment_status, order_id } = payload;
+    console.log(`[Webhook] ✅ Valid IPN — payment_id=${payment_id} status=${payment_status} order_id=${order_id}`);
+
+    // Only process terminal success states
     if (payment_status === 'finished' || payment_status === 'confirmed') {
       const payment = await prisma.payment.findUnique({ where: { id: order_id } });
-      if (payment && payment.status !== 'COMPLETED') {
-        // 1. Update Payment Status
-        await prisma.payment.update({
-          where: { id: order_id },
-          data: { status: 'COMPLETED', updatedAt: new Date() }
-        });
 
-        // 2. Upgrade User Subscription
-        await prisma.user.update({
-          where: { id: payment.userId },
-          data: { 
-            subscriptionStatus: 'PRO',
-            subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-          }
-        });
-        
-        console.log(`[Payment] Order ${order_id} completed. User ${payment.userId} upgraded to PRO.`);
+      if (!payment) {
+        console.warn(`[Webhook] Payment record not found for order_id=${order_id}`);
+        // Still return 200 so NOWPayments stops retrying for unknown orders
+        return res.json({ ok: true });
       }
+
+      if (payment.status === 'COMPLETED') {
+        console.log(`[Webhook] Order ${order_id} already completed — idempotent skip`);
+        return res.json({ ok: true });
+      }
+
+      // 1. Update Payment Status
+      await prisma.payment.update({
+        where: { id: order_id },
+        data: { status: 'COMPLETED', updatedAt: new Date() }
+      });
+
+      // 2. Upgrade User Subscription
+      await prisma.user.update({
+        where: { id: payment.userId },
+        data: {
+          subscriptionStatus: 'PRO',
+          subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+        }
+      });
+
+      console.log(`[Webhook] ✅ Order ${order_id} completed. User ${payment.userId} upgraded to PRO.`);
+    } else {
+      console.log(`[Webhook] Non-terminal status=${payment_status} for order_id=${order_id} — no action taken`);
     }
-    
+
+    // Always respond 200 to acknowledge receipt
     res.json({ ok: true });
   } catch (error) {
-    console.error('[PaymentController] Webhook error:', error.message);
-    res.status(500).json({ ok: false });
+    console.error('[PaymentController] Webhook error:', error.message, error.stack);
+    // Return 200 to prevent NOWPayments from hammering with retries on our bugs
+    res.json({ ok: false, error: 'Internal error' });
   }
 };
 
@@ -208,6 +250,8 @@ export const verifyPayment = async (req, res) => {
   try {
     const { paymentId, txId } = req.body;
     const userId = req.user.id;
+
+    console.log(`[PaymentController] verifyPayment — user=${userId} paymentId=${paymentId}`);
 
     if (!paymentId) {
       return res.status(400).json({ ok: false, error: 'paymentId is required' });
@@ -222,9 +266,17 @@ export const verifyPayment = async (req, res) => {
       return res.status(404).json({ ok: false, error: 'Payment not found' });
     }
 
+    // Already completed
+    if (payment.status === 'COMPLETED') {
+      return res.json({ ok: true, status: 'COMPLETED', message: 'Payment already verified' });
+    }
+
     // If automated, check with gateway
     if (paymentService.isEnabled() && payment.txId && payment.status === 'PENDING') {
+      console.log(`[PaymentController] Checking gateway status for payment_id=${payment.txId}`);
       const remote = await paymentService.checkStatus(payment.txId);
+      console.log(`[PaymentController] Gateway status: ${remote.status}`);
+
       if (remote.isFinished) {
         await prisma.payment.update({
           where: { id: paymentId },
@@ -234,37 +286,35 @@ export const verifyPayment = async (req, res) => {
         // Upgrade User Subscription
         await prisma.user.update({
           where: { id: userId },
-          data: { 
+          data: {
             subscriptionStatus: 'PRO',
             subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
           }
         });
 
+        console.log(`[PaymentController] Payment ${paymentId} confirmed via polling. User ${userId} upgraded to PRO.`);
         return res.json({ ok: true, status: 'COMPLETED', message: 'Payment confirmed! Welcome to PRO.' });
       }
+
+      return res.json({ ok: true, status: remote.status, message: 'Payment is being processed...' });
     }
 
-    if (payment.status === 'COMPLETED') {
-        return res.json({ ok: true, message: 'Payment already verified', status: 'COMPLETED' });
-    }
-
-    // Manual flow update
+    // Manual flow update (txId provided by user)
     if (txId) {
-        // Validate TxID Format
-        const evmRegex = /^0x([A-Fa-f0-9]{64})$/;
-        const solRegex = /^[1-9A-HJ-NP-Za-km-z]{87,88}$/;
-        
-        if (!evmRegex.test(txId) && !solRegex.test(txId)) {
-            return res.status(400).json({ ok: false, error: 'Invalid transaction hash format' });
-        }
+      const evmRegex = /^0x([A-Fa-f0-9]{64})$/;
+      const solRegex = /^[1-9A-HJ-NP-Za-km-z]{87,88}$/;
 
-        const updated = await prisma.payment.update({
-          where: { id: paymentId },
-          data: { txId, status: 'PENDING', updatedAt: new Date() },
-        });
+      if (!evmRegex.test(txId) && !solRegex.test(txId)) {
+        return res.status(400).json({ ok: false, error: 'Invalid transaction hash format' });
+      }
 
-        // Audit log...
-        return res.json({ ok: true, status: 'PENDING', message: 'Manual verification submitted! Pending admin approval.' });
+      await prisma.payment.update({
+        where: { id: paymentId },
+        data: { txId, status: 'PENDING', updatedAt: new Date() },
+      });
+
+      console.log(`[PaymentController] Manual TxID submitted for payment ${paymentId}: ${txId}`);
+      return res.json({ ok: true, status: 'PENDING', message: 'Manual verification submitted! Pending admin approval.' });
     }
 
     res.json({ ok: true, status: payment.status, message: 'Verification pending...' });
@@ -305,7 +355,7 @@ export const getPaymentHistory = async (req, res) => {
 
 /**
  * GET /api/payments/status
- * Check if the user has Pro status (any COMPLETED payment).
+ * Check if the user has Pro status.
  */
 export const getProStatus = async (req, res) => {
   try {
@@ -315,7 +365,7 @@ export const getProStatus = async (req, res) => {
       where: { id: userId },
       select: { subscriptionStatus: true, subscriptionExpiresAt: true }
     });
- 
+
     res.json({
       ok: true,
       isPro: user?.subscriptionStatus === 'PRO',
