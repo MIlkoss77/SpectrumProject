@@ -147,16 +147,14 @@ bot.on('message', async (msg) => {
     // Skip if it's a command
     if (msg.text?.startsWith('/')) return;
 
-    const solRegex = /[1-9A-HJ-NP-Za-km-z]{32,44}/;
+    // Precise Solana: exactly 43-44 Base58 chars (word boundary prevents false positives)
+    const solRegex = /\b[1-9A-HJ-NP-Za-km-z]{43,44}\b/;
     const evmRegex = /0x[a-fA-F0-9]{40}/;
     
-    const match = msg.text?.match(solRegex) || msg.text?.match(evmRegex);
+    const match = msg.text?.match(evmRegex) || msg.text?.match(solRegex);
     if (match) {
         const contract = match[0];
-        // Only auto-check if it looks like a real contract (shallow validation)
-        if (contract.length >= 32) {
-             handleContractCheck(msg.chat.id, contract, msg.from.username);
-        }
+        handleContractCheck(msg.chat.id, contract, msg.from.username);
     }
 });
 
@@ -207,7 +205,8 @@ ${score > 75 ? '🟢 *HIGH CONVICTION:* Low risk, high liquidity.' : (score > 40
 
         bot.sendMessage(chatId, text, opts);
     } catch (e) {
-        // Silent fail for passive
+        // Silent fail for passive checks — log for debug only
+        console.error(`[Bot] handleContractCheck failed for ${contract}:`, e.message);
     }
 }
 

@@ -100,6 +100,8 @@ router.get('/admin/stats', authMiddleware, adminMiddleware, adminController.getS
 router.get('/admin/users', authMiddleware, adminMiddleware, adminController.getUsers);
 router.patch('/admin/users/:id/role', authMiddleware, adminMiddleware, adminController.updateUserRole);
 router.patch('/admin/users/:id/subscription', authMiddleware, adminMiddleware, adminController.updateUserSubscription);
+router.get('/admin/payments', authMiddleware, adminMiddleware, adminController.getPayments);
+router.get('/admin/logs', authMiddleware, adminMiddleware, adminController.getAuditLogs);
 
 export default router;
 
