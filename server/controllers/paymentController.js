@@ -2,14 +2,6 @@ import { prisma } from '../config/database.js';
 import { paymentService } from '../services/paymentService.js';
 import crypto from 'crypto';
 
-// Static deposit addresses from env (Phase 1 — manual verification fallback)
-// All addresses MUST be configured via env vars. No placeholders.
-const DEPOSIT_ADDRESSES = {
-  USDT: process.env.DEPOSIT_WALLET_USDT || null,
-  SOL: process.env.DEPOSIT_WALLET_SOL || null,
-  ETH: process.env.DEPOSIT_WALLET_ETH || null,
-};
-
 // Plan pricing (Updated for 2026 Strategy)
 const PLAN_PRICES = {
   pro: { amount: 29, label: 'Pro: Cognitive Edge', duration: 30 },
@@ -30,7 +22,7 @@ function getSubscriptionExpiry(planId) {
 
 /**
  * POST /api/payments/deposit
- * Create a new deposit record and return the wallet address.
+ * Create a payment via NOWPayments (direct address or hosted invoice).
  */
 export const createDeposit = async (req, res) => {
   try {
@@ -43,6 +35,12 @@ export const createDeposit = async (req, res) => {
       return res.status(400).json({ ok: false, error: 'currency and planId are required' });
     }
 
+    // Verify NOWPayments is configured
+    if (!paymentService.isEnabled()) {
+      console.error('[PaymentController] NOWPAYMENTS_API_KEY not set — payments disabled');
+      return res.status(503).json({ ok: false, error: 'Payment system is temporarily unavailable. Please try again later.' });
+    }
+
     // Idempotency check — prevent duplicate payment records
     if (idempotencyKey) {
       const existing = await prisma.payment.findFirst({
@@ -52,12 +50,13 @@ export const createDeposit = async (req, res) => {
         console.log(`[PaymentController] Returning existing payment record ${existing.id} (idempotency)`);
         return res.json({
           ok: true,
-          automated: !!existing.txId,
+          automated: true,
           payment: {
             id: existing.id,
             amount: existing.amount,
             currency: existing.currency,
             depositAddress: existing.depositAddress,
+            invoiceUrl: existing.invoiceUrl || null,
             status: existing.status,
             planLabel: PLAN_PRICES[planId]?.label
           }
@@ -71,98 +70,111 @@ export const createDeposit = async (req, res) => {
       return res.status(400).json({ ok: false, error: `Unknown plan: ${planId}.` });
     }
 
-    // --- AUTOMATED FLOW (NOWPayments) ---
-    if (paymentService.isEnabled()) {
-      try {
-        // Build the IPN callback URL from PUBLIC_URL env var (required for production)
-        const publicBase = process.env.PUBLIC_URL
-          ? process.env.PUBLIC_URL.replace(/\/$/, '')
-          : `${req.protocol}://${req.get('host')}`;
+    // Build callback URLs
+    const publicBase = process.env.PUBLIC_URL
+      ? process.env.PUBLIC_URL.replace(/\/$/, '')
+      : `${req.protocol}://${req.get('host')}`;
+    const ipnCallbackUrl = `${publicBase}/api/payments/webhook`;
+    const frontendBase = process.env.FRONTEND_URL || publicBase;
 
-        const ipnCallbackUrl = `${publicBase}/api/payments/webhook`;
-        console.log(`[PaymentController] IPN callback URL: ${ipnCallbackUrl}`);
+    // --- PRIMARY: Direct crypto address via NOWPayments ---
+    try {
+      console.log(`[PaymentController] IPN callback URL: ${ipnCallbackUrl}`);
 
-        // Create Prisma record first to obtain a stable order_id
-        const paymentRecord = await prisma.payment.create({
-          data: {
-            userId,
-            amount: plan.amount,
-            currency: upperCurrency,
-            planId: planId,
-            status: 'PENDING',
-            idempotencyKey: idempotencyKey || null,
-          },
-        });
-
-        console.log(`[PaymentController] Created payment record ${paymentRecord.id}`);
-
-        const gatewayPayment = await paymentService.createPayment({
+      const paymentRecord = await prisma.payment.create({
+        data: {
+          userId,
           amount: plan.amount,
           currency: upperCurrency,
-          orderId: paymentRecord.id,
-          ipnCallbackUrl,
-        });
+          planId: planId,
+          status: 'PENDING',
+          idempotencyKey: idempotencyKey || null,
+        },
+      });
 
-        console.log(`[PaymentController] Gateway payment created — paymentId=${gatewayPayment.paymentId} address=${gatewayPayment.depositAddress}`);
+      console.log(`[PaymentController] Created payment record ${paymentRecord.id}`);
 
-        const updated = await prisma.payment.update({
-          where: { id: paymentRecord.id },
-          data: {
-            depositAddress: gatewayPayment.depositAddress,
-            txId: gatewayPayment.paymentId, // Store NOWPayments payment_id for status polling
-          }
-        });
-
-        return res.json({
-          ok: true,
-          automated: true,
-          payment: {
-            id: updated.id,
-            amount: plan.amount,
-            currency: upperCurrency,
-            depositAddress: updated.depositAddress,
-            status: updated.status,
-            planLabel: plan.label,
-            payAmount: gatewayPayment.payAmount,
-          }
-        });
-      } catch (e) {
-        console.error('[PaymentController] Automated gateway failed, falling back to manual:', e.message);
-      }
-    }
-
-    // --- MANUAL FALLBACK ---
-    const walletAddr = DEPOSIT_ADDRESSES[upperCurrency];
-    if (!walletAddr) {
-      return res.status(400).json({ ok: false, error: `Deposit address for ${currency} is not configured. Please contact support.` });
-    }
-
-    const payment = await prisma.payment.create({
-      data: {
-        userId,
+      const gatewayPayment = await paymentService.createPayment({
         amount: plan.amount,
         currency: upperCurrency,
-        planId: planId,
-        status: 'PENDING',
-        depositAddress: walletAddr,
-        idempotencyKey: idempotencyKey || null,
-      },
-    });
+        orderId: paymentRecord.id,
+        ipnCallbackUrl,
+      });
 
-    console.log(`[PaymentController] Manual payment record created ${payment.id}`);
+      console.log(`[PaymentController] Gateway payment created — paymentId=${gatewayPayment.paymentId} address=${gatewayPayment.depositAddress}`);
 
-    res.json({
-      ok: true,
-      automated: false,
-      payment: {
-        id: payment.id,
-        amount: payment.amount,
-        currency: payment.currency,
-        depositAddress: payment.depositAddress,
-        status: payment.status,
-        planLabel: plan.label,
-      },
-    });
+      await prisma.payment.update({
+        where: { id: paymentRecord.id },
+        data: {
+          depositAddress: gatewayPayment.depositAddress,
+          txId: gatewayPayment.paymentId,
+        }
+      });
+
+      return res.json({
+        ok: true,
+        automated: true,
+        payment: {
+          id: paymentRecord.id,
+          amount: plan.amount,
+          currency: upperCurrency,
+          depositAddress: gatewayPayment.depositAddress,
+          status: 'PENDING',
+          planLabel: plan.label,
+          payAmount: gatewayPayment.payAmount,
+        }
+      });
+    } catch (directErr) {
+      console.warn('[PaymentController] Direct payment failed, trying hosted invoice:', directErr.message);
+    }
+
+    // --- FALLBACK: Hosted invoice page (NOWPayments) ---
+    try {
+      const paymentRecord = await prisma.payment.create({
+        data: {
+          userId,
+          amount: plan.amount,
+          currency: upperCurrency,
+          planId: planId,
+          status: 'PENDING',
+          idempotencyKey: idempotencyKey ? `${idempotencyKey}_inv` : null,
+        },
+      });
+
+      const invoice = await paymentService.createInvoice({
+        amount: plan.amount,
+        currency: 'usd',
+        orderId: paymentRecord.id,
+        description: plan.label,
+        successUrl: `${frontendBase}/pricing?payment=success`,
+        cancelUrl: `${frontendBase}/pricing?payment=cancelled`,
+        ipnCallbackUrl,
+      });
+
+      console.log(`[PaymentController] Invoice created — id=${invoice.invoiceId} url=${invoice.invoiceUrl}`);
+
+      await prisma.payment.update({
+        where: { id: paymentRecord.id },
+        data: { txId: String(invoice.invoiceId) }
+      });
+
+      return res.json({
+        ok: true,
+        automated: true,
+        invoiceFlow: true,
+        payment: {
+          id: paymentRecord.id,
+          amount: plan.amount,
+          currency: upperCurrency,
+          invoiceUrl: invoice.invoiceUrl,
+          status: 'PENDING',
+          planLabel: plan.label,
+        }
+      });
+    } catch (invoiceErr) {
+      console.error('[PaymentController] Invoice creation also failed:', invoiceErr.message);
+      return res.status(502).json({ ok: false, error: 'Payment gateway is temporarily unavailable. Please try again in a few minutes.' });
+    }
   } catch (error) {
     console.error('[PaymentController] createDeposit error:', error.message);
     res.status(500).json({ ok: false, error: 'Failed to create deposit' });

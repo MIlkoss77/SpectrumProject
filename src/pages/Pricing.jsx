@@ -68,20 +68,17 @@ const CRYPTO_OPTIONS = [
 
 function DepositModal({ plan, onClose, onSuccess }) {
   const { t } = useTranslation()
-  const [step, setStep] = useState('select') // select | deposit | txid | pending_review | success
+  const [step, setStep] = useState('select') // select | deposit | success
   const [selectedCrypto, setSelectedCrypto] = useState(null)
   const [depositData, setDepositData] = useState(null)
-  const [isAutomated, setIsAutomated] = useState(false)
-  const [txId, setTxId] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [copied, setCopied] = useState(false)
-  const [statusText, setStatusText] = useState('Awaiting Payment')
 
-  // Auto-poll for status if automated
+  // Auto-poll for payment confirmation
   useEffect(() => {
     let timer;
-    if (step === 'deposit' && isAutomated && depositData?.id) {
+    if (step === 'deposit' && depositData?.id) {
       timer = setInterval(async () => {
         try {
           const token = localStorage.getItem('spectr_auth_token')
@@ -107,7 +104,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
       }, 5000)
     }
     return () => clearInterval(timer)
-  }, [step, isAutomated, depositData])
+  }, [step, depositData])
 
   const handleSelectCrypto = async (crypto) => {
     setSelectedCrypto(crypto)
@@ -134,8 +131,15 @@ function DepositModal({ plan, onClose, onSuccess }) {
       console.log('[Payment] Deposit response:', res.data)
 
       if (res.data.ok) {
+        // Invoice flow — redirect to NOWPayments hosted page
+        if (res.data.invoiceFlow && res.data.payment?.invoiceUrl) {
+          window.open(res.data.payment.invoiceUrl, '_blank')
+          setDepositData(res.data.payment)
+          setStep('deposit')
+          return
+        }
+        // Direct deposit address flow
         setDepositData(res.data.payment)
-        setIsAutomated(res.data.automated)
         setStep('deposit')
       } else {
         setError(res.data.error || 'Unknown error from server')
@@ -147,7 +151,6 @@ function DepositModal({ plan, onClose, onSuccess }) {
       console.error('[Payment] Deposit failed — HTTP', status, ':', serverMsg || err.message)
 
       if (status === 401) {
-        // JWT expired or invalid — clear stale token
         localStorage.removeItem('spectr_auth_token')
         setError('Session expired. Please log in again to continue.')
       } else if (status === 429) {
@@ -164,36 +167,6 @@ function DepositModal({ plan, onClose, onSuccess }) {
     navigator.clipboard.writeText(depositData.depositAddress)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }
-
-  const handleSubmitTxId = async () => {
-    if (!txId.trim()) return
-    setLoading(true)
-    setError(null)
-    try {
-      const token = localStorage.getItem('spectr_auth_token')
-      const res = await axios.post('/api/payments/verify', {
-        paymentId: depositData.id,
-        txId: txId.trim(),
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.data.ok && res.data.status === 'COMPLETED') {
-        // Only grant access when payment is fully confirmed
-        setStep('success')
-        localStorage.setItem('spectr_pro_status', 'true')
-        window.dispatchEvent(new Event('proStatusChanged'))
-        onSuccess?.()
-      } else if (res.data.ok) {
-        // Payment submitted but not yet confirmed (PENDING / processing)
-        setStatusText(res.data.message || 'Transaction submitted. Awaiting confirmation...')
-        setStep('pending_review')
-      }
-    } catch (err) {
-      setError(err.response?.data?.error || 'Verification failed')
-    } finally {
-      setLoading(false)
-    }
   }
 
   return (
@@ -242,8 +215,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
               </h3>
               <p style={{ margin: '6px 0 0', color: 'rgba(255,255,255,0.4)', fontSize: 13, fontWeight: 500 }}>
                 {step === 'select' && 'Select your preferred settlement asset'}
-                {step === 'deposit' && isAutomated && 'Gateway active. Polling blockchain for status...'}
-                {step === 'deposit' && !isAutomated && `Send $${depositData?.amount} to the secure vault`}
+                {step === 'deposit' && 'Gateway active. Polling blockchain for status...'}
                 {step === 'success' && 'Deep institutional intelligence now available.'}
               </p>
             </div>
@@ -327,7 +299,7 @@ function DepositModal({ plan, onClose, onSuccess }) {
                 textAlign: 'center'
               }}>
                 <div style={{ fontSize: 11, fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16 }}>
-                  {isAutomated ? 'LIVE DEPOSIT GATEWAY' : 'MANUAL VAULT ADDRESS'}
+                  LIVE DEPOSIT GATEWAY
                 </div>
                 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
@@ -359,102 +331,19 @@ function DepositModal({ plan, onClose, onSuccess }) {
                 </div>
               </div>
 
-              {isAutomated ? (
-                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: '#00FFFF', fontSize: 12, fontWeight: 800, marginBottom: 12 }}>
-                       <div className="animate-pulse w-2 h-2 rounded-full bg-cyan-400" />
-                       AUTO-TRACKING ENGAGED
-                    </div>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, margin: 0 }}>
-                      System is polling blockchain explorers. <br/> Pro status will unlock instantly after 1 confirm.
-                    </p>
-                 </div>
-              ) : (
-                <button
-                  onClick={() => setStep('txid')}
-                  className="dx-btn"
-                  style={{
-                    width: '100%', justifyContent: 'center',
-                    background: 'rgba(0,255,255,0.08)',
-                    border: '1px solid rgba(0,255,255,0.15)', color: '#00FFFF',
-                    height: 52, borderRadius: 16, fontSize: 15, fontWeight: 800
-                  }}
-                >
-                  <Shield size={18} /> Confirm Manual Transfer
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Step: Enter TxID */}
-          {step === 'txid' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 800, color: 'rgba(255,255,255,0.3)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: 1.5 }}>
-                  Transaction Identifier (TxID)
-                </label>
-                <input
-                  type="text"
-                  value={txId}
-                  onChange={e => setTxId(e.target.value)}
-                  placeholder="0x... paste hash from explorer"
-                  autoFocus
-                  style={{
-                    width: '100%', padding: '16px', borderRadius: 16,
-                    border: '1px solid rgba(0,255,255,0.12)',
-                    background: 'rgba(0,0,0,0.5)',
-                    color: '#fff', fontSize: 13, fontFamily: 'var(--font-mono)',
-                    outline: 'none', transition: 'border-color 0.2s'
-                  }}
-                  onKeyDown={e => e.key === 'Enter' && handleSubmitTxId()}
-                />
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: '#00FFFF', fontSize: 12, fontWeight: 800, marginBottom: 12 }}>
+                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#00FFFF', animation: 's-pulse 2s infinite' }} />
+                   AUTO-TRACKING ENGAGED
+                </div>
+                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, margin: 0 }}>
+                  System is polling blockchain explorers. <br/> Pro status will unlock instantly after 1 confirm.
+                </p>
               </div>
-
-              <button
-                onClick={handleSubmitTxId}
-                disabled={!txId.trim() || loading}
-                className="dx-btn"
-                style={{
-                  width: '100%', justifyContent: 'center',
-                  background: 'var(--accent)', color: '#000', fontWeight: 900,
-                  height: 52, borderRadius: 16, fontSize: 15,
-                  opacity: (!txId.trim() || loading) ? 0.5 : 1,
-                }}
-              >
-                {loading ? 'Validating...' : 'Unlock Membership'}
-              </button>
             </div>
           )}
 
-          {/* Step: Pending Review (manual flow — txId submitted, awaiting admin) */}
-          {step === 'pending_review' && (
-            <div style={{ textAlign: 'center', padding: '20px 0 10px' }}>
-              <div style={{
-                width: 80, height: 80, borderRadius: 24, margin: '0 auto 24px',
-                background: 'rgba(255,180,0,0.08)', border: '1px solid rgba(255,180,0,0.2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 0 40px rgba(255,180,0,0.08)'
-              }}>
-                <Shield size={40} color="#FFB400" />
-              </div>
-              <h3 style={{ margin: '0 0 10px', fontSize: 24, fontWeight: 900, letterSpacing: '-0.5px' }}>
-                Submitted for <span style={{ color: '#FFB400' }}>Review</span>
-              </h3>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, lineHeight: 1.6, margin: '0 0 28px', fontWeight: 500 }}>
-                {statusText}
-              </p>
-              <button
-                onClick={onClose}
-                className="dx-btn secondary"
-                style={{
-                  width: '100%', justifyContent: 'center',
-                  height: 52, borderRadius: 16, fontSize: 15, fontWeight: 800
-                }}
-              >
-                Close <ChevronRight size={16} />
-              </button>
-            </div>
-          )}
+
 
           {/* Step: Success */}
           {step === 'success' && (
