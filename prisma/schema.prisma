@@ -65,6 +65,7 @@ model Payment {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   txId          String?  @unique
   idempotencyKey String?  @unique
+  planId        String?  // "pro", "lifetime" — determines subscription duration
   amount        Float
   currency      String
   status        String   // "PENDING", "COMPLETED", "FAILED"

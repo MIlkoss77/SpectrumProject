@@ -68,7 +68,7 @@ const CRYPTO_OPTIONS = [
 
 function DepositModal({ plan, onClose, onSuccess }) {
   const { t } = useTranslation()
-  const [step, setStep] = useState('select') // select | deposit | success
+  const [step, setStep] = useState('select') // select | deposit | txid | pending_review | success
   const [selectedCrypto, setSelectedCrypto] = useState(null)
   const [depositData, setDepositData] = useState(null)
   const [isAutomated, setIsAutomated] = useState(false)
@@ -178,11 +178,16 @@ function DepositModal({ plan, onClose, onSuccess }) {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       })
-      if (res.data.ok) {
+      if (res.data.ok && res.data.status === 'COMPLETED') {
+        // Only grant access when payment is fully confirmed
         setStep('success')
         localStorage.setItem('spectr_pro_status', 'true')
         window.dispatchEvent(new Event('proStatusChanged'))
         onSuccess?.()
+      } else if (res.data.ok) {
+        // Payment submitted but not yet confirmed (PENDING / processing)
+        setStatusText(res.data.message || 'Transaction submitted. Awaiting confirmation...')
+        setStep('pending_review')
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Verification failed')
@@ -417,6 +422,36 @@ function DepositModal({ plan, onClose, onSuccess }) {
                 }}
               >
                 {loading ? 'Validating...' : 'Unlock Membership'}
+              </button>
+            </div>
+          )}
+
+          {/* Step: Pending Review (manual flow — txId submitted, awaiting admin) */}
+          {step === 'pending_review' && (
+            <div style={{ textAlign: 'center', padding: '20px 0 10px' }}>
+              <div style={{
+                width: 80, height: 80, borderRadius: 24, margin: '0 auto 24px',
+                background: 'rgba(255,180,0,0.08)', border: '1px solid rgba(255,180,0,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 0 40px rgba(255,180,0,0.08)'
+              }}>
+                <Shield size={40} color="#FFB400" />
+              </div>
+              <h3 style={{ margin: '0 0 10px', fontSize: 24, fontWeight: 900, letterSpacing: '-0.5px' }}>
+                Submitted for <span style={{ color: '#FFB400' }}>Review</span>
+              </h3>
+              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, lineHeight: 1.6, margin: '0 0 28px', fontWeight: 500 }}>
+                {statusText}
+              </p>
+              <button
+                onClick={onClose}
+                className="dx-btn secondary"
+                style={{
+                  width: '100%', justifyContent: 'center',
+                  height: 52, borderRadius: 16, fontSize: 15, fontWeight: 800
+                }}
+              >
+                Close <ChevronRight size={16} />
               </button>
             </div>
           )}

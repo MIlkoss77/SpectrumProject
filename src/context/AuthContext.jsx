@@ -26,11 +26,17 @@ export const AuthProvider = ({ children }) => {
       });
       if (res.data.ok) {
         setUser(res.data.user);
-        // Sync Pro status
-        if (res.data.user.subscriptionStatus === 'PRO') {
+        // Sync Pro status — check if subscription is active and not expired
+        const isPro = res.data.user.subscriptionStatus === 'PRO';
+        const expiresAt = res.data.user.subscriptionExpiresAt;
+        const isExpired = expiresAt && new Date(expiresAt) < new Date();
+        
+        if (isPro && !isExpired) {
           localStorage.setItem('spectr_pro_status', 'true');
-          window.dispatchEvent(new Event('proStatusChanged'));
+        } else {
+          localStorage.removeItem('spectr_pro_status');
         }
+        window.dispatchEvent(new Event('proStatusChanged'));
       } else {
         setToken(null);
       }

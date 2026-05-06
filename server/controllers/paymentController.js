@@ -3,17 +3,30 @@ import { paymentService } from '../services/paymentService.js';
 import crypto from 'crypto';
 
 // Static deposit addresses from env (Phase 1 — manual verification fallback)
+// All addresses MUST be configured via env vars. No placeholders.
 const DEPOSIT_ADDRESSES = {
-  USDT: process.env.DEPOSIT_WALLET_USDT || 'TBA_USDT_ADDRESS',
-  SOL: process.env.DEPOSIT_WALLET_SOL || 'TBA_SOL_ADDRESS',
-  ETH: process.env.DEPOSIT_WALLET_ETH || 'TBA_ETH_ADDRESS',
+  USDT: process.env.DEPOSIT_WALLET_USDT || null,
+  SOL: process.env.DEPOSIT_WALLET_SOL || null,
+  ETH: process.env.DEPOSIT_WALLET_ETH || null,
 };
 
 // Plan pricing (Updated for 2026 Strategy)
 const PLAN_PRICES = {
-  pro: { amount: 29, label: 'Pro: Cognitive Edge' },
-  lifetime: { amount: 499, label: 'Protocol Founder (Lifetime)' },
+  pro: { amount: 29, label: 'Pro: Cognitive Edge', duration: 30 },
+  lifetime: { amount: 499, label: 'Protocol Founder (Lifetime)', duration: null }, // null = perpetual
 };
+
+/**
+ * Calculate subscription expiry date based on plan.
+ * Returns null for lifetime (perpetual) plans.
+ */
+function getSubscriptionExpiry(planId) {
+  const plan = PLAN_PRICES[planId];
+  if (!plan || plan.duration === null) {
+    return null; // Lifetime — no expiry
+  }
+  return new Date(Date.now() + plan.duration * 24 * 60 * 60 * 1000);
+}
 
 /**
  * POST /api/payments/deposit
@@ -75,6 +88,7 @@ export const createDeposit = async (req, res) => {
             userId,
             amount: plan.amount,
             currency: upperCurrency,
+            planId: planId,
             status: 'PENDING',
             idempotencyKey: idempotencyKey || null,
           },
@@ -118,8 +132,9 @@ export const createDeposit = async (req, res) => {
     }
 
     // --- MANUAL FALLBACK ---
-    if (!DEPOSIT_ADDRESSES[upperCurrency]) {
-      return res.status(400).json({ ok: false, error: `Unsupported currency: ${currency}` });
+    const walletAddr = DEPOSIT_ADDRESSES[upperCurrency];
+    if (!walletAddr) {
+      return res.status(400).json({ ok: false, error: `Deposit address for ${currency} is not configured. Please contact support.` });
     }
 
     const payment = await prisma.payment.create({
@@ -127,8 +142,9 @@ export const createDeposit = async (req, res) => {
         userId,
         amount: plan.amount,
         currency: upperCurrency,
+        planId: planId,
         status: 'PENDING',
-        depositAddress: DEPOSIT_ADDRESSES[upperCurrency],
+        depositAddress: walletAddr,
         idempotencyKey: idempotencyKey || null,
       },
     });
@@ -219,16 +235,17 @@ export const handleWebhook = async (req, res) => {
         data: { status: 'COMPLETED', updatedAt: new Date() }
       });
 
-      // 2. Upgrade User Subscription
+      // 2. Upgrade User Subscription (lifetime = no expiry)
+      const expiresAt = getSubscriptionExpiry(payment.planId);
       await prisma.user.update({
         where: { id: payment.userId },
         data: {
           subscriptionStatus: 'PRO',
-          subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+          subscriptionExpiresAt: expiresAt
         }
       });
 
-      console.log(`[Webhook] ✅ Order ${order_id} completed. User ${payment.userId} upgraded to PRO.`);
+      console.log(`[Webhook] ✅ Order ${order_id} completed. User ${payment.userId} upgraded to PRO (plan=${payment.planId}, expires=${expiresAt || 'NEVER'}).`);
     } else {
       console.log(`[Webhook] Non-terminal status=${payment_status} for order_id=${order_id} — no action taken`);
     }
@@ -283,16 +300,17 @@ export const verifyPayment = async (req, res) => {
           data: { status: 'COMPLETED', updatedAt: new Date() }
         });
 
-        // Upgrade User Subscription
+        // Upgrade User Subscription (lifetime = no expiry)
+        const expiresAt = getSubscriptionExpiry(payment.planId);
         await prisma.user.update({
           where: { id: userId },
           data: {
             subscriptionStatus: 'PRO',
-            subscriptionExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            subscriptionExpiresAt: expiresAt
           }
         });
 
-        console.log(`[PaymentController] Payment ${paymentId} confirmed via polling. User ${userId} upgraded to PRO.`);
+        console.log(`[PaymentController] Payment ${paymentId} confirmed via polling. User ${userId} upgraded to PRO (plan=${payment.planId}, expires=${expiresAt || 'NEVER'}).`);
         return res.json({ ok: true, status: 'COMPLETED', message: 'Payment confirmed! Welcome to PRO.' });
       }
 
@@ -365,6 +383,26 @@ export const getProStatus = async (req, res) => {
       where: { id: userId },
       select: { subscriptionStatus: true, subscriptionExpiresAt: true }
     });
+
+    // Check if subscription is expired (null expiresAt = lifetime, never expires)
+    const isExpired = user?.subscriptionExpiresAt
+      && new Date(user.subscriptionExpiresAt) < new Date();
+
+    // Auto-downgrade expired subscriptions
+    if (user?.subscriptionStatus === 'PRO' && isExpired) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { subscriptionStatus: 'FREE', subscriptionExpiresAt: null }
+      });
+      console.log(`[PaymentController] User ${userId} PRO expired — downgraded to FREE.`);
+      return res.json({
+        ok: true,
+        isPro: false,
+        status: 'FREE',
+        expiresAt: null,
+        expired: true
+      });
+    }
 
     res.json({
       ok: true,
