@@ -29,9 +29,11 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.06 } }
 }
 
+import MiniChart from '@/components/MiniChart'
+
 // ── Gauge SVG Component ──
-function SentimentGauge({ score = 50, size = 140 }) {
-  const radius = (size / 2) - 12
+function SentimentGauge({ score = 50, size = 100 }) {
+  const radius = (size / 2) - 8
   const circumference = 2 * Math.PI * radius
   const progress = Math.max(0, Math.min(100, score))
   const offset = circumference - (progress / 100) * circumference
@@ -66,12 +68,59 @@ function SentimentGauge({ score = 50, size = 140 }) {
         />
       </svg>
       <div className="ov-gauge-center">
-        <span className="ov-gauge-num" style={{ color }}>
+        <span className="ov-gauge-num" style={{ color, fontSize: '24px' }}>
           <NumberTicker value={score} decimals={0} />
         </span>
-        <span className="ov-gauge-label" style={{ color }}>{label}</span>
+        <span className="ov-gauge-label" style={{ color, fontSize: '7px' }}>{label}</span>
       </div>
     </div>
+  )
+}
+
+function AssetChartCard({ symbol = 'BTC', price = 0, change = 0, data = [] }) {
+  return (
+    <motion.div 
+      className="ov-hero" 
+      style={{ 
+        padding: '20px', 
+        flex: 1, 
+        minWidth: '300px', 
+        background: 'rgba(10,10,18,0.8)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px'
+      }}
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="flex items-center gap-3">
+          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(0,255,255,0.1)', border: '1px solid rgba(0,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+             <Activity size={18} color="#00FFFF" />
+          </div>
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 900, color: '#fff' }}>{symbol}/USDT</div>
+            <div style={{ fontSize: '10px', fontWeight: 800, color: change >= 0 ? '#00E396' : '#FF4560' }}>
+              {change >= 0 ? '+' : ''}{change.toFixed(2)}% (24h)
+            </div>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+           <div style={{ fontSize: '18px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>${price.toLocaleString()}</div>
+           <div style={{ fontSize: '8px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: '1px' }}>Neural: LONG (84%)</div>
+        </div>
+      </div>
+      
+      <MiniChart data={data} color="#00FFFF" height={80} />
+      
+      <div className="flex gap-2">
+         {['1H', '1D', '1W', '1M'].map(tf => (
+           <button key={tf} style={{ flex: 1, padding: '4px 0', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', background: tf === '1D' ? 'rgba(0,255,255,0.1)' : 'transparent', color: tf === '1D' ? '#00FFFF' : 'rgba(255,255,255,0.3)', fontSize: '9px', fontWeight: 900, cursor: 'pointer' }}>
+             {tf}
+           </button>
+         ))}
+      </div>
+    </motion.div>
   )
 }
 
@@ -86,6 +135,9 @@ export default function Overview() {
   const [loading, setLoading] = useState(true)
   const [topActions, setTopActions] = useState([])
   const [superScore, setSuperScore] = useState(null)
+  
+  // Chart mock data
+  const chartData = useMemo(() => [64200, 64500, 64100, 64800, 65200, 64900, 65800, 66400, 66100, 67200, 68100, 67900, 68430], [])
 
   const [intelStream] = useState([
     { id: 1, type: 'BULLISH', msg: 'Neural Engine detects whale accumulation on BTC @ $68.4k', time: 'JUST NOW' },
@@ -194,55 +246,56 @@ export default function Overview() {
     LOW: { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }
   }
 
+  const btcTicker = tickers['btcusdt'] || { price: 68430, changePercent: 2.4 }
+
   return (
     <div style={{ padding: 'var(--panel-padding)', maxWidth: '1400px', margin: '0 auto' }}>
 
       {/* ═══ S1: HERO — Command Center ═══ */}
-      <motion.div
-        className="ov-hero"
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-      >
-        <div className="ov-hero-top">
-          <div className="ov-engine-badge">
-            <div className="ov-engine-dot" />
-            Neural Engine Active
+      <div className="flex flex-col lg:flex-row gap-6 mb-8">
+        <motion.div
+          className="ov-hero"
+          style={{ flex: 1.5, marginBottom: 0 }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="ov-hero-top">
+            <div className="ov-engine-badge">
+              <div className="ov-engine-dot" />
+              Neural Engine Active
+            </div>
           </div>
-        </div>
 
-        <div className="ov-hero-body">
-          <div className="ov-hero-left">
-            <h1 className="ov-hero-headline">
-              {marketScore >= 60 ? 'Ready to Trade' : marketScore >= 40 ? 'Market Stabilizing' : 'Exercise Caution'}
-            </h1>
-            <p className="ov-hero-sub">
-              <span className="ov-hero-sub-dot" />
-              {opportunityCount} Alpha Opportunities Detected
-            </p>
-
-            <div className="ov-hero-metrics">
-              <div className="ov-metric-pill">
-                Sentiment: <span className="val" style={{ color: sentimentColor }}>{sentimentLabel} {sentimentScore}%</span>
-              </div>
-              <div className="ov-metric-pill">
-                Whales: <span className="val">{whaleLabel}</span>
-              </div>
-              <div className="ov-metric-pill">
-                Volatility: <span className="val">Low</span>
+          <div className="ov-hero-body" style={{ gap: '16px' }}>
+            <div className="ov-hero-left">
+              <h1 className="ov-hero-headline" style={{ fontSize: '24px' }}>
+                {marketScore >= 60 ? 'Ready to Trade' : marketScore >= 40 ? 'Market Stabilizing' : 'Exercise Caution'}
+              </h1>
+              
+              <div style={{ marginTop: '12px' }}>
+                <div className="ov-metric-pill" style={{ marginBottom: '8px' }}>
+                  Sentiment: <span className="val" style={{ color: sentimentColor }}>{sentimentLabel}</span>
+                </div>
+                <div className="ov-metric-pill">
+                  Whales: <span className="val">{whaleLabel}</span>
+                </div>
               </div>
             </div>
 
-            <button className="ov-hero-cta" onClick={() => navigate('/signals')}>
-              View Top Signals <ArrowRight size={16} />
-            </button>
+            <div className="ov-hero-right">
+              <SentimentGauge score={marketScore} />
+            </div>
           </div>
+        </motion.div>
 
-          <div className="ov-hero-right">
-            <SentimentGauge score={marketScore} />
-          </div>
-        </div>
-      </motion.div>
+        <AssetChartCard 
+          symbol="BTC" 
+          price={btcTicker.price} 
+          change={btcTicker.changePercent} 
+          data={chartData} 
+        />
+      </div>
 
       {/* ═══ S2: QUICK ACTIONS ═══ */}
       <motion.div

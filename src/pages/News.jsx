@@ -14,48 +14,47 @@ function ClusterCard({ cluster, onSelect, isActive }) {
   return (
     <div 
       onClick={() => onSelect(cluster.id)}
-      className={`action-card group cursor-pointer transition-all duration-300 ${
-        isActive ? 'ring-2 ring-cyan-500/50 bg-cyan-500/5' : ''
-      }`}
+      className="group relative overflow-hidden transition-all duration-300 hover:scale-[1.01] cursor-pointer"
       style={{ 
-        width: '100%', 
-        padding: '20px',
-        borderRadius: '24px',
+        background: isActive ? 'rgba(0, 255, 255, 0.05)' : 'rgba(10, 10, 15, 0.6)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: isActive ? '1px solid #00FFFF' : '1px solid rgba(255,255,255,0.06)',
+        borderRadius: '16px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        border: isActive ? '1px solid var(--accent)' : '1px solid var(--glass-border)',
-        background: isActive ? 'rgba(0, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
-        textAlign: 'left',
-        cursor: 'pointer',
+        gap: '12px',
+        width: '100%',
         transition: 'all 0.3s ease'
       }}
     >
-      <div className="flex justify-between items-start mb-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
             <Layers size={18} className="text-cyan-400" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">{cluster.name}</span>
-            <span className="text-[8px] font-bold text-white/20 uppercase tracking-widest">{cluster.count} STORIES</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">Narrative</span>
+            <span className="text-[9px] font-bold text-white/40 uppercase">{cluster.count} STORIES</span>
           </div>
         </div>
-        {isActive && <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />}
+        {isActive && <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />}
       </div>
       
-      <h4 className="text-lg font-bold text-white mb-6 line-clamp-3 leading-tight tracking-tight">
+      <h4 className="text-[13px] font-bold text-white mb-2 line-clamp-3 leading-tight tracking-tight">
         {cluster.topStory}
       </h4>
 
-      <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">
-        <div className="flex -space-x-2">
-          {[...Array(3)].map((_, i) => (
-             <div key={i} className="w-8 h-8 rounded-full bg-[#111] border-2 border-black flex items-center justify-center text-xs shadow-xl">
-               {['🔥', '📈', '⚡'][i]}
+      <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between">
+        <div className="flex -space-x-1.5">
+          {['🔥', '📈', '⚡'].map((emoji, i) => (
+             <div key={i} className="w-6 h-6 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-[10px] shadow-lg">
+               {emoji}
              </div>
           ))}
         </div>
-        <div className="text-[10px] font-black text-white/40 uppercase tracking-widest group-hover:text-cyan-400 transition-colors">Analyze Narrative →</div>
+        <div className="text-[9px] font-black text-white/40 uppercase tracking-widest group-hover:text-cyan-400 transition-colors">Analyze Narrative →</div>
       </div>
     </div>
   )
@@ -152,8 +151,8 @@ function NewsCard({ item }) {
               <Newspaper size={16} color="rgba(255,255,255,0.5)" />
             </div>
             <div className="flex flex-col">
-              <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>{item.domain}</span>
-              <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>{item.time}</span>
+              <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Neural Intelligence</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em' }}>{item.time}</span>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
