@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config();
+const result = dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
@@ -13,6 +13,13 @@ import { telegramScout } from './services/telegramService.js';
 import session from 'express-session';
 import passport from './config/passport.js';
 import logger from './logger.js';
+
+logger.info(`[Server] Current Working Directory: ${process.cwd()}`);
+if (result.error) {
+    logger.error('[Server] Error loading .env file:', result.error);
+} else {
+    logger.info('[Server] .env loaded successfully');
+}
 
 logger.info('[Server] Checking Environment Variables...');
 const requiredEnv = [
