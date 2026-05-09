@@ -5,7 +5,7 @@ import crypto from 'crypto';
 // Plan pricing (Updated for 2026 Strategy)
 const PLAN_PRICES = {
   pro: { amount: 29, label: 'Pro: Cognitive Edge', duration: 30 },
-  lifetime: { amount: 499, label: 'Protocol Founder (Lifetime)', duration: null }, // null = perpetual
+  lifetime: { amount: 449, label: 'Protocol Founder (Lifetime)', duration: null }, // null = perpetual
 };
 
 /**
@@ -173,7 +173,10 @@ export const createDeposit = async (req, res) => {
       });
     } catch (invoiceErr) {
       console.error('[PaymentController] Invoice creation also failed:', invoiceErr.message);
-      return res.status(502).json({ ok: false, error: 'Payment gateway is temporarily unavailable. Please try again in a few minutes.' });
+      if (invoiceErr.response?.data) {
+        console.error('[PaymentController] Gateway error details:', JSON.stringify(invoiceErr.response.data));
+      }
+      return res.status(502).json({ ok: false, error: 'Payment gateway is temporarily unavailable. Please check backend logs for NOWPAYMENTS_API_KEY issues.' });
     }
   } catch (error) {
     console.error('[PaymentController] createDeposit error:', error.message);

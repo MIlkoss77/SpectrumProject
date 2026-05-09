@@ -83,7 +83,7 @@ export default function Login() {
                         <ShieldCheck size={32} color="#00FFFF" />
                     </div>
                     <h1 style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
-                        SPECTR <span style={{ color: '#00FFFF' }}>PROTOCOL</span>
+                        SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
                     </h1>
                     <p style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '14px', fontWeight: 500 }}>
                         {isLogin ? 'Neural Tactical Terminal v5.2.1' : 'Initialize your trading profile'}

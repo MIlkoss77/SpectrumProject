@@ -201,7 +201,7 @@ export default function AppShell() {
                   <img src={logoImg} alt="L" style={{ width: '20px', height: '20px', filter: 'brightness(0)' }} />
                 </div>
                 <span style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-1px', color: '#fff' }}>
-                  SPECTR<span style={{ color: '#00FFFF' }}>OS</span>
+                  SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
                 </span>
             </div>
             <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)' }} onClick={() => setNavOpen(false)} className="lg:dx-hidden">

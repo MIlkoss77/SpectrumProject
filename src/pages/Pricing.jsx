@@ -44,7 +44,8 @@ const PLANS = [
   {
     id: 'lifetime',
     name: 'Lifetime',
-    price: 499,
+    price: 449,
+    originalPrice: 499,
     period: 'one-time',
     description: 'Founding Member — Pay Once, Own Forever',
     features: [
@@ -56,7 +57,8 @@ const PLANS = [
     ],
     cta: 'Become a Founder',
     popular: false,
-    gradient: 'linear-gradient(135deg, #f093fb, #f5576c)'
+    gradient: 'linear-gradient(135deg, #f093fb, #f5576c)',
+    discount: '10% OFF'
   }
 ];
 
@@ -419,6 +421,50 @@ export default function Pricing() {
 
   return (
     <div className="dx-panels">
+      {/* Exclusive Offer Banner */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        style={{
+          background: 'linear-gradient(90deg, rgba(0, 255, 255, 0.1) 0%, rgba(79, 70, 229, 0.1) 100%)',
+          border: '1px solid rgba(0, 255, 255, 0.2)',
+          borderRadius: '16px',
+          padding: '20px',
+          marginBottom: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '20px',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ 
+            background: 'var(--accent)', 
+            color: '#000', 
+            padding: '8px 12px', 
+            borderRadius: '10px', 
+            fontWeight: 900, 
+            fontSize: '12px' 
+          }}>
+            EXCLUSIVE
+          </div>
+          <div>
+            <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 800 }}>Limited-Time Founding Member Offer</h4>
+            <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>
+              Join the elite circle of founders and get lifetime access with a 10% discount.
+            </p>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--accent)' }}>SAVE $50</div>
+          <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase' }}>Limited Slots Remaining</div>
+        </div>
+        {/* Decorative Glow */}
+        <div style={{ position: 'absolute', right: '-20px', top: '-20px', width: '100px', height: '100px', background: 'var(--accent)', filter: 'blur(60px)', opacity: 0.2 }} />
+      </motion.div>
+
       <header style={{ textAlign: 'center', marginBottom: 48 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase', marginBottom: 12, padding: '4px 12px', borderRadius: 20, background: 'rgba(0,255,255,0.06)', border: '1px solid rgba(0,255,255,0.15)' }}>
           <Sparkles size={12} /> {t('ui.transparent_pricing') || 'Transparent Pricing'}
@@ -482,12 +528,28 @@ export default function Pricing() {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              <span style={{ fontSize: 48, fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
-                ${plan.price}
-              </span>
-              <span style={{ color: 'var(--muted)', fontSize: 14 }}>
-                {plan.period === 'forever' ? '' : `/${plan.period}`}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ fontSize: 48, fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
+                  ${plan.price}
+                </span>
+                {plan.originalPrice && (
+                  <span style={{ color: 'var(--muted)', fontSize: 18, textDecoration: 'line-through', fontWeight: 500 }}>
+                    ${plan.originalPrice}
+                  </span>
+                )}
+                <span style={{ color: 'var(--muted)', fontSize: 14 }}>
+                  {plan.period === 'forever' ? '' : `/${plan.period}`}
+                </span>
+              </div>
+              {plan.discount && (
+                <div style={{ 
+                  display: 'inline-flex', padding: '4px 8px', borderRadius: '6px', 
+                  background: 'rgba(245, 87, 108, 0.1)', color: '#f5576c', 
+                  fontSize: '11px', fontWeight: 800, marginTop: '8px' 
+                }}>
+                  {plan.discount}
+                </div>
+              )}
             </div>
 
             <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px 0' }}>
