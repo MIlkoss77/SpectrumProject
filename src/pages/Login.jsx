@@ -80,7 +80,10 @@ export default function Login() {
                         marginBottom: '20px',
                         boxShadow: '0 0 30px rgba(0, 255, 255, 0.1)'
                     }}>
-                        <ShieldCheck size={32} color="#00FFFF" />
+                        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M70 30C70 30 65 20 50 20C35 20 25 30 25 45C25 55 35 60 50 60" stroke="#00FFFF" strokeWidth="12" strokeLinecap="round"/>
+                            <path d="M30 70C30 70 35 80 50 80C65 80 75 70 75 55C75 45 65 40 50 40" stroke="#00FFFF" strokeWidth="12" strokeLinecap="round"/>
+                        </svg>
                     </div>
                     <h1 style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
                         SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>

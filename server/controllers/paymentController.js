@@ -5,7 +5,7 @@ import crypto from 'crypto';
 // Plan pricing (Updated for 2026 Strategy)
 const PLAN_PRICES = {
   pro: { amount: 29, label: 'Pro: Cognitive Edge', duration: 30 },
-  lifetime: { amount: 449, label: 'Protocol Founder (Lifetime)', duration: null }, // null = perpetual
+  lifetime: { amount: 499, label: 'Protocol Founder (Lifetime)', duration: null }, // null = perpetual
 };
 
 /**

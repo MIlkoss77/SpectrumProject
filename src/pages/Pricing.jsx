@@ -24,41 +24,48 @@ const PLANS = [
   },
   {
     id: 'pro',
-    name: 'Pro',
+    name: 'Pro: Cognitive Edge',
     price: 29,
+    originalPrice: 79,
     period: 'month',
-    description: 'The Ultimate Edge for High-Performance Traders',
+    description: 'Full market intelligence for serious traders.',
     features: [
-      'Unlimited Alerts & Notifications',
-      'Full Degen Intel (Scout) Access',
-      'Elite Community Entry',
-      'AI Analysis & Score Validation',
-      'Whale Tracking & Sentiment',
-      'Priority Support',
-      'Zero Ads Experience'
+      'Real-time AI predictions (87% avg. accuracy)',
+      'Whale tracking across 8 chains',
+      'Cross-exchange arbitrage alerts',
+      'Ferocious Scout signal feed',
+      'Priority support',
+      'API access (100 req/min)'
     ],
-    cta: 'Upgrade to Pro',
+    cta: 'Get Pro',
     popular: true,
-    gradient: 'linear-gradient(135deg, #00FFFF, #4F46E5)'
+    gradient: 'linear-gradient(135deg, #00FFFF, #4F46E5)',
+    discount: 'EXCLUSIVE OFFER'
   },
   {
     id: 'lifetime',
-    name: 'Lifetime',
-    price: 449,
-    originalPrice: 499,
+    name: 'Protocol Founder',
+    price: 499,
+    originalPrice: 1099,
     period: 'one-time',
-    description: 'Founding Member — Pay Once, Own Forever',
+    description: 'Lifetime access. Eternal edge.',
     features: [
-      'Everything in Pro + Beta access',
-      'Lifetime platform access',
-      'Exclusive Community Badge',
-      'Future Premium Modules Inc.',
-      '1-on-1 Onboarding Call'
+      'Real-time AI predictions (87% avg. accuracy)',
+      'Whale tracking across 8 chains',
+      'Cross-exchange arbitrage alerts',
+      'Ferocious Scout signal feed',
+      'Priority support',
+      'API access (100 req/min)',
+      'Lifetime access — no recurring fees',
+      'Unlimited API requests',
+      'Founder badge in community',
+      'Early access to new features',
+      'Direct line to dev team'
     ],
     cta: 'Become a Founder',
     popular: false,
     gradient: 'linear-gradient(135deg, #f093fb, #f5576c)',
-    discount: '10% OFF'
+    discount: 'EXCLUSIVE OFFER'
   }
 ];
 
