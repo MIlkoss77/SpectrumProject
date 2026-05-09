@@ -314,7 +314,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .ov-section-title {
@@ -461,16 +461,16 @@
 }
 
 .ov-pred-card {
-  padding: 16px 20px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.06);
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .ov-pred-card:hover {
@@ -479,9 +479,9 @@
 }
 
 .ov-pred-q {
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.9);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
   flex: 1;
   min-width: 0;
 }

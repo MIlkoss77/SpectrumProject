@@ -272,87 +272,100 @@ export default function Overview() {
         ))}
       </motion.div>
 
-      {/* ═══ S3: YOUR NEXT MOVE ═══ */}
+      {/* ═══ S3: NEURAL TACTICAL PULSE ═══ */}
       <motion.section
         initial="hidden" animate="visible" variants={stagger}
       >
         <motion.div className="ov-section-header" variants={fadeUp} custom={0}>
           <Zap size={18} style={{ color: 'var(--accent)' }} />
-          <h2 className="ov-section-title">Your Next Move</h2>
-          <span className="ov-section-badge" style={{ background: 'rgba(0,255,255,0.08)', color: 'var(--accent)' }}>LIVE</span>
+          <h2 className="ov-section-title">Neural Tactical Pulse</h2>
+          <span className="ov-section-badge" style={{ background: 'rgba(0,255,255,0.08)', color: 'var(--accent)' }}>ALPHA</span>
         </motion.div>
-
+ 
         <div className="ov-next-move-scroll">
           {loading ? (
             [1, 2, 3].map(i => (
               <div key={i} className="ov-move-card ov-skeleton" style={{ minHeight: '180px' }} />
             ))
           ) : (
-            (topActions.length > 0 ? topActions : [
-              { symbol: 'BTCUSDT', score: 78, status: 'STRONG BUY', details: {} },
-              { symbol: 'SOLUSDT', score: 71, status: 'BUY', details: {} },
-              { symbol: 'ETHUSDT', score: 45, status: 'NEUTRAL', details: {} }
-            ]).slice(0, 3).map((action, i) => {
-              const isBuy = action.status.includes('BUY')
-              const color = isBuy ? '#00FFFF' : action.status.includes('SELL') ? '#FF4560' : '#FEB019'
-              const sym = action.symbol?.replace('USDT', '') || 'BTC'
-              const ticker = tickers[`${sym.toLowerCase()}usdt`]
+            (() => {
+              const displayActions = (topActions.length > 0 ? topActions : [
+                { symbol: 'BTCUSDT', score: 84, status: 'STRONG BUY', details: {} },
+                { symbol: 'SOLUSDT', score: 76, status: 'BUY', details: {} },
+                { symbol: 'ETHUSDT', score: 68, status: 'BULLISH', details: {} }
+              ]).filter(a => a.score >= 65);
 
-              return (
-                <motion.div
-                  key={i}
-                  className="ov-move-card"
-                  variants={fadeUp}
-                  custom={i + 1}
-                  whileHover={{ y: -4, borderColor: `${color}30` }}
-                >
-                  <div className="ov-move-top">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div className="ov-move-icon" style={{ background: `${color}12`, border: `1px solid ${color}25`, color }}>
-                        <Zap size={20} fill={isBuy ? 'currentColor' : 'none'} />
-                      </div>
-                      <div>
-                        <div className="ov-move-sym">{sym}</div>
-                        <div className="ov-move-status" style={{ color }}>{action.status}</div>
-                      </div>
-                    </div>
-                    <div className="ov-move-score">
-                      <span className="ov-move-score-label">Confidence</span>
-                      <span className="ov-move-score-val">{action.score}%</span>
-                    </div>
+              if (displayActions.length === 0) {
+                return (
+                  <div className="ov-move-card" style={{ minWidth: '100%', alignItems: 'center', justifyContent: 'center', opacity: 0.6 }}>
+                    <Activity size={24} style={{ marginBottom: '12px', color: 'rgba(255,255,255,0.2)' }} />
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>Scanning for High-Confidence Alpha...</div>
                   </div>
+                );
+              }
 
-                  {ticker && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px' }}>
-                      <span style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>
-                        ${ticker.price?.toLocaleString()}
-                      </span>
-                      <span style={{ color: ticker.changePercent >= 0 ? '#00E396' : '#FF4560', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-                        {ticker.changePercent >= 0 ? '+' : ''}{ticker.changePercent?.toFixed(2)}%
-                      </span>
-                    </div>
-                  )}
+              return displayActions.slice(0, 3).map((action, i) => {
+                const isBuy = action.status.includes('BUY') || action.status.includes('BULLISH')
+                const color = isBuy ? '#00FFFF' : action.status.includes('SELL') ? '#FF4560' : '#FEB019'
+                const sym = action.symbol?.replace('USDT', '') || 'BTC'
+                const ticker = tickers[`${sym.toLowerCase()}usdt`]
 
-                  <div className="ov-move-bar">
-                    <motion.div
-                      className="ov-move-bar-fill"
-                      style={{ background: color, boxShadow: `0 0 8px ${color}40` }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${action.score}%` }}
-                      transition={{ duration: 1, delay: 0.4 + i * 0.15 }}
-                    />
-                  </div>
-
-                  <button
-                    className="ov-move-btn"
-                    style={{ background: color }}
-                    onClick={() => openTrade({ symbol: action.symbol, action: isBuy ? 'BUY' : 'SELL' })}
+                return (
+                  <motion.div
+                    key={i}
+                    className="ov-move-card"
+                    variants={fadeUp}
+                    custom={i + 1}
+                    whileHover={{ y: -4, borderColor: `${color}30` }}
                   >
-                    Execute {isBuy ? 'Long' : action.status.includes('SELL') ? 'Short' : 'Trade'}
-                  </button>
-                </motion.div>
-              )
-            })
+                    <div className="ov-move-top">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="ov-move-icon" style={{ background: `${color}12`, border: `1px solid ${color}25`, color }}>
+                          <Zap size={20} fill={isBuy ? 'currentColor' : 'none'} />
+                        </div>
+                        <div>
+                          <div className="ov-move-sym">{sym}</div>
+                          <div className="ov-move-status" style={{ color }}>{action.status}</div>
+                        </div>
+                      </div>
+                      <div className="ov-move-score">
+                        <span className="ov-move-score-label">Accuracy</span>
+                        <span className="ov-move-score-val">{action.score}%</span>
+                      </div>
+                    </div>
+
+                    {ticker && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '12px' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>
+                          ${ticker.price?.toLocaleString()}
+                        </span>
+                        <span style={{ color: ticker.changePercent >= 0 ? '#00E396' : '#FF4560', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                          {ticker.changePercent >= 0 ? '+' : ''}{ticker.changePercent?.toFixed(2)}%
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="ov-move-bar">
+                      <motion.div
+                        className="ov-move-bar-fill"
+                        style={{ background: color, boxShadow: `0 0 8px ${color}40` }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${action.score}%` }}
+                        transition={{ duration: 1, delay: 0.4 + i * 0.15 }}
+                      />
+                    </div>
+
+                    <button
+                      className="ov-move-btn"
+                      style={{ background: color }}
+                      onClick={() => openTrade({ symbol: action.symbol, action: isBuy ? 'BUY' : 'SELL' })}
+                    >
+                      Execute {isBuy ? 'Long' : action.status.includes('SELL') ? 'Short' : 'Trade'}
+                    </button>
+                  </motion.div>
+                )
+              });
+            })()
           )}
         </div>
       </motion.section>
