@@ -1,5 +1,6 @@
 import axios from 'axios';
 import ccxt from 'ccxt';
+import logger from '../logger.js';
 
 export const fetchBybitTicker = async (symbol) => {
     const endpoints = ['api.bybit.com', 'api.bytick.com'];
@@ -20,7 +21,7 @@ export const fetchBybitTicker = async (symbol) => {
                     return parseFloat(response.data.result.list[0].lastPrice);
                 }
             } catch (err) {
-                console.warn(`Bybit Attempt Failed: ${host}/${cat}/${symbol} - ${err.message}`);
+                logger.warn(`Bybit Attempt Failed: ${host}/${cat}/${symbol} - ${err.message}`);
             }
         }
     }
@@ -53,7 +54,7 @@ export const fetchPortfolioBalance = async (exchangeId, apiKey, secret) => {
                     if (ticker) priceUsd = ticker.last;
                 }
             } catch (e) {
-                console.log(`Could not fetch price for ${symbol}`);
+                logger.warn(`Could not fetch price for ${symbol} on ${exchangeId}`);
             }
 
             const valueUsd = amount * priceUsd;

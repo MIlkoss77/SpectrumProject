@@ -12,52 +12,75 @@ import { prisma } from './config/database.js';
 import { telegramScout } from './services/telegramService.js';
 import session from 'express-session';
 import passport from './config/passport.js';
+import logger from './logger.js';
 
-console.log('[Server] Checking Environment Variables...');
-console.log(`- ETHERSCAN_API_KEY: ${process.env.ETHERSCAN_API_KEY ? '✅ Present' : '❌ MISSING'}`);
-console.log(`- CRYPTOPANIC_KEY: ${process.env.CRYPTOPANIC_KEY ? '✅ Present' : '❌ MISSING'}`);
-console.log(`- NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+logger.info('[Server] Checking Environment Variables...');
+const requiredEnv = ['DATABASE_URL', 'JWT_SECRET', 'ETHERSCAN_API_KEY', 'CRYPTOPANIC_KEY'];
+const missingEnv = requiredEnv.filter(key => !process.env[key]);
 
+if (missingEnv.length > 0 && process.env.NODE_ENV === 'production') {
+    logger.error('[FATAL] Missing required environment variables: %s', missingEnv.join(', '));
+    process.exit(1);
+}
+
+requiredEnv.forEach(key => {
+    logger.info(`- ${key}: ${process.env[key] ? '✅ Present' : '❌ MISSING'}`);
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 process.on('uncaughtException', (err) => {
-    console.error('[FATAL] Uncaught Exception:', err);
+    logger.error('[FATAL] Uncaught Exception:', err);
     process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('[FATAL] Unhandled Rejection at:', promise, 'reason:', reason);
+    logger.error('[FATAL] Unhandled Rejection at: %O, reason: %O', promise, reason);
 });
 
 const app = express();
 const PORT = process.env.PORT || 8787;
 
 // 0. Session & Passport
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+    logger.error('[FATAL] JWT_SECRET is required in production');
+    process.exit(1);
+}
+
 app.use(session({
-    secret: process.env.JWT_SECRET || 'spectr-secret',
+    secret: process.env.JWT_SECRET || 'spectr-secret-dev',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Resolve absolute path to dist once
 const distPath = path.resolve(__dirname, '../dist');
-console.log(`[Server] Static files directory: ${distPath}`);
+logger.info(`[Server] Static files directory: ${distPath}`);
 
 // 1. Security Headers
-app.set('trust proxy', 1); // Required for express-rate-limit behind proxies
+app.set('trust proxy', 1);
 app.use(helmet({
-    contentSecurityPolicy: true, // Enabled CSP for production
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            "img-src": ["'self'", "data:", "https:"],
+            "connect-src": ["'self'", "https:", "wss:"],
+            "script-src": ["'self'", "'unsafe-inline'"],
+        },
+    },
     crossOriginEmbedderPolicy: false
 }));
 
-// 2. Log all requests
+// 2. HTTP Request Logging
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    logger.http(`${req.method} ${req.url}`);
     next();
 });
 
@@ -74,25 +97,20 @@ const ALLOWED_ORIGINS = [
 
 app.use('/api', cors({
     origin: (origin, callback) => {
-        const isDev = process.env.NODE_ENV !== 'production'; // More permissive dev check
+        const isDev = process.env.NODE_ENV !== 'production';
         if (!origin || ALLOWED_ORIGINS.includes(origin) || isDev) {
             callback(null, true);
         } else {
-            console.warn(`[CORS] Blocked origin: ${origin}`);
+            logger.warn(`[CORS] Blocked origin: ${origin}`);
             callback(new Error('Not allowed by CORS'));
         }
     },
-
     credentials: true
 }));
 
-// Webhook MUST receive raw Buffer — HMAC-SHA512 is computed on the raw body
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
-// All other API routes use JSON parser
 app.use('/api', express.json());
 
-// Basic XSS Sanitization Middleware
-// NOTE: Webhook route is excluded — body must remain untouched for HMAC verification
 app.use('/api', (req, res, next) => {
     if (req.path === '/payments/webhook') return next();
     const sanitize = (obj) => {
@@ -114,8 +132,6 @@ app.use('/api', limiter);
 
 // 4. API Routes
 app.use('/api', apiRoutes);
-
-// Serve Static Files (Frontend)
 app.use(express.static(distPath));
 
 // Health Check
@@ -124,43 +140,31 @@ app.get('/api/health', async (req, res) => {
         await prisma.$queryRaw`SELECT 1`;
         res.json({ ok: true, status: 'Spectr API Running', db: 'connected', ts: Date.now() });
     } catch (error) {
+        logger.error('[Health] DB Connection Failed: %O', error);
         res.status(500).json({ ok: false, status: 'Database Connection Failed', error: error.message });
     }
 });
 
-// Catch-all for Frontend Routing (React Router)
+// Catch-all for Frontend Routing
 app.use((req, res, next) => {
-    // 1. Skip API routes (handled by router or 404 later)
-    if (req.url.startsWith('/api')) {
-        return next();
-    }
+    if (req.url.startsWith('/api')) return next();
+    if (req.url.includes('.') && !req.url.endsWith('.html')) return res.status(404).send('Asset not found');
 
-    // 2. Skip files with extensions (likely missing assets)
-    // This prevents serving index.html as a .js/.css file (MIME error)
-    if (req.url.includes('.') && !req.url.endsWith('.html')) {
-        return res.status(404).send('Asset not found');
-    }
-
-    // 3. Serve index.html for everything else (SPA routes)
     res.sendFile(path.join(distPath, 'index.html'), (err) => {
         if (err) {
-            console.error(`[Server] Error sending index.html: ${err.message}`);
+            logger.error(`[Server] Error sending index.html: ${err.message}`);
             res.status(500).send('Frontend build not found. Please run npm run build.');
         }
     });
 });
 
-// Final API 404 handler
 app.use('/api', (req, res) => {
     res.status(404).json({ error: 'API endpoint not found' });
 });
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-    const isDev = process.env.NODE_ENV === 'development';
-    console.error(`[Server] Global Error: ${err.message}`);
-    if (err.stack) console.error(err.stack);
-    
+    logger.error(`[Server] Global Error: ${err.message}`, { stack: err.stack, path: req.url });
     res.status(err.status || 500).json({ 
         error: 'Internal Server Error', 
         message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message,
@@ -168,19 +172,14 @@ app.use((err, req, res, next) => {
     });
 });
 
-
-
 // Start the Server
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on port ${PORT}`);
-    
-    // Start Intelligence Scouts
+    logger.info(`Server running on port ${PORT}`);
     telegramScout.start();
 
-    // Explicitly keep the process alive
     setInterval(() => {
         if (process.env.NODE_ENV === 'debug') {
-            console.log('[Keep-Alive] Heartbeat at', new Date().toISOString());
+            logger.debug('[Keep-Alive] Heartbeat at %s', new Date().toISOString());
         }
     }, 60000);
 });

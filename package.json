@@ -9,7 +9,8 @@
         "studio": "vite spectr-studio --config spectr-studio/vite.config.js --host --port 5175",
         "build": "vite build",
         "preview": "vite preview",
-        "server": "node server/index.js"
+        "server": "node server/index.js",
+        "test": "vitest"
     },
     "dependencies": {
         "@polymarket/clob-client": "^5.8.1",
@@ -38,19 +39,24 @@
         "passport-google-oauth20": "^2.0.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "react-error-boundary": "^6.1.1",
         "react-i18next": "^15.7.3",
         "react-router-dom": "^7.9.4",
         "recharts": "^2.15.4",
         "rss-parser": "^3.13.0",
         "technicalindicators": "^3.1.0",
         "vite-plugin-pwa": "^1.2.0",
+        "winston": "^3.19.0",
         "yargs": "^18.0.0"
     },
     "devDependencies": {
         "@prisma/client": "^5.22.0",
+        "@testing-library/react": "^16.3.2",
         "@vitejs/plugin-react": "^4.7.0",
         "concurrently": "^9.2.1",
+        "jsdom": "^29.1.1",
         "prisma": "^5.22.0",
-        "vite": "^7.1.4"
+        "vite": "^7.1.4",
+        "vitest": "^4.1.5"
     }
 }
