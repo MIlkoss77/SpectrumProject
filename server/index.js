@@ -15,7 +15,14 @@ import passport from './config/passport.js';
 import logger from './logger.js';
 
 logger.info('[Server] Checking Environment Variables...');
-const requiredEnv = ['DATABASE_URL', 'JWT_SECRET', 'ETHERSCAN_API_KEY', 'CRYPTOPANIC_KEY'];
+const requiredEnv = [
+    'DATABASE_URL', 
+    'JWT_SECRET', 
+    'GOOGLE_CLIENT_ID', 
+    'GOOGLE_CLIENT_SECRET', 
+    'NOWPAYMENTS_API_KEY',
+    'NOWPAYMENTS_IPN_SECRET'
+];
 const missingEnv = requiredEnv.filter(key => !process.env[key]);
 
 if (missingEnv.length > 0 && process.env.NODE_ENV === 'production') {
