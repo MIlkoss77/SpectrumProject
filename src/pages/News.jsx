@@ -21,40 +21,40 @@ function ClusterCard({ cluster, onSelect, isActive }) {
         WebkitBackdropFilter: 'blur(20px)',
         border: isActive ? '1px solid #00FFFF' : '1px solid rgba(255,255,255,0.06)',
         borderRadius: '16px',
-        padding: '16px',
+        padding: '12px 16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '8px',
         width: '100%',
         transition: 'all 0.3s ease'
       }}
     >
       <div className="flex justify-between items-start">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
-            <Layers size={18} className="text-cyan-400" />
+          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+            <Layers size={14} className="text-cyan-400" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">Narrative</span>
-            <span className="text-[9px] font-bold text-white/40 uppercase">{cluster.count} STORIES</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-cyan-400">Narrative</span>
+            <span className="text-[8px] font-bold text-white/30 uppercase">{cluster.count} STORIES</span>
           </div>
         </div>
-        {isActive && <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />}
+        {isActive && <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />}
       </div>
       
-      <h4 className="text-[13px] font-bold text-white mb-2 line-clamp-3 leading-tight tracking-tight">
+      <h4 className="text-[12px] font-bold text-white line-clamp-2 leading-tight tracking-tight">
         {cluster.topStory}
       </h4>
 
-      <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between">
-        <div className="flex -space-x-1.5">
+      <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-between">
+        <div className="flex -space-x-1">
           {['🔥', '📈', '⚡'].map((emoji, i) => (
-             <div key={i} className="w-6 h-6 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-[10px] shadow-lg">
+             <div key={i} className="w-5 h-5 rounded-full bg-[#111] border border-white/10 flex items-center justify-center text-[9px] shadow-lg">
                {emoji}
              </div>
           ))}
         </div>
-        <div className="text-[9px] font-black text-white/40 uppercase tracking-widest group-hover:text-cyan-400 transition-colors">Analyze Narrative →</div>
+        <div className="text-[8px] font-black text-white/30 uppercase tracking-widest group-hover:text-cyan-400 transition-colors">Analyze Narrative →</div>
       </div>
     </div>
   )
