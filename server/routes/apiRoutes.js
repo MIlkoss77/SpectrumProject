@@ -41,19 +41,35 @@ router.post('/auth/login', authController.login);
 router.get('/auth/me', authMiddleware, authController.getMe);
 
 // Google OAuth
-router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/auth/google/callback', 
-    passport.authenticate('google', { failureRedirect: '/login?error=oauth_failed' }),
-    (req, res) => {
-        // Successful authentication
-        const token = generateToken(req.user.id);
-        const baseUrl = process.env.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
-        // If we are behind Nginx proxy, req.get('host') might be the backend port, 
-        // but usually proxy_set_header Host $host; handles it.
-        // However, in production, we want it to go back to the frontend.
-        res.redirect(`${baseUrl}/auth/callback?token=${token}`);
-    }
-);
+router.get('/auth/google', (req, res, next) => {
+    console.log('[Auth] Google Login requested');
+    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
+
+router.get('/auth/google/callback', (req, res, next) => {
+    console.log('[Auth] Google Callback received');
+    passport.authenticate('google', { failureRedirect: '/login?error=oauth_failed' }, (err, user, info) => {
+        if (err) {
+            console.error('[Auth] Google Strategy Error:', err);
+            return res.redirect(`/login?error=${encodeURIComponent(err.message)}`);
+        }
+        if (!user) {
+            console.warn('[Auth] Google Auth failed - no user:', info);
+            return res.redirect('/login?error=no_user');
+        }
+        
+        req.logIn(user, (loginErr) => {
+            if (loginErr) {
+                console.error('[Auth] Login Error:', loginErr);
+                return res.redirect('/login?error=session_error');
+            }
+            const token = generateToken(user.id);
+            const baseUrl = process.env.FRONTEND_URL || `${req.protocol}://${req.get('host')}`;
+            console.log(`[Auth] Google Success! Redirecting to: ${baseUrl}/auth/callback`);
+            res.redirect(`${baseUrl}/auth/callback?token=${token}`);
+        });
+    })(req, res, next);
+});
 
 // Payment Routes
 router.post('/payments/webhook', paymentController.handleWebhook);

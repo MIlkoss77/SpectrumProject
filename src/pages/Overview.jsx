@@ -152,9 +152,6 @@ export default function Overview() {
   const [topActions, setTopActions] = useState([])
   const [superScore, setSuperScore] = useState(null)
   
-  // Chart mock data
-  const chartData = useMemo(() => [64200, 64500, 64100, 64800, 65200, 64900, 65800, 66400, 66100, 67200, 68100, 67900, 68430], [])
-
   const [intelStream] = useState([
     { id: 1, type: 'BULLISH', msg: 'Neural Engine detects whale accumulation on BTC @ $68.4k', time: 'JUST NOW' },
     { id: 2, type: 'NEUTRAL', msg: 'Volatility expansion expected in ETH within 4 hours', time: '2m ago' },
