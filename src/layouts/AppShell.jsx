@@ -201,27 +201,14 @@ export default function AppShell() {
                   width: '32px', 
                   height: '32px', 
                   borderRadius: '10px', 
-                  background: 'rgba(0, 255, 255, 0.05)', 
+                  background: 'rgba(255, 255, 255, 0.03)', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center',
-                  border: '1px solid rgba(0, 255, 255, 0.1)'
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  overflow: 'hidden'
                 }}>
-                  <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path 
-                      d="M65 35C65 35 60 25 45 25C30 25 22 35 22 45C22 55 35 55 50 55C65 55 78 55 78 70C78 85 65 95 50 95C35 95 30 85 30 85" 
-                      stroke="#00FFFF" 
-                      strokeWidth="14" 
-                      strokeLinecap="round"
-                    />
-                    <path 
-                      d="M35 65C35 65 40 75 55 75C70 75 78 65 78 55C78 45 65 45 50 45C35 45 22 45 22 30C22 15 35 5 50 5C65 5 70 15 70 15" 
-                      stroke="#00FFFF" 
-                      strokeWidth="14" 
-                      strokeLinecap="round"
-                      style={{ opacity: 0.6 }}
-                    />
-                  </svg>
+                  <img src="/logo.png" alt="S" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} />
                 </div>
                 <span style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-0.5px', color: '#fff', textTransform: 'uppercase' }}>
                   SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
