@@ -20,6 +20,8 @@ class PaymentService {
         const enabled = !!this.apiKey;
         if (!enabled) {
             console.warn('[PaymentService] NOWPAYMENTS_API_KEY is not configured');
+        } else {
+            console.log(`[PaymentService] API Key is set (starts with: ${this.apiKey.substring(0, 4)}...)`);
         }
         return enabled;
     }

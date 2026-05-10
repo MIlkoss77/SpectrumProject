@@ -77,45 +77,61 @@ function SentimentGauge({ score = 50, size = 100 }) {
   )
 }
 
-function AssetChartCard({ symbol = 'BTC', price = 0, change = 0, data = [] }) {
+function AssetChartCard({ symbol = 'BTC', price = 0, change = 0, data = [], timeframe = '1D', setTimeframe }) {
   return (
     <motion.div 
       className="ov-hero" 
       style={{ 
-        padding: '20px', 
+        padding: '16px', 
         flex: 1, 
         minWidth: '300px', 
         background: 'rgba(10,10,18,0.8)',
         display: 'flex',
         flexDirection: 'column',
-        gap: '16px'
+        gap: '12px',
+        borderRadius: '24px'
       }}
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="flex items-center gap-3">
-          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(0,255,255,0.1)', border: '1px solid rgba(0,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-             <Activity size={18} color="#00FFFF" />
+          <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(0,255,255,0.1)', border: '1px solid rgba(0,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+             <Activity size={16} color="#00FFFF" />
           </div>
           <div>
-            <div style={{ fontSize: '14px', fontWeight: 900, color: '#fff' }}>{symbol}/USDT</div>
-            <div style={{ fontSize: '10px', fontWeight: 800, color: change >= 0 ? '#00E396' : '#FF4560' }}>
-              {change >= 0 ? '+' : ''}{change.toFixed(2)}% (24h)
+            <div style={{ fontSize: '13px', fontWeight: 900, color: '#fff' }}>{symbol}/USDT</div>
+            <div style={{ fontSize: '9px', fontWeight: 800, color: change >= 0 ? '#00E396' : '#FF4560' }}>
+              {change >= 0 ? '+' : ''}{change.toFixed(2)}%
             </div>
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-           <div style={{ fontSize: '18px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>${price.toLocaleString()}</div>
-           <div style={{ fontSize: '8px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: '1px' }}>Neural: LONG (84%)</div>
+           <div style={{ fontSize: '16px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>${price.toLocaleString()}</div>
+           <div style={{ fontSize: '7px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: '1px' }}>Neural: LONG (84%)</div>
         </div>
       </div>
       
-      <MiniChart data={data} color="#00FFFF" height={80} />
+      <MiniChart data={data} color="#00FFFF" height={70} />
       
       <div className="flex gap-2">
          {['1H', '1D', '1W', '1M'].map(tf => (
-           <button key={tf} style={{ flex: 1, padding: '4px 0', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)', background: tf === '1D' ? 'rgba(0,255,255,0.1)' : 'transparent', color: tf === '1D' ? '#00FFFF' : 'rgba(255,255,255,0.3)', fontSize: '9px', fontWeight: 900, cursor: 'pointer' }}>
+           <button 
+             key={tf} 
+             onClick={() => setTimeframe?.(tf)}
+             style={{ 
+               flex: 1, 
+               padding: '6px 0', 
+               borderRadius: '8px', 
+               border: '1px solid rgba(255,255,255,0.05)', 
+               background: tf === timeframe ? 'rgba(0,255,255,0.1)' : 'rgba(255,255,255,0.02)', 
+               color: tf === timeframe ? '#00FFFF' : 'rgba(255,255,255,0.3)', 
+               fontSize: '9px', 
+               fontWeight: 900, 
+               cursor: 'pointer',
+               transition: 'all 0.2s ease'
+             }}
+           >
              {tf}
            </button>
          ))}
@@ -246,9 +262,20 @@ export default function Overview() {
     LOW: { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }
   }
 
-  const btcTicker = tickers['btcusdt'] || { price: 68430.50, changePercent: 2.45 }
+  const [timeframe, setTimeframe] = useState('1D')
+  const btcTicker = tickers['btcusdt'] || { price: 0, changePercent: 0 }
   const btcPrice = btcTicker.price || 68430.50
   
+  // Dynamic mock data based on timeframe
+  const chartDataMap = {
+    '1H': [67800, 67950, 67850, 68100, 68050, 68200, 68150, 68300, 68250, 68430],
+    '1D': [64200, 64500, 64100, 64800, 65200, 64900, 65800, 66400, 66100, 67200, 68100, 67900, 68430],
+    '1W': [61000, 62500, 60800, 63000, 64500, 63800, 65000, 66200, 65500, 68430],
+    '1M': [58000, 60000, 59500, 62000, 61500, 64000, 63500, 66000, 65500, 68430]
+  }
+
+  const chartData = useMemo(() => chartDataMap[timeframe], [timeframe])
+
   // Scout mock data from bot
   const scoutAlpha = [
     { id: 's1', time: '12:57:25 AM', msg: 'Significant activity detected on SOLANA. $3ATDSKXQJ9 contract recently received visibility boosts.', score: 92, sym: 'SOL' },
@@ -265,6 +292,8 @@ export default function Overview() {
           price={btcPrice} 
           change={btcTicker.changePercent || 0} 
           data={chartData} 
+          timeframe={timeframe}
+          setTimeframe={setTimeframe}
         />
       </div>
 
@@ -274,6 +303,7 @@ export default function Overview() {
         variants={stagger}
         initial="hidden"
         animate="visible"
+        style={{ marginBottom: '32px' }}
       >
         {quickActions.map((qa, i) => (
           <motion.div
@@ -284,15 +314,15 @@ export default function Overview() {
             onClick={() => navigate(qa.to)}
             whileHover={{ y: -3 }}
             whileTap={{ scale: 0.97 }}
-            style={{ minWidth: '90px', padding: '12px' }}
+            style={{ minWidth: '85px', padding: '10px' }}
           >
             <div className="ov-qa-badge" style={{ background: qa.badgeBg, color: qa.badgeColor }}>
               {qa.badge}
             </div>
-            <div className="ov-qa-icon" style={{ width: '32px', height: '32px', background: qa.bg, border: `1px solid ${qa.border}`, color: qa.color }}>
-              {React.cloneElement(qa.icon, { size: 16 })}
+            <div className="ov-qa-icon" style={{ width: '28px', height: '28px', background: qa.bg, border: `1px solid ${qa.border}`, color: qa.color }}>
+              {React.cloneElement(qa.icon, { size: 14 })}
             </div>
-            <span className="ov-qa-label" style={{ fontSize: '10px' }}>{qa.label}</span>
+            <span className="ov-qa-label" style={{ fontSize: '9px', fontWeight: 900 }}>{qa.label}</span>
           </motion.div>
         ))}
       </motion.div>
@@ -300,6 +330,7 @@ export default function Overview() {
       {/* ═══ S3: FEROCIOUS SCOUT ALPHA ═══ */}
       <motion.section
         initial="hidden" animate="visible" variants={stagger}
+        style={{ marginBottom: '32px' }}
       >
         <motion.div className="ov-section-header" variants={fadeUp} custom={0}>
           <Flame size={18} style={{ color: '#FF4560' }} />
@@ -314,25 +345,25 @@ export default function Overview() {
               className="ov-move-card"
               variants={fadeUp}
               custom={i + 1}
-              style={{ minWidth: '300px', padding: '16px' }}
+              style={{ minWidth: '280px', padding: '14px', borderRadius: '16px' }}
             >
-              <div className="ov-move-top" style={{ marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div className="ov-move-icon" style={{ background: 'rgba(255,69,96,0.1)', border: '1px solid rgba(255,69,96,0.2)', color: '#FF4560', width: '36px', height: '36px' }}>
-                    <Zap size={18} fill="#FF4560" />
+              <div className="ov-move-top" style={{ marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="ov-move-icon" style={{ background: 'rgba(255,69,96,0.1)', border: '1px solid rgba(255,69,96,0.2)', color: '#FF4560', width: '32px', height: '32px' }}>
+                    <Zap size={16} fill="#FF4560" />
                   </div>
                   <div>
-                    <div className="ov-move-sym" style={{ fontSize: '14px' }}>{item.sym} ALPHA</div>
-                    <div className="ov-move-status" style={{ color: '#FF4560', fontSize: '9px' }}>HIGH VELOCITY</div>
+                    <div className="ov-move-sym" style={{ fontSize: '13px' }}>{item.sym} ALPHA</div>
+                    <div className="ov-move-status" style={{ color: '#FF4560', fontSize: '8px' }}>HIGH VELOCITY</div>
                   </div>
                 </div>
                 <div className="ov-move-score">
-                  <span className="ov-move-score-label">Intel Score</span>
-                  <span className="ov-move-score-val" style={{ fontSize: '18px' }}>{item.score}/100</span>
+                  <span className="ov-move-score-label" style={{ fontSize: '7px' }}>Intel Score</span>
+                  <span className="ov-move-score-val" style={{ fontSize: '16px' }}>{item.score}/100</span>
                 </div>
               </div>
 
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4, marginBottom: '12px' }}>
+              <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.4, marginBottom: '12px', height: '30px', overflow: 'hidden' }}>
                 {item.msg}
               </p>
 
@@ -347,7 +378,7 @@ export default function Overview() {
 
               <button
                 className="ov-move-btn"
-                style={{ background: '#FF4560', padding: '10px', fontSize: '10px' }}
+                style={{ background: '#FF4560', padding: '8px', fontSize: '9px', borderRadius: '8px' }}
                 onClick={() => navigate('/signals')}
               >
                 Analyze Signal
@@ -372,15 +403,15 @@ export default function Overview() {
               variants={fadeUp}
               custom={i}
               onClick={() => navigate('/polymarket')}
-              style={{ padding: '8px 12px', borderRadius: '10px' }}
+              style={{ padding: '8px 12px', borderRadius: '12px', marginBottom: '8px' }}
             >
-              <div className="ov-pred-q" style={{ fontSize: '11px' }}>{p.question}</div>
+              <div className="ov-pred-q" style={{ fontSize: '10px', color: 'rgba(255,255,255,0.8)' }}>{p.question}</div>
               <div className="ov-pred-prob">
-                <span className="ov-pred-prob-val" style={{ fontSize: '14px', color: p.probability >= 60 ? '#00E396' : p.probability >= 40 ? '#FEB019' : '#FF4560' }}>
+                <span className="ov-pred-prob-val" style={{ fontSize: '14px', fontWeight: 900, color: p.probability >= 60 ? '#00E396' : p.probability >= 40 ? '#FEB019' : '#FF4560' }}>
                   {p.probability}%
                 </span>
               </div>
-              <button className="ov-pred-btn" style={{ padding: '6px 12px', fontSize: '9px' }}>
+              <button className="ov-pred-btn" style={{ padding: '6px 12px', fontSize: '9px', borderRadius: '8px' }}>
                 Predict
               </button>
             </motion.div>
