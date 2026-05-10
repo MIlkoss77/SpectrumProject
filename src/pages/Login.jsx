@@ -68,27 +68,11 @@ export default function Login() {
                 style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 10 }}
             >
                 <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-                    <div style={{ 
-                        display: 'inline-flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        width: '84px', 
-                        height: '84px', 
-                        borderRadius: '24px', 
-                        background: 'rgba(255, 255, 255, 0.05)', 
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        marginBottom: '20px',
-                        overflow: 'hidden'
-                    }}>
-                        <img 
-                            src="/logo.png" 
-                            alt="Spectr Logo" 
-                            style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} 
-                        />
-                    </div>
-                    <h1 style={{ fontSize: '36px', fontWeight: 900, letterSpacing: '-1.5px', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
-                        SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
-                    </h1>
+                    <img 
+                        src="/logo-full.png" 
+                        alt="Spectr Trading" 
+                        style={{ height: '50px', width: 'auto', marginBottom: '10px' }} 
+                    />
                     <p style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '14px', fontWeight: 500 }}>
                         {isLogin ? 'Neural Tactical Terminal v5.2.1' : 'Initialize your trading profile'}
                     </p>

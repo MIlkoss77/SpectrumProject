@@ -195,31 +195,19 @@ export default function AppShell() {
         )}
 
         <aside className={`dx-sidebar ${navOpen ? 'open' : ''}`}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '48px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ 
-                  width: '32px', 
-                  height: '32px', 
-                  borderRadius: '10px', 
-                  background: 'rgba(255, 255, 255, 0.03)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  overflow: 'hidden'
-                }}>
-                  <img src="/logo.png" alt="S" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} />
-                </div>
-                <span style={{ fontWeight: 900, fontSize: '18px', letterSpacing: '-0.5px', color: '#fff', textTransform: 'uppercase' }}>
-                  SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
-                </span>
-            </div>
-            <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)' }} onClick={() => setNavOpen(false)} className="lg:dx-hidden">
-                <X size={20} />
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 16px', marginBottom: '20px' }}>
+              <img 
+                src="/logo-full.png" 
+                alt="Spectr Trading" 
+                style={{ height: '24px', width: 'auto', cursor: 'pointer' }}
+                onClick={() => { navigate('/'); setNavOpen(false); }}
+              />
+              <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)' }} onClick={() => setNavOpen(false)} className="lg:hidden">
+                  <X size={20} />
+              </button>
           </div>
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, padding: '0 12px' }}>
             {NAV.map(({ label, to, icon: Icon }) => (
               <NavLink key={to} to={to} className={({ isActive }) => `dx-nav-item ${isActive ? 'active' : ''}`} end={to === '/'}>
                 <Icon size={18} />
