@@ -195,14 +195,20 @@ export default function AppShell() {
         )}
 
         <aside className={`dx-sidebar ${navOpen ? 'open' : ''}`}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 16px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '24px 16px', marginBottom: '20px' }}>
               <img 
-                src="/logo-full.png" 
-                alt="Spectr Trading" 
-                style={{ height: '24px', width: 'auto', cursor: 'pointer' }}
+                src="/logo.png" 
+                alt="Spectr" 
+                style={{ width: '38px', height: '38px', borderRadius: '12px', cursor: 'pointer' }}
                 onClick={() => { navigate('/'); setNavOpen(false); }}
               />
-              <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)' }} onClick={() => setNavOpen(false)} className="lg:hidden">
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontWeight: 900, fontSize: '16px', letterSpacing: '-0.5px', color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>
+                  SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
+                </span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '1px', marginTop: '4px' }}>NEURAL TERMINAL</span>
+              </div>
+              <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', marginLeft: 'auto' }} onClick={() => setNavOpen(false)} className="lg:hidden">
                   <X size={20} />
               </button>
           </div>
