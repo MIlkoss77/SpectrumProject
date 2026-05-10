@@ -72,21 +72,34 @@ export default function Login() {
                         display: 'inline-flex', 
                         alignItems: 'center', 
                         justifyContent: 'center', 
-                        width: '72px', 
-                        height: '72px', 
-                        borderRadius: '20px', 
-                        background: 'rgba(0, 255, 255, 0.1)', 
-                        border: '1px solid rgba(0, 255, 255, 0.2)',
+                        width: '84px', 
+                        height: '84px', 
+                        borderRadius: '24px', 
+                        background: 'rgba(0, 255, 255, 0.05)', 
+                        border: '1px solid rgba(0, 255, 255, 0.1)',
                         marginBottom: '20px',
-                        boxShadow: '0 0 30px rgba(0, 255, 255, 0.1)'
+                        boxShadow: '0 0 40px rgba(0, 255, 255, 0.08)'
                     }}>
-                        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M70 30C70 30 65 20 50 20C35 20 25 30 25 45C25 55 35 60 50 60" stroke="#00FFFF" strokeWidth="12" strokeLinecap="round"/>
-                            <path d="M30 70C30 70 35 80 50 80C65 80 75 70 75 55C75 45 65 40 50 40" stroke="#00FFFF" strokeWidth="12" strokeLinecap="round"/>
+                        <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            {/* NEW NEON S LOGO */}
+                            <path 
+                                d="M65 35C65 35 60 25 45 25C30 25 22 35 22 45C22 55 35 55 50 55C65 55 78 55 78 70C78 85 65 95 50 95C35 95 30 85 30 85" 
+                                stroke="#00FFFF" 
+                                strokeWidth="12" 
+                                strokeLinecap="round"
+                                style={{ filter: 'drop-shadow(0 0 8px rgba(0,255,255,0.8))' }}
+                            />
+                            <path 
+                                d="M35 65C35 65 40 75 55 75C70 75 78 65 78 55C78 45 65 45 50 45C35 45 22 45 22 30C22 15 35 5 50 5C65 5 70 15 70 15" 
+                                stroke="#00FFFF" 
+                                strokeWidth="12" 
+                                strokeLinecap="round"
+                                style={{ opacity: 0.8 }}
+                            />
                         </svg>
                     </div>
-                    <h1 style={{ fontSize: '32px', fontWeight: 900, letterSpacing: '-1px', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
-                        SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
+                    <h1 style={{ fontSize: '36px', fontWeight: 900, letterSpacing: '-1.5px', margin: '0 0 8px 0', textTransform: 'uppercase' }}>
+                        SPECTR <span style={{ color: '#00FFFF', textShadow: '0 0 20px rgba(0,255,255,0.4)' }}>Trading</span>
                     </h1>
                     <p style={{ color: 'rgba(255, 255, 255, 0.4)', fontSize: '14px', fontWeight: 500 }}>
                         {isLogin ? 'Neural Tactical Terminal v5.2.1' : 'Initialize your trading profile'}
