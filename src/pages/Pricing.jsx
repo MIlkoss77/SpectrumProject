@@ -142,7 +142,10 @@ function DepositModal({ plan, onClose, onSuccess }) {
       if (res.data.ok) {
         // Invoice flow — redirect to NOWPayments hosted page
         if (res.data.invoiceFlow && res.data.payment?.invoiceUrl) {
-          window.open(res.data.payment.invoiceUrl, '_blank')
+          const win = window.open(res.data.payment.invoiceUrl, '_blank')
+          if (!win || win.closed || typeof win.closed === 'undefined') {
+             console.warn('[Payment] Popup blocked by browser')
+          }
           setDepositData(res.data.payment)
           setStep('deposit')
           return
@@ -302,43 +305,67 @@ function DepositModal({ plan, onClose, onSuccess }) {
           {/* Step: Deposit Address */}
           {step === 'deposit' && depositData && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <div style={{
-                padding: '24px', borderRadius: 20,
-                background: 'rgba(0,255,255,0.02)', border: '1px solid rgba(0,255,255,0.06)',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: 11, fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16 }}>
-                  LIVE DEPOSIT GATEWAY
+              {depositData.invoiceUrl ? (
+                <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                   <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 20, lineHeight: 1.5 }}>
+                      Please complete your payment on the secure gateway page. 
+                      <br/><span style={{ fontSize: 11, color: '#00FFFF' }}>Disable AdBlock if the page looks broken.</span>
+                   </div>
+                   <a 
+                    href={depositData.invoiceUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="dx-btn"
+                    style={{ 
+                      width: '100%', justifyContent: 'center', background: 'var(--accent)', 
+                      color: '#000', fontWeight: 900, height: 52, borderRadius: 16 
+                    }}
+                   >
+                     Pay Now <ExternalLink size={18} style={{ marginLeft: 8 }} />
+                   </a>
+                   <div style={{ marginTop: 16, fontSize: 11, color: 'rgba(255,255,255,0.2)', wordBreak: 'break-all' }}>
+                      {depositData.invoiceUrl}
+                   </div>
                 </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                  <code style={{
-                    flex: 1, fontSize: 12, padding: '14px', borderRadius: 12,
-                    background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.04)',
-                    fontFamily: 'var(--font-mono)', wordBreak: 'break-all', color: '#fff',
-                    textAlign: 'left'
-                  }}>
-                    {depositData.depositAddress}
-                  </code>
-                  <button onClick={handleCopyAddress} style={{
-                    background: copied ? 'rgba(0,227,150,0.1)' : 'rgba(255,255,255,0.04)',
-                    border: `1px solid ${copied ? 'rgba(0,227,150,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                    borderRadius: 14, width: 48, height: 48, cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: copied ? '#00E396' : '#fff', transition: 'all 0.3s',
-                  }}>
-                    {copied ? <Check size={20} /> : <Copy size={18} />}
-                  </button>
-                </div>
-
-                <div style={{ 
-                  display: 'inline-flex', alignItems: 'center', gap: 8, 
-                  padding: '8px 16px', borderRadius: 20, background: 'rgba(255,255,255,0.03)',
-                  fontSize: 13, color: '#fff', fontWeight: 700
+              ) : (
+                <div style={{
+                  padding: '24px', borderRadius: 20,
+                  background: 'rgba(0,255,255,0.02)', border: '1px solid rgba(0,255,255,0.06)',
+                  textAlign: 'center'
                 }}>
-                  Send <span style={{ color: '#00FFFF' }}>{depositData.payAmount || plan.price} {selectedCrypto.id}</span>
+                  <div style={{ fontSize: 11, fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 16 }}>
+                    LIVE DEPOSIT GATEWAY
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                    <code style={{
+                      flex: 1, fontSize: 12, padding: '14px', borderRadius: 12,
+                      background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.04)',
+                      fontFamily: 'var(--font-mono)', wordBreak: 'break-all', color: '#fff',
+                      textAlign: 'left'
+                    }}>
+                      {depositData.depositAddress}
+                    </code>
+                    <button onClick={handleCopyAddress} style={{
+                      background: copied ? 'rgba(0,227,150,0.1)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${copied ? 'rgba(0,227,150,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                      borderRadius: 14, width: 48, height: 48, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: copied ? '#00E396' : '#fff', transition: 'all 0.3s',
+                    }}>
+                      {copied ? <Check size={20} /> : <Copy size={18} />}
+                    </button>
+                  </div>
+
+                  <div style={{ 
+                    display: 'inline-flex', alignItems: 'center', gap: 8, 
+                    padding: '8px 16px', borderRadius: 20, background: 'rgba(255,255,255,0.03)',
+                    fontSize: 13, color: '#fff', fontWeight: 700
+                  }}>
+                    Send <span style={{ color: '#00FFFF' }}>{depositData.payAmount || plan.price} {selectedCrypto.id}</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div style={{ textAlign: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: '#00FFFF', fontSize: 12, fontWeight: 800, marginBottom: 12 }}>
