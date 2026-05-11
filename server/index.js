@@ -143,7 +143,10 @@ app.use('/api', (req, res, next) => {
     if (req.params) sanitize(req.params);
     next();
 });
-app.use('/api', limiter);
+app.use('/api', (req, res, next) => {
+    if (req.path.startsWith('/payments')) return next();
+    limiter(req, res, next);
+});
 
 // 4. API Routes
 app.use('/api', apiRoutes);
