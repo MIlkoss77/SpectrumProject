@@ -16,6 +16,7 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
+        navigateFallbackDenylist: [/^\/api/],
       },
       manifest: {
         name: 'Spectr Trading',
