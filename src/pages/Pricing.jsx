@@ -70,9 +70,9 @@ const PLANS = [
 ];
 
 const CRYPTO_OPTIONS = [
-  { id: 'USDT', label: 'USDT (TRC-20)', icon: Coins, color: '#26A17B' },
-  { id: 'SOL', label: 'Solana (SOL)', icon: Zap, color: '#9945FF' },
-  { id: 'ETH', label: 'Ethereum (ETH)', icon: Wallet, color: '#627EEA' },
+  { id: 'usdttrc20', label: 'USDT (TRC-20)', icon: Coins, color: '#26A17B' },
+  { id: 'sol', label: 'Solana (SOL)', icon: Zap, color: '#9945FF' },
+  { id: 'eth', label: 'Ethereum (ETH)', icon: Wallet, color: '#627EEA' },
 ]
 
 function DepositModal({ plan, onClose, onSuccess }) {
