@@ -79,7 +79,7 @@ export const createDeposit = async (req, res) => {
 
     // --- PRIMARY: Direct crypto address via NOWPayments ---
     try {
-      console.log(`[PaymentController] IPN callback URL: ${ipnCallbackUrl}`);
+      console.log(`[PaymentController] Attempting direct payment — currency=${upperCurrency} amount=${plan.amount}`);
 
       const paymentRecord = await prisma.payment.create({
         data: {
@@ -92,8 +92,6 @@ export const createDeposit = async (req, res) => {
         },
       });
 
-      console.log(`[PaymentController] Created payment record ${paymentRecord.id}`);
-
       const gatewayPayment = await paymentService.createPayment({
         amount: plan.amount,
         currency: upperCurrency,
@@ -101,7 +99,7 @@ export const createDeposit = async (req, res) => {
         ipnCallbackUrl,
       });
 
-      console.log(`[PaymentController] Gateway payment created — paymentId=${gatewayPayment.paymentId} address=${gatewayPayment.depositAddress}`);
+      console.log(`[PaymentController] ✅ Direct payment created — address=${gatewayPayment.depositAddress}`);
 
       await prisma.payment.update({
         where: { id: paymentRecord.id },
@@ -125,7 +123,10 @@ export const createDeposit = async (req, res) => {
         }
       });
     } catch (directErr) {
-      console.warn('[PaymentController] Direct payment failed, trying hosted invoice:', directErr.message);
+      console.error('[PaymentController] ❌ Direct payment failed:', directErr.message);
+      if (directErr.response?.data) {
+        console.error('[PaymentController] ❌ Reason:', JSON.stringify(directErr.response.data));
+      }
     }
 
     // --- FALLBACK: Hosted invoice page (NOWPayments) ---
