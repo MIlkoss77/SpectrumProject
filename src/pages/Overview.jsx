@@ -145,30 +145,42 @@ export default function Overview() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { openTrade } = useTrade()
-  const { tickers } = useWebSocket()
+  const { tickers, subscribe, unsubscribe } = useWebSocket()
   const { user } = useAuth()
 
   const [loading, setLoading] = useState(true)
   const [topActions, setTopActions] = useState([])
   const [superScore, setSuperScore] = useState(null)
   
-  const [intelStream] = useState([
-    { id: 1, type: 'BULLISH', msg: 'Neural Engine detects whale accumulation on BTC @ $68.4k', time: 'JUST NOW' },
-    { id: 2, type: 'NEUTRAL', msg: 'Volatility expansion expected in ETH within 4 hours', time: '2m ago' },
-    { id: 3, type: 'BEARISH', msg: 'Liquidity gap identified for SOL below $142.50', time: '5m ago' },
+  const btcTicker = tickers['btcusdt'] || { price: 0, changePercent: 0 }
+  const ethTicker = tickers['ethusdt'] || { price: 0, changePercent: 0 }
+  const solTicker = tickers['solusdt'] || { price: 0, changePercent: 0 }
+
+  const btcPrice = btcTicker.price || 64230.50
+  
+  const intelStream = useMemo(() => [
+    { id: 1, type: 'BULLISH', msg: `Neural Engine detects whale accumulation on BTC @ $${btcPrice.toLocaleString()}`, time: 'JUST NOW' },
+    { id: 2, type: 'NEUTRAL', msg: `Volatility expansion expected in ETH within 4 hours`, time: '2m ago' },
+    { id: 3, type: 'BEARISH', msg: `Liquidity gap identified for SOL below $${(solTicker.price || 142).toFixed(2)}`, time: '5m ago' },
     { id: 4, type: 'BULLISH', msg: 'Institutional inflow detected on ETH perpetuals', time: '8m ago' }
-  ])
+  ], [btcPrice, solTicker.price])
+
+  useEffect(() => {
+    const streams = ['btcusdt@ticker', 'ethusdt@ticker', 'solusdt@ticker']
+    subscribe(streams)
+    return () => unsubscribe(streams)
+  }, [])
 
   const [predictions] = useState([
-    { id: 1, question: 'BTC > $75,000 by June 2026?', probability: 73, volume: '$42.1K' },
-    { id: 2, question: 'ETH 2.0 staking yield > 5% Q3?', probability: 58, volume: '$18.7K' },
+    { id: 1, question: 'BTC > $100,000 by end of year?', probability: 73, volume: '$42.1K' },
+    { id: 2, question: 'ETH staking yield > 5% Q4?', probability: 58, volume: '$18.7K' },
     { id: 3, question: 'SOL flips BNB by market cap?', probability: 41, volume: '$31.2K' }
   ])
 
   const [news] = useState([
-    { id: 1, title: 'Bitcoin ETF inflows hit $2.1B weekly record as institutional demand surges', sentiment: 'BULLISH', impact: 'HIGH', time: '12m' },
-    { id: 2, title: 'Federal Reserve signals potential rate pause in upcoming meeting', sentiment: 'NEUTRAL', impact: 'HIGH', time: '34m' },
-    { id: 3, title: 'Major exchange reports security breach affecting cold wallets', sentiment: 'BEARISH', impact: 'MED', time: '1h' }
+    { id: 1, title: 'Institutional crypto adoption accelerates with new regulatory clarity', sentiment: 'BULLISH', impact: 'HIGH', time: '12m' },
+    { id: 2, title: 'Global central banks signal shift in digital asset strategy', sentiment: 'NEUTRAL', impact: 'HIGH', time: '34m' },
+    { id: 3, title: 'Network upgrade successfully deployed on major L1 blockchain', sentiment: 'BULLISH', impact: 'MED', time: '1h' }
   ])
 
   // Academy mock data
@@ -260,9 +272,6 @@ export default function Overview() {
   }
 
   const [timeframe, setTimeframe] = useState('1D')
-  const btcTicker = tickers['btcusdt'] || { price: 0, changePercent: 0 }
-  const btcPrice = btcTicker.price || 68430.50
-  
   // Dynamic mock data based on timeframe
   const chartDataMap = {
     '1H': [67800, 67950, 67850, 68100, 68050, 68200, 68150, 68300, 68250, 68430],
