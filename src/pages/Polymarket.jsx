@@ -289,7 +289,7 @@ export default function Polymarket() {
                         <h2 style={{ fontSize: '16px', fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '8px' }}>Initialize Wallet</h2>
                         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', marginBottom: '32px' }}>
                           Authorize with your Polygon Private Key to enable one-click trading. 
-                          <br/><span style={{ fontSize: '10px', color: '#00FFFF' }}>You can find your API keys in Polymarket Settings -> API Keys.</span>
+                          <br/><span style={{ fontSize: '10px', color: '#00FFFF' }}>You can find your API keys in Polymarket Settings &rarr; API Keys.</span>
                         </p>
                         
                         <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '16px', borderRadius: '16px', marginBottom: '24px', textAlign: 'left' }}>
