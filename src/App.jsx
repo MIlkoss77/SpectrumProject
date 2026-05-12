@@ -13,10 +13,8 @@ const Alerts = React.lazy(() => import('@/pages/Alerts.jsx'))
 const Signals = React.lazy(() => import('@/pages/Signals.jsx'))
 const News = React.lazy(() => import('@/pages/News.jsx'))
 const Analytics = React.lazy(() => import('@/pages/Analytics.jsx'))
-const NotFound = React.lazy(() => import('@/pages/NotFound.jsx'))
-const Arbitrage = React.lazy(() => import('@/pages/Arbitrage.jsx'))
-const Staking = React.lazy(() => import('@/pages/Staking.jsx'))
-const Academy = React.lazy(() => import('@/pages/Academy.jsx'))
+const NotFound = React.lazy(() => import('@/pages/NotFound.jsx'));
+const Academy = React.lazy(() => import('@/pages/Academy.jsx'));
 const Settings = React.lazy(() => import('@/pages/Settings.jsx'))
 const Pricing = React.lazy(() => import('@/pages/Pricing.jsx'))
 const Portfolio = React.lazy(() => import('@/pages/Portfolio.jsx'))
@@ -79,8 +77,6 @@ export default function App() {
                         <Route path='alerts' element={<Alerts />} />
                         <Route path='signals' element={<Signals />} />
                         <Route path='news' element={<News />} />
-                        <Route path='arbitrage' element={<Arbitrage />} />
-                        <Route path='staking' element={<Staking />} />
                         <Route path='academy' element={<Academy />} />
                         <Route path='analytics' element={<Analytics />} />
                         <Route path='pricing' element={<Pricing />} />
