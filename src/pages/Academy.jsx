@@ -7,161 +7,84 @@ import './dashboard.css'
 const MODULES = [
   {
     id: 1,
-    title: 'Crypto Basics',
-    desc: 'Start your journey here. Learn wallets, security, and transfers.',
-    progress: 100,
-    reward: 'Novice Badge',
-    gradient: 'linear-gradient(135deg, #667eea, #764ba2)',
+    title: 'Neuro-Foundation',
+    desc: 'The "Hardware" upgrade. Optimize your biology for high-stakes decision making.',
+    progress: 0,
+    reward: 'Neural Base Badge',
+    gradient: 'linear-gradient(135deg, #00FFFF, #0080FF)',
     lessons: [
       {
-        title: 'What is Blockchain?',
-        duration: '5 min read',
-        completed: true,
-        content: `A blockchain is a distributed, immutable ledger that records transactions across a network of computers. Each "block" contains a batch of transactions and a cryptographic hash of the previous block, forming a chain.\n\nKey properties:\n• Decentralized — no single authority controls the data\n• Immutable — once written, records cannot be altered\n• Transparent — anyone can verify the transaction history\n• Consensus-driven — network participants agree on the state`,
-        quiz: { q: 'What makes blockchain immutable?', options: ['Fast servers', 'Cryptographic hashing of blocks', 'Government regulation'], answer: 1 }
+        title: 'Biohacking for Clarity',
+        duration: '10 min read',
+        completed: false,
+        content: `Your brain is the hardware of your trading system. If the hardware is laggy, no strategy will save you.\n\nKey Pillars of Neuro-Foundation:\n• Dopamine Reset: Why social media and junk food are destroying your trading patience.\n• Sleep Optimization: The link between REM sleep and pattern recognition.\n• Cold Exposure: Training the nervous system to remain calm under financial pressure.\n• Nutrition: Why blood sugar spikes lead to impulsive entries.\n\nAction Item: Tomorrow morning, delay your first dose of caffeine by 90 minutes to allow natural adenosine clearance.`,
+        quiz: { q: 'Why is dopamine management important for traders?', options: ['It makes you trade faster', 'It preserves patience and prevents impulsive decisions', 'It helps with chart colors'], answer: 1 }
       },
       {
-        title: 'Setting up MetaMask',
+        title: 'The Peptide Protocol',
         duration: '8 min read',
-        completed: true,
-        content: `MetaMask is a browser extension and mobile app that serves as your crypto wallet and gateway to decentralized applications.\n\nSetup Steps:\n1. Install MetaMask from metamask.io (browser extension)\n2. Click "Create a New Wallet"\n3. Set a strong password\n4. Write down your 12-word seed phrase on paper — never share it!\n5. Confirm the seed phrase\n6. Your wallet is ready — you'll see your ETH address (0x...)\n\n⚠️ Critical: Your seed phrase is the master key. If you lose it, you lose access to your funds forever. Never store it digitally.`,
-        quiz: { q: 'Where should you store your seed phrase?', options: ['In a notes app', 'On physical paper in a safe place', 'Screenshot on phone'], answer: 1 }
-      },
-      {
-        title: 'Your First Transaction',
-        duration: '6 min read',
-        completed: true,
-        content: `Sending crypto is like sending an email — you need the recipient's address and enough balance to cover the amount + gas fee.\n\nAnatomy of a transaction:\n• From: your wallet address\n• To: recipient's address (0x... for ETH, or ENS like vitalik.eth)\n• Amount: how much to send\n• Gas Fee: payment to miners/validators for processing\n\nGas tips:\n• Gas price fluctuates with network demand\n• Use etherscan.io/gastracker for current prices\n• Transactions during off-peak hours (weekends, late night UTC) are cheaper`,
-        quiz: { q: 'What is a gas fee?', options: ['A penalty for slow transactions', 'Payment to network validators for processing', 'A subscription fee'], answer: 1 }
-      },
-      {
-        title: 'Security Best Practices',
-        duration: '12 min read',
-        completed: true,
-        content: `Protecting your crypto requires a different mindset than traditional banking. You are your own bank.\n\nEssential practices:\n1. Use a hardware wallet (Ledger, Trezor) for large holdings\n2. Enable 2FA on all exchange accounts (use Authenticator app, not SMS)\n3. Never share your seed phrase — no legitimate service will ask for it\n4. Verify URLs before connecting your wallet — phishing sites look identical\n5. Use separate wallets — a "hot" wallet for daily use, "cold" for storage\n6. Revoke unused approvals — check revoke.cash regularly\n\n🔴 Red flags: DMs offering free tokens, "support" asking for your keys, too-good-to-be-true APYs`,
-        quiz: { q: 'What should you NEVER share?', options: ['Your wallet address', 'Your seed phrase', 'Your transaction history'], answer: 1 }
-      },
+        completed: false,
+        content: `Advanced biohacking for the 1%. Exploring substances that enhance cognitive function.\n\nNeuro-Peptides Overview:\n• Cerebrolysin: Enhancing neuroplasticity and recovery.\n• Semax: Improving focus and memory during high-volatility events.\n• Selank: Reducing anxiety without sedation — keeping you in the "Cold Zone".\n\n⚠️ Disclaimer: Always consult a professional. We focus on the science of optimization, not medical advice.`,
+        quiz: { q: 'Which peptide is primarily known for reducing anxiety without sedation?', options: ['Semax', 'Selank', 'Cerebrolysin'], answer: 1 }
+      }
     ]
   },
   {
     id: 2,
-    title: 'Candlestick Master',
-    desc: 'Read charts like a pro. Understand patterns and trends.',
-    progress: 35,
-    reward: '5% Discount',
-    gradient: 'linear-gradient(135deg, #f093fb, #f5576c)',
+    title: 'Mindset Programming',
+    desc: 'The "Software" upgrade. Re-write the scripts in your prefrontal cortex.',
+    progress: 0,
+    reward: 'Focus Master Badge',
+    gradient: 'linear-gradient(135deg, #FF00FF, #8000FF)',
     lessons: [
       {
-        title: 'Reading a Candle',
-        duration: '4 min read',
-        completed: true,
-        content: `Each candlestick shows four data points for a time period: Open, High, Low, Close (OHLC).\n\nAnatomy:\n• Green candle (bullish) — close > open → price went up\n• Red candle (bearish) — close < open → price went down\n• Body — the thick part between open and close\n• Wick/Shadow — the thin lines showing the high and low\n\nWhat candles tell you:\n• Long body = strong conviction (buyers or sellers dominated)\n• Long wick = rejection (price tested a level but was pushed back)\n• Small body = indecision (neither side won)`,
-        quiz: { q: 'A green candle means:', options: ['Price went down', 'Price went up (close > open)', 'Volume increased'], answer: 1 }
-      },
-      {
-        title: 'Doji & Hammers',
-        duration: '7 min read',
-        completed: true,
-        content: `Special candlestick patterns signal potential reversals.\n\nDoji — open ≈ close (tiny body, equal wicks)\n• Signals indecision; often appears before a trend change\n• More significant after a strong trend\n\nHammer — small body at top, long lower wick (2x body)\n• Appears at the bottom of downtrends\n• Shows sellers pushed price down but buyers fought back\n• Bullish reversal signal\n\nInverted Hammer — small body at bottom, long upper wick\n• Also bullish if confirmed by next candle closing higher\n\nShooting Star — like inverted hammer but at top of uptrend\n• Bearish reversal signal`,
-        quiz: { q: 'A hammer pattern at the bottom of a downtrend signals:', options: ['Continue selling', 'Potential bullish reversal', 'No useful information'], answer: 1 }
-      },
-      {
-        title: 'Trend Reversals',
-        duration: '10 min read',
-        completed: false,
-        content: `Recognizing when a trend is about to reverse is one of the most valuable skills in trading.\n\nReversal signals:\n• Higher highs → lower high = uptrend weakening\n• Lower lows → higher low = downtrend weakening\n• Volume divergence — price makes new high but volume decreases\n• RSI divergence — price makes new high but RSI makes lower high\n\nCommon reversal patterns:\n1. Double Top/Bottom — price tests same level twice and fails\n2. Head & Shoulders — three peaks, middle highest\n3. Engulfing candle — large candle completely covers previous\n\n⚠️ Never trade a reversal without confirmation. Wait for the next candle.`,
-        quiz: { q: 'What confirms a trend reversal?', options: ['A single red candle', 'Price making a lower high after higher highs', 'High volume alone'], answer: 1 }
-      },
-      {
-        title: 'Volume Analysis',
-        duration: '8 min read',
-        completed: false,
-        content: `Volume shows how many units were traded. It's the fuel behind price moves.\n\nRules of volume:\n• Rising price + rising volume = strong uptrend (healthy)\n• Rising price + falling volume = weak rally (likely to reverse)\n• Spike volume = climactic move, often near reversals\n• Low volume = no interest, choppy price action\n\nUsing volume in practice:\n1. Confirm breakouts — a breakout on high volume is more reliable\n2. Spot exhaustion — huge volume spike after a long trend = potential top/bottom\n3. Volume profile — shows which price levels have the most activity (support/resistance)`,
-        quiz: { q: 'Rising price with falling volume suggests:', options: ['Strong trend continuation', 'Weak rally that may reverse', 'Increased demand'], answer: 1 }
-      },
-      {
-        title: 'Support & Resistance',
-        duration: '15 min read',
-        completed: false,
-        content: `Support and resistance are price levels where buying or selling pressure concentrates.\n\nSupport — a price level where demand prevents further decline\n• Think of it as a floor\n• More touches = stronger support\n• When broken, often becomes resistance\n\nResistance — a price level where selling prevents further rise\n• Think of it as a ceiling\n• Breakout above resistance on high volume = bullish signal\n\nHow to identify:\n1. Previous highs and lows\n2. Round numbers ($50k, $100k for BTC)\n3. Moving averages (EMA 50, 200)\n4. Volume clusters`,
-        quiz: { q: 'When support is broken, it often becomes:', options: ['Stronger support', 'Resistance', 'Irrelevant'], answer: 1 }
-      },
-      {
-        title: 'Chart Patterns',
+        title: 'The Prefrontal Cortex (PFC)',
         duration: '12 min read',
         completed: false,
-        content: `Chart patterns are visual formations that predict future price direction.\n\nContinuation patterns (trend continues):\n• Flag/Pennant — brief consolidation after sharp move\n• Triangle — price compresses before breakout\n• Rectangle — price bounces between two levels\n\nReversal patterns (trend changes):\n• Double Top (M shape) — bearish reversal\n• Double Bottom (W shape) — bullish reversal\n• Head & Shoulders — three peaks pattern\n\nKey rules:\n1. Patterns need context — a flag in an uptrend is bullish\n2. Volume confirms — breakout on low volume often fails\n3. Measure the target — height of pattern = expected move`,
-        quiz: { q: 'A "flag" pattern in an uptrend indicates:', options: ['Trend reversal', 'Trend continuation after brief consolidation', 'No signal'], answer: 1 }
+        content: `The PFC is your "CEO". When fear kicks in, the Amygdala hijacks the PFC, and you make "crypto-perm" mistakes.\n\nPFC Activation Techniques:\n• Physiological Sigh: Two inhales, one long exhale to instantly lower heart rate.\n• Visualization: Simulating loss before it happens to desensitize the fear response.\n• Affirmations: Hard-coding the belief that "I am a disciplined observer of the market."`,
+        quiz: { q: 'Which part of the brain is responsible for logical decision making?', options: ['Amygdala', 'Prefrontal Cortex', 'Hippocampus'], answer: 1 }
       },
+      {
+        title: 'Entering the Flow State',
+        duration: '15 min read',
+        completed: false,
+        content: `Flow is when the self disappears and you become one with the data. It is the highest state of performance.\n\nFlow Triggers:\n• High Stakes: The market provides this naturally.\n• Clear Goals: Know your exit before you enter.\n• Immediate Feedback: The PnL provides this.\n• Challenge/Skill Balance: Don't trade size that makes you vomit.`,
+        quiz: { q: 'What is a key requirement for entering the Flow State?', options: ['High anxiety', 'A balance between challenge and skill', 'Listening to loud music'], answer: 1 }
+      }
     ]
   },
   {
     id: 3,
-    title: 'Arbitrage Strategies',
-    desc: 'How to find and execute risk-free trades across exchanges.',
+    title: 'Market as a Mirror',
+    desc: 'Understanding global sentiment as a biological mass-phenomenon.',
     progress: 0,
-    reward: 'Arb Sniper Badge',
-    gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+    reward: 'Sentiment Expert',
+    gradient: 'linear-gradient(135deg, #00FF00, #008000)',
     lessons: [
       {
-        title: 'What is Arbitrage?',
-        duration: '6 min read',
+        title: 'The Biology of Crowds',
+        duration: '10 min read',
         completed: false,
-        content: `Arbitrage is the simultaneous purchase and sale of the same asset on different markets to profit from price differences.\n\nHow it works:\nBTC on Binance: $97,500\nBTC on Bybit: $97,650\nDifference: $150 per BTC (0.15%)\n\nTypes of crypto arbitrage:\n1. Cross-exchange — same asset, different exchanges\n2. Triangular — three pairs on the same exchange (BTC→ETH→USDT→BTC)\n3. DEX vs CEX — decentralized vs centralized exchange pricing\n\nWhy it works:\n• Different exchanges have different liquidity and user bases\n• Price differences exist for seconds to minutes\n• Bots dominate — manual arb is rare but possible on smaller pairs`,
-        quiz: { q: 'Arbitrage profits come from:', options: ['Predicting price direction', 'Price differences between markets', 'Holding assets long-term'], answer: 1 }
-      },
-      {
-        title: 'CEX vs DEX Spreads',
-        duration: '9 min read',
-        completed: false,
-        content: `Centralized exchanges (Binance, Bybit) and decentralized exchanges (Uniswap, Raydium) often have significant price differences.\n\nWhy spreads exist:\n• CEX has order books with tight spreads for popular pairs\n• DEX uses Automated Market Makers (AMMs) — price depends on pool balance\n• Low-liquidity DEX pools can have 1-5% spreads\n\nFinding CEX/DEX spreads:\n1. Compare Binance spot price with Uniswap/Jupiter price\n2. Factor in gas fees (ETH) or priority fees (SOL)\n3. Account for slippage — large orders move DEX price\n\nSpectr Scanner shows you these spreads in real-time on the Smart Ops page.`,
-        quiz: { q: 'Why do DEX prices often differ from CEX?', options: ['Government regulation', 'AMM pricing depends on pool balance', 'DEX is always more expensive'], answer: 1 }
-      },
-      {
-        title: 'Execution Latency',
-        duration: '11 min read',
-        completed: false,
-        content: `Speed is critical in arbitrage. The faster you execute, the more likely the opportunity still exists.\n\nLatency factors:\n• Network latency — distance to exchange servers\n• Blockchain confirmation — ETH ~12s per block, SOL ~0.4s\n• Withdrawal processing — some exchanges delay withdrawals\n\nReducing latency:\n1. Pre-fund both exchanges (no transfer needed)\n2. Use API trading instead of manual UI\n3. Choose SOL/L2 chains for faster confirmation\n4. Run bots on cloud servers near exchange data centers\n\nRealistic expectations:\n• Cross-exchange arb: 0.1-0.5% per trade (after fees)\n• DEX/CEX arb: 0.5-2% on low-cap tokens\n• Frequency: 5-20 opportunities per day for major pairs`,
-        quiz: { q: 'How to reduce execution latency?', options: ['Trade manually', 'Pre-fund both exchanges', 'Only trade on weekends'], answer: 1 }
-      },
-      {
-        title: 'Using Spectr Scanner',
-        duration: '8 min read',
-        completed: false,
-        content: `Spectr's Smart Ops page is your real-time arbitrage dashboard.\n\nFeatures:\n• Live spreads — Binance vs Bybit prices updated every 5 seconds\n• Net profit % — accounts for trading fees automatically\n• Symbol scanner — monitors BTC, ETH, SOL, and more\n\nHow to use it:\n1. Navigate to Smart Ops in the sidebar\n2. Watch for green profit percentages\n3. When spread > 0.1%, check both exchanges\n4. Execute buy on cheaper exchange, sell on expensive one\n5. Profit is the spread minus fees\n\nPro tips:\n• Spreads widen during high volatility (news events)\n• Weekend spreads tend to be wider (lower liquidity)\n• Always check withdrawal fees before executing`,
-        quiz: { q: 'When do arbitrage spreads typically widen?', options: ['During low volatility', 'During high volatility and news events', 'On Mondays'], answer: 1 }
-      },
+        content: `Charts are just heartbeats of the collective human nervous system. Fear and Greed are contagious.\n\nSentiment Signals:\n• Extreme Greed: The mass Amygdala is over-stimulated. Time to exit.\n• Extreme Fear: The mass nervous system is in "freeze" mode. Time to look for entries.\n\nSpectr Sentiment Heatmap shows you these biological states in real-time.`,
+        quiz: { q: 'What does a chart represent in this philosophy?', options: ['Random numbers', 'The collective nervous system of the market', 'Historical data'], answer: 1 }
+      }
     ]
   },
   {
     id: 4,
-    title: 'DeFi & Staking',
-    desc: 'How to earn passive income safely.',
+    title: 'System Integration',
+    desc: 'Using Spectr Trading tools with your upgraded brain.',
     progress: 0,
-    reward: 'Earn Badge',
-    gradient: 'linear-gradient(135deg, #a8edea, #fed6e3)',
+    reward: 'Improved Self Badge',
+    gradient: 'linear-gradient(135deg, #FFFF00, #808000)',
     lessons: [
       {
-        title: 'Liquidity Pools',
-        duration: '10 min read',
+        title: 'The Neural Workflow',
+        duration: '15 min read',
         completed: false,
-        content: `Liquidity pools power decentralized exchanges. You deposit token pairs and earn fees from trades.\n\nHow it works:\n1. You deposit equal value of two tokens (e.g., $500 ETH + $500 USDC)\n2. Traders swap between these tokens using your liquidity\n3. You earn a share of trading fees (typically 0.3% per trade)\n\nPopular platforms:\n• Uniswap (Ethereum) — largest DEX by volume\n• Raydium (Solana) — fast and cheap\n• PancakeSwap (BSC) — high APYs for exotic pairs\n\nRisks:\n• Impermanent loss (next lesson)\n• Smart contract bugs\n• Rug pulls on unverified tokens`,
-        quiz: { q: 'How do liquidity providers earn money?', options: ['From staking rewards', 'From a share of trading fees', 'From token price appreciation'], answer: 1 }
-      },
-      {
-        title: 'Impermanent Loss',
-        duration: '14 min read',
-        completed: false,
-        content: `Impermanent Loss (IL) occurs when the price ratio of your deposited tokens changes compared to when you deposited them.\n\nExample:\nYou deposit 1 ETH ($2000) + 2000 USDC\nETH price doubles to $4000\n• If you just held: 1 ETH ($4000) + 2000 USDC = $6000\n• In the pool: ~0.707 ETH + ~2828 USDC = $5656\n• Impermanent loss: $344 (5.7%)\n\nMitigating IL:\n1. Stablecoin pairs (USDC/USDT) — near-zero IL\n2. Correlated pairs (ETH/stETH) — minimal price divergence\n3. High fee pools — fees can offset IL\n4. Concentrated liquidity — provide in specific price ranges for higher fees`,
-        quiz: { q: 'Which pool has the lowest impermanent loss?', options: ['ETH/DOGE', 'USDC/USDT', 'BTC/MEME'], answer: 1 }
-      },
-      {
-        title: 'Yield Farming 101',
-        duration: '12 min read',
-        completed: false,
-        content: `Yield farming is the practice of moving crypto between protocols to maximize returns.\n\nCommon strategies:\n1. Stake LP tokens — provide liquidity, then stake the LP token for extra rewards\n2. Lending + borrowing — deposit collateral, borrow stablecoins, deploy elsewhere\n3. Auto-compounding — protocols like Beefy automatically reinvest your rewards\n\nEvaluating APY:\n• APY = Annual Percentage Yield (includes compounding)\n• APR = Annual Percentage Rate (simple interest)\n• TVL = Total Value Locked (higher TVL = more trust)\n\nRed flags:\n🔴 APY > 1000% — usually unsustainable\n🔴 Anonymous team + no audit\n🔴 Locked withdrawals\n🔴 Token has no utility beyond farming\n\n✅ Realistic sustainable yields: 5-20% APY for blue chip pairs`,
-        quiz: { q: 'An APY above 1000% is usually:', options: ['A great opportunity', 'Unsustainable and risky', 'Guaranteed profit'], answer: 1 }
-      },
+        content: `Now that your brain is upgraded, we use Spectr to filter the remaining noise.\n\nWorkflow:\n1. Check News (Global Awareness).\n2. Check Whale Radar (Tracking the Apex Predators).\n3. Check AI Forecasts (Neural confirmation).\n4. Execute on Polymarket (Monetizing your prediction).\n\nYou are now an improved version of yourself. The system is ready.`,
+        quiz: { q: 'What is the final step in the Neural Workflow?', options: ['Checking Twitter', 'Executing on Polymarket', 'Asking a friend'], answer: 1 }
+      }
     ]
   }
 ]

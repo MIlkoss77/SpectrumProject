@@ -113,73 +113,25 @@ export default function Analytics() {
 
       {/* ═══ Analytics Grid ═══ */}
       <div className="dx-grid-premium mt-8">
-        {/* Row 1: Whale Radar (2) & Neural Confidence (1) & Sentiment Header (1) if space */}
+        {/* Row 1: Whale Radar (Intelligence) */}
         <div className="col-span-1 lg:col-span-2">
           <WhaleRadar symbol={symbol} />
         </div>
 
-        <div className="col-span-1 lg:col-span-1">
+        {/* Row 1: Sentiment & Confidence (Filtering Noise) */}
+        <div className="col-span-1 lg:col-span-1 flex flex-col gap-6">
           <NeuralConfidence value={84} />
-        </div>
-
-        <div className="col-span-1 lg:col-span-1">
           <SentimentHeatmap />
         </div>
 
-        {/* Row 2: PnL History spans the rest */}
-        <div className="col-span-1 lg:col-span-3">
+        {/* Row 2: Financial Discipline (PnL & Calculator) */}
+        <div className="col-span-1 lg:col-span-2">
           <PnLHistory />
         </div>
 
-        {/* Row 2 extra space: Leverage & Funding or wrap them */}
         <div className="col-span-1 lg:col-span-1 flex flex-col gap-6">
           <LeverageCalculator />
           <FundingRates />
-        </div>
-
-        {/* Row 4: Technical Briefing (High Density) */}
-        <div className="col-span-full">
-          <div className="action-card" style={{ padding: '24px' }}>
-            <div className="flex items-center gap-2 mb-6">
-              <Layers size={18} className="text-white/80" />
-              <h3 className="font-bold text-white">Neural Technical Briefing</h3>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="text-[10px] font-bold text-white/30 uppercase mb-1">RSI Sentiment</div>
-                <div className={`text-xl font-mono font-bold ${lastRSI > 70 ? 'text-red-400' : lastRSI < 30 ? 'text-green-400' : 'text-white'}`}>
-                  {lastRSI ? fmt(lastRSI, 1) : '--'}
-                </div>
-                <div className="text-[9px] text-white/20 font-bold uppercase mt-1">{lastRSI > 50 ? 'Bullish' : 'Bearish'}</div>
-              </div>
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="text-[10px] font-bold text-white/30 uppercase mb-1">Volatility (24h)</div>
-                <div className="text-xl font-mono font-bold text-white">
-                  {liveTicker ? Math.abs(liveTicker.changePercent).toFixed(2) + '%' : '2.4%'}
-                </div>
-                <div className="text-[9px] text-white/20 font-bold uppercase mt-1">
-                  {liveTicker && Math.abs(liveTicker.changePercent) > 3 ? 'High' : 'Normal'}
-                </div>
-              </div>
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="text-[10px] font-bold text-white/30 uppercase mb-1">Exchange Flow</div>
-                <div className={`text-xl font-mono font-bold ${liveTicker && liveTicker.changePercent < 0 ? 'text-red-400' : 'text-green-400'}`}>
-                  {liveTicker && liveTicker.changePercent < 0 ? 'HIGH' : 'STABLE'}
-                </div>
-                <div className="text-[9px] text-white/20 font-bold uppercase mt-1">
-                  {liveTicker && liveTicker.changePercent < 0 ? 'Selling Pressure' : 'Buying Support'}
-                </div>
-              </div>
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 relative overflow-hidden">
-                <div className="text-[10px] font-bold text-white/30 uppercase mb-1">AI Recommendation</div>
-                <div className="text-xl font-bold text-white tracking-tighter">WAITING FOR ENTRY</div>
-                <div className="text-[9px] text-white/20 font-bold uppercase mt-1 flex items-center gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
-                  Confirmed by 14 nodes
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

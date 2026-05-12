@@ -229,18 +229,7 @@ export default function Overview() {
       to: '/signals'
     },
     {
-      label: 'Arbitrage',
-      icon: <Scale size={20} />,
-      color: '#00E396',
-      bg: 'rgba(0,227,150,0.08)',
-      border: 'rgba(0,227,150,0.15)',
-      badge: '>0.3%',
-      badgeBg: 'rgba(0,227,150,0.15)',
-      badgeColor: '#00E396',
-      to: '/arbitrage'
-    },
-    {
-      label: 'Predictions',
+      label: 'Polymarket',
       icon: <Layers size={20} />,
       color: '#A78BFA',
       bg: 'rgba(139,92,246,0.08)',

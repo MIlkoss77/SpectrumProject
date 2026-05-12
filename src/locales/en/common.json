@@ -7,9 +7,6 @@
         "alerts": "Alerts",
         "news": "News",
         "calibration": "Calibration",
-        "arbitrage": "Arbitrage",
-        "copySim": "Copy (Sim)",
-        "staking": "Staking",
         "academy": "Academy",
         "settings": "Settings",
         "pricing": "Pricing",
@@ -98,21 +95,9 @@
         "news": {
             "title": "News"
         },
-        "arbitrage": {
-            "title": "Arbitrage"
-        },
-        "copysim": {
-            "title": "Copy Trading (Simulation)"
-        },
-        "staking": {
-            "title": "Staking Pools"
-        },
-        "calibration": {
-            "title": "Prediction Calibration"
-        },
         "academy": {
             "title": "Spectr Academy",
-            "subtitle": "Master crypto trading and unlock exclusive scanner features.",
+            "subtitle": "Neuro-Performance Transformation: Upgrade your biology, master the market.",
             "xp_level": "XP LEVEL",
             "module": "MODULE"
         },
