@@ -226,7 +226,7 @@ function getMockBuzz() {
   return [
     { 
       id: 'b1', 
-      source: 'Twitter', 
+      source: 'X', 
       author: 'VitalikButerin', 
       title: 'Ethereum layer 2 scaling is accelerating faster than anticipated. The ecosystem is maturing into a multi-chain powerhouse.', 
       velocity: '9.8', 
@@ -236,23 +236,72 @@ function getMockBuzz() {
     },
     { 
       id: 'b2', 
-      source: 'Reddit', 
-      sub: 'r/CryptoCurrency', 
-      author: 'DeepMindTrader', 
-      title: '[DUE DILIGENCE] Why the current market structure mirrors the 2020 pre-halving accumulation phase.', 
-      velocity: '8.5', 
-      score: 3420, 
-      created_at: now - 3600000, 
-      url: '#' 
-    },
-    { 
-      id: 'b3', 
-      source: 'Twitter', 
+      source: 'X', 
       author: 'WhaleChart', 
       title: 'BREAKING: Massive $500M USDT inflow to exchanges detected. Prepare for volatility.', 
       velocity: '10.0', 
       score: 890, 
       created_at: now - 600000, 
+      url: '#' 
+    },
+    { 
+      id: 'b3', 
+      source: 'X', 
+      author: 'ElonMusk', 
+      title: 'The future of finance is digital and decentralized. Neural networks are the new clearing houses.', 
+      velocity: '12.4', 
+      score: 45200, 
+      created_at: now - 300000, 
+      url: '#' 
+    },
+    { 
+      id: 'b4', 
+      source: 'X', 
+      author: 'ZeroHedge', 
+      title: 'FED rate decision looms as inflation data shows unexpected cooling in core sectors.', 
+      velocity: '7.2', 
+      score: 2100, 
+      created_at: now - 7200000, 
+      url: '#' 
+    },
+    { 
+      id: 'b5', 
+      source: 'X', 
+      author: 'GCRClassic', 
+      title: 'Size is not the goal. Survival is the goal. Patience is the ultimate edge in this macro cycle.', 
+      velocity: '9.1', 
+      score: 5600, 
+      created_at: now - 14400000, 
+      url: '#' 
+    },
+    { 
+      id: 'b6', 
+      source: 'X', 
+      author: 'Cobie', 
+      title: 'If you are not using neural-enhanced tools in 2026, you are just providing liquidity for those who do.', 
+      velocity: '8.8', 
+      score: 3200, 
+      created_at: now - 1800000, 
+      url: '#' 
+    },
+    { 
+      id: 'b7', 
+      source: 'X', 
+      author: 'HsakaTrades', 
+      title: 'SOL/BTC pair reaching a multi-year pivot point. All eyes on the breakout.', 
+      velocity: '9.5', 
+      score: 4100, 
+      created_at: now - 2400000, 
+      url: '#' 
+    },
+    { 
+      id: 'b8', 
+      source: 'X', 
+      author: 'BarrySilbert', 
+      title: 'Institutional demand for digital assets has reached a new paradigm. The floodgates are open.', 
+      velocity: '6.5', 
+      score: 1200, 
+      created_at: now - 86400000, 
       url: '#' 
     }
   ];

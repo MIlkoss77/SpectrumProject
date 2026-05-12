@@ -86,10 +86,10 @@ function ViralCard({ item }) {
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-center gap-3">
             <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${accentColor}10`, border: `1px solid ${accentColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {isReddit ? <MessageCircle size={16} color={accentColor} /> : <Twitter size={16} color={accentColor} />}
+              <span style={{ fontSize: '14px', fontWeight: 900, color: accentColor, fontFamily: 'serif' }}>X</span>
             </div>
             <div className="flex flex-col">
-              <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>{item.sub || item.source}</span>
+              <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>NEURAL FEED</span>
               <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>@{item.author}</span>
             </div>
           </div>
@@ -208,18 +208,21 @@ function ScoutCard({ item }) {
 
       <div className="flex justify-between items-start mb-2">
         <div className="flex gap-3 items-center">
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${accentColor}10`, border: `1px solid ${accentColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-              {item.photo ? (
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(0, 255, 255, 0.1)', border: '1px solid rgba(0, 255, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              {item.photo && !item.photo.includes('undefined') ? (
                 <img 
                   src={item.photo} 
                   alt="Token" 
                   className="w-full h-full object-cover" 
                   onError={(e) => {
-                    e.target.onerror = null; 
-                    e.target.src = 'https://cryptologos.cc/logos/solana-sol-logo.png'; // Fallback to SOL logo or Bot
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
                   }} 
                 />
-              ) : <Bot size={16} color={accentColor} />}
+              ) : null}
+              <div style={{ display: item.photo ? 'none' : 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,255,255,0.05)' }}>
+                <Zap size={16} color="#00FFFF" />
+              </div>
             </div>
             <div className="flex flex-col">
               <span style={{ fontSize: '12px', fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textTransform: 'uppercase' }}>FEROCIOUS SCOUT</span>
@@ -331,6 +334,22 @@ export default function News() {
     return `[NEURAL TRANSLATION]: Global market intelligence update regarding emerging trends.`;
   };
 
+  const processedBuzz = useMemo(() => {
+    return (socialBuzz || []).map(item => ({
+      ...item,
+      title: neuralize(item.title),
+      summary: neuralize(item.summary || item.title)
+    }))
+  }, [socialBuzz]);
+
+  const processedScout = useMemo(() => {
+    return (scoutSignals || []).map(item => ({
+      ...item,
+      text: neuralize(item.text),
+      title: neuralize(item.title || item.text)
+    }))
+  }, [scoutSignals]);
+
   const filtered = useMemo(() => {
     return (rows || []).map(r => ({
       ...r,
@@ -437,9 +456,9 @@ export default function News() {
             {activeTab === 'ARTICLES' ? (
               filtered.map(n => <NewsCard key={n.id} item={n} />)
             ) : activeTab === 'SOCIAL' ? (
-              socialBuzz.map(item => <ViralCard key={item.id} item={item} />)
+              processedBuzz.map(item => <ViralCard key={item.id} item={item} />)
             ) : (
-              scoutSignals.map(item => <ScoutCard key={item.id} item={item} />)
+              processedScout.map(item => <ScoutCard key={item.id} item={item} />)
             )}
           </>
         )}
