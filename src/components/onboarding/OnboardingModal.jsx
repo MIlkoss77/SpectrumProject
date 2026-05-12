@@ -86,17 +86,32 @@ export default function OnboardingModal() {
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 md:p-6 overflow-hidden">
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 9999,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px',
+                    overflow: 'hidden'
+                }}>
                     <motion.div 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-black/80 backdrop-blur-3xl"
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            backdropFilter: 'blur(40px)',
+                            WebkitBackdropFilter: 'blur(40px)'
+                        }}
                         onClick={handleComplete}
                     />
 
-                    {/* Animated Background Orbs for Premium feel */}
-                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {/* Animated Background Orbs */}
+                    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
                         <motion.div 
                             animate={{ 
                                 x: [0, 100, 0], 
@@ -105,17 +120,11 @@ export default function OnboardingModal() {
                                 opacity: [0.1, 0.2, 0.1]
                             }}
                             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-cyan-500/20 rounded-full blur-[120px]" 
-                        />
-                        <motion.div 
-                            animate={{ 
-                                x: [0, -100, 0], 
-                                y: [0, 50, 0],
-                                scale: [1.5, 1, 1.5],
-                                opacity: [0.1, 0.2, 0.1]
+                            style={{
+                                position: 'absolute', top: '25%', left: '-20%', width: '500px', height: '500px',
+                                background: 'radial-gradient(circle, rgba(0,255,255,0.2) 0%, transparent 70%)',
+                                borderRadius: '50%', filter: 'blur(100px)'
                             }}
-                            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" 
                         />
                     </div>
                     
@@ -124,23 +133,34 @@ export default function OnboardingModal() {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 40 }}
                         transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-                        className="relative w-full max-w-lg bg-black/40 border border-white/10 rounded-[40px] overflow-hidden shadow-[0_32px_128px_rgba(0,0,0,1)] backdrop-blur-2xl"
+                        style={{
+                            position: 'relative',
+                            width: '100%',
+                            maxWidth: '500px',
+                            backgroundColor: 'rgba(10,10,15,0.9)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            borderRadius: '32px',
+                            overflow: 'hidden',
+                            boxShadow: '0 32px 128px rgba(0,0,0,0.8)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)'
+                        }}
                     >
                         {/* Progress Bar */}
-                        <div className="absolute top-0 left-0 right-0 h-1 flex gap-1.5 px-6 pt-6">
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', display: 'flex', gap: '6px', padding: '24px 24px 0' }}>
                             {STEPS.map((_, i) => (
-                                <div key={i} className="flex-1 h-1 rounded-full bg-white/5 overflow-hidden">
+                                <div key={i} style={{ flex: 1, height: '2px', borderRadius: '4px', backgroundColor: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
                                     <motion.div 
                                         initial={false}
                                         animate={{ width: i < currentStep ? '100%' : i === currentStep ? '100%' : '0%' }}
-                                        className={`h-full ${i <= currentStep ? 'bg-gradient-to-r from-cyan-400 to-blue-500 shadow-[0_0_8px_rgba(34,211,238,0.6)]' : ''}`}
+                                        style={{ height: '100%', background: i <= currentStep ? 'var(--accent)' : 'transparent', boxShadow: i <= currentStep ? '0 0 10px var(--accent)' : 'none' }}
                                         transition={{ duration: 0.6, ease: "easeInOut" }}
                                     />
                                 </div>
                             ))}
                         </div>
 
-                        <div className="p-10 md:p-14 pt-20">
+                        <div style={{ padding: '60px 40px 40px' }}>
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={currentStep}
@@ -148,93 +168,65 @@ export default function OnboardingModal() {
                                     animate={{ x: 0, opacity: 1, filter: 'blur(0px)' }}
                                     exit={{ x: -30, opacity: 0, filter: 'blur(10px)' }}
                                     transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                                    className="flex flex-col items-center"
+                                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
                                 >
-                                    <div className="relative mb-12">
-                                        <motion.div 
-                                            animate={{ rotate: 360 }}
-                                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                                            className={`absolute -inset-8 rounded-full bg-gradient-to-tr ${currentData.gradient} blur-3xl opacity-60`}
-                                        />
+                                    <div style={{ position: 'relative', marginBottom: '40px' }}>
                                         <div 
-                                            className="relative w-28 h-28 rounded-[32px] flex items-center justify-center bg-black/40 border border-white/10 shadow-2xl overflow-hidden group"
-                                            style={{ boxShadow: `0 0 50px ${currentData.color}30` }}
+                                            style={{
+                                                position: 'relative', width: '100px', height: '100px', borderRadius: '24px',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)',
+                                                boxShadow: `0 0 40px ${currentData.color}20`
+                                            }}
                                         >
-                                            <div className={`absolute inset-0 bg-gradient-to-br ${currentData.gradient} opacity-40`} />
-                                            <Icon size={48} style={{ color: currentData.color }} className="relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]" />
-                                            
-                                            {/* Pulsing Core */}
-                                            <motion.div 
-                                                animate={{ scale: [1, 1.4, 1], opacity: [0.05, 0.15, 0.05] }}
-                                                transition={{ duration: 4, repeat: Infinity }}
-                                                className="absolute inset-0 bg-white rounded-full blur-3xl" 
-                                            />
+                                            <Icon size={40} style={{ color: currentData.color, position: 'relative', zIndex: 10 }} />
                                         </div>
                                     </div>
 
-                                    <div className="text-center mb-12">
-                                        <motion.div 
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.2 }}
-                                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-4"
-                                        >
-                                            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,1)]" />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400">
+                                    <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: '100px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '16px' }}>
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--accent)', boxShadow: '0 0 8px var(--accent)' }} />
+                                            <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'var(--accent)' }}>
                                                 {currentData.subtitle}
                                             </span>
-                                        </motion.div>
+                                        </div>
                                         
-                                        <h2 className="text-3xl md:text-4xl font-black text-white mb-5 tracking-tight leading-[1.1]">
+                                        <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#fff', marginBottom: '16px', letterSpacing: '-0.5px' }}>
                                             {currentData.title}
                                         </h2>
-                                        <p className="text-base md:text-lg text-white/50 font-medium leading-relaxed max-w-sm mx-auto">
+                                        <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, maxWidth: '320px', margin: '0 auto' }}>
                                             {currentData.description}
                                         </p>
                                     </div>
                                 </motion.div>
                             </AnimatePresence>
 
-                            <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
-                                {currentStep > 0 && (
-                                    <button 
-                                        onClick={handleBack}
-                                        className="flex-1 py-4.5 px-6 rounded-2xl border border-white/10 text-white/60 font-bold hover:text-white hover:bg-white/5 hover:border-white/20 transition-all flex items-center justify-center gap-2 group active:scale-95"
-                                    >
-                                        <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                                        <span>Back</span>
-                                    </button>
-                                )}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 <button 
                                     onClick={handleNext}
-                                    className="flex-[2] py-4.5 px-8 rounded-2xl bg-cyan-400 hover:bg-white text-black font-black uppercase tracking-[0.15em] text-xs transition-all shadow-[0_10px_40px_rgba(34,211,238,0.3)] hover:shadow-[0_20px_60px_rgba(255,255,255,0.4)] flex items-center justify-center gap-3 active:scale-95 overflow-hidden relative group"
+                                    style={{
+                                        width: '100%', padding: '16px', borderRadius: '16px', background: 'var(--accent)',
+                                        color: '#000', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px',
+                                        fontSize: '12px', border: 'none', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,255,255,0.2)'
+                                    }}
                                 >
-                                    <span className="relative z-10 flex items-center gap-2">
-                                        {currentStep === STEPS.length - 1 ? (
-                                            <>IGNITE ENGINES <Sparkles size={18} /></>
-                                        ) : (
-                                            <>NEXT PROTOCOL <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" /></>
-                                        )}
-                                    </span>
-                                    
-                                    {/* Shimmer Effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-[100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                    {currentStep === STEPS.length - 1 ? 'IGNITE ENGINES' : 'NEXT PROTOCOL'}
+                                </button>
+                                
+                                <button 
+                                    onClick={handleComplete}
+                                    style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.2)', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', cursor: 'pointer', marginTop: '10px' }}
+                                >
+                                    SKIP INTRODUCTION
                                 </button>
                             </div>
-                            
-                            <button 
-                                onClick={handleComplete}
-                                className="mt-8 text-[10px] font-bold text-white/20 hover:text-cyan-400/60 uppercase tracking-[0.3em] transition-all w-full text-center hover:scale-105 active:scale-95"
-                            >
-                                SKIP INTRODUCTION
-                            </button>
                         </div>
 
                         <button 
                             onClick={handleComplete}
-                            className="absolute top-8 right-8 p-3 text-white/20 hover:text-white/60 hover:bg-white/5 rounded-full transition-all group"
+                            style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer' }}
                         >
-                            <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+                            <X size={20} />
                         </button>
                     </motion.div>
                 </div>

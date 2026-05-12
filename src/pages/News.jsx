@@ -16,38 +16,47 @@ function ClusterCard({ cluster, onSelect, isActive }) {
       onClick={() => onSelect(cluster.id)}
       className="group relative overflow-hidden transition-all duration-300 hover:scale-[1.01] cursor-pointer"
       style={{ 
-        background: isActive ? 'rgba(0, 255, 255, 0.05)' : 'rgba(10, 10, 15, 0.6)',
+        background: 'rgba(10, 10, 15, 0.6)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         border: isActive ? '1px solid #00FFFF' : '1px solid rgba(255,255,255,0.06)',
-        borderRadius: '12px',
-        padding: '10px 14px',
+        borderRadius: '16px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '4px',
+        gap: '12px',
         width: '100%',
         transition: 'all 0.3s ease'
       }}
     >
-      <div className="flex justify-between items-start">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
-            <Layers size={12} className="text-cyan-400" />
+      <div style={{ position: 'absolute', top: -20, left: -20, width: 80, height: 80, borderRadius: '50%', background: '#00FFFF', filter: 'blur(40px)', opacity: isActive ? 0.15 : 0.05, pointerEvents: 'none' }} />
+
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center gap-3">
+            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(0, 255, 255, 0.1)', border: '1px solid rgba(0, 255, 255, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Layers size={16} className="text-cyan-400" />
+            </div>
+            <div className="flex flex-col">
+              <span style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Neural Narrative</span>
+              <span style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.1em' }}>{cluster.count} STORIES DETECTED</span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-[8px] font-black uppercase tracking-widest text-cyan-400">Narrative</span>
+          {isActive && <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]" />}
+        </div>
+        
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', lineHeight: 1.4, marginBottom: '12px' }} className="line-clamp-3">
+          {cluster.topStory}
+        </h3>
+
+        <div className="mt-auto pt-3 border-t border-white/5 flex items-center justify-between">
+          <span style={{ fontSize: '9px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(0,255,255,0.1)', color: '#00FFFF', padding: '2px 6px', borderRadius: '4px' }}>
+            #{cluster.name.split(' ')[0]}
+          </span>
+          <div style={{ fontSize: '9px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)' }}>
+            TRENDING
           </div>
         </div>
-        {isActive && <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]" />}
-      </div>
-      
-      <h4 className="text-[11px] font-bold text-white line-clamp-2 leading-tight">
-        {cluster.topStory}
-      </h4>
-
-      <div className="mt-1 pt-1 border-t border-white/5 flex items-center justify-between">
-        <span className="text-[8px] font-bold text-white/20 uppercase">{cluster.count} STORIES</span>
-        <div className="text-[8px] font-black text-white/30 uppercase tracking-widest group-hover:text-cyan-400 transition-colors">Analyze Narrative →</div>
       </div>
     </div>
   )

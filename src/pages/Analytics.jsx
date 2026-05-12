@@ -112,24 +112,29 @@ export default function Analytics() {
       </div>
 
       {/* ═══ Analytics Grid ═══ */}
-      <div className="dx-grid-premium mt-8">
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '24px',
+        marginTop: '32px'
+      }}>
         {/* Row 1: Whale Radar (Intelligence) */}
-        <div className="col-span-1 lg:col-span-2">
+        <div style={{ gridColumn: 'span 1' }}>
           <WhaleRadar symbol={symbol} />
         </div>
 
         {/* Row 1: Sentiment & Confidence (Filtering Noise) */}
-        <div className="col-span-1 lg:col-span-1 flex flex-col gap-6">
+        <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <NeuralConfidence value={84} />
           <SentimentHeatmap />
         </div>
 
         {/* Row 2: Financial Discipline (PnL & Calculator) */}
-        <div className="col-span-1 lg:col-span-2">
+        <div style={{ gridColumn: 'span 1' }}>
           <PnLHistory />
         </div>
 
-        <div className="col-span-1 lg:col-span-1 flex flex-col gap-6">
+        <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <LeverageCalculator />
           <FundingRates />
         </div>

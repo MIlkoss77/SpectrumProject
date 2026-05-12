@@ -107,7 +107,9 @@ function AssetChartCard({ symbol = 'BTC', price = 0, change = 0, data = [], time
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-           <div style={{ fontSize: '16px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>${price.toLocaleString()}</div>
+           <div style={{ fontSize: '16px', fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>
+             $<NumberTicker value={price} decimals={2} />
+           </div>
            <div style={{ fontSize: '7px', fontWeight: 900, color: '#00FFFF', textTransform: 'uppercase', letterSpacing: '1px' }}>Neural: LONG (84%)</div>
         </div>
       </div>
@@ -152,11 +154,12 @@ export default function Overview() {
   const [topActions, setTopActions] = useState([])
   const [superScore, setSuperScore] = useState(null)
   
-  const btcTicker = tickers['btcusdt'] || { price: 0, changePercent: 0 }
-  const ethTicker = tickers['ethusdt'] || { price: 0, changePercent: 0 }
-  const solTicker = tickers['solusdt'] || { price: 0, changePercent: 0 }
+  const btcTicker = tickers['btcusdt'] || tickers['BTCUSDT'] || { price: 0, changePercent: 0 }
+  const ethTicker = tickers['ethusdt'] || tickers['ETHUSDT'] || { price: 0, changePercent: 0 }
+  const solTicker = tickers['solusdt'] || tickers['SOLUSDT'] || { price: 0, changePercent: 0 }
 
-  const btcPrice = btcTicker.price || 64230.50
+  // Use real price if available (> 0), otherwise use a slightly varied mock to detect updates
+  const btcPrice = btcTicker.price > 0 ? btcTicker.price : 64280.40
   
   const intelStream = useMemo(() => [
     { id: 1, type: 'BULLISH', msg: `Neural Engine detects whale accumulation on BTC @ $${btcPrice.toLocaleString()}`, time: 'JUST NOW' },

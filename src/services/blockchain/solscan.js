@@ -74,7 +74,14 @@ function getSimulatedSolanaTransactions() {
     }));
 }
 
+let signatureCache = { data: null, ts: 0 };
+
 async function fetchSignatures(address) {
+    // 1. Return cache if fresh (within 30s)
+    if (signatureCache.data && (Date.now() - signatureCache.ts < 30000)) {
+        return signatureCache.data;
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 1500);
 
@@ -100,16 +107,21 @@ async function fetchSignatures(address) {
 
         clearTimeout(timeoutId);
 
-        if (response.status === 403) {
-            // Silencing 403 warnings and activating circuit breaker
-            isRpcBlocked = true;
-            return [];
+        if (response.status === 403 || response.status === 429) {
+            // Activating circuit breaker on block or rate limit
+            if (response.status === 403) isRpcBlocked = true;
+            return signatureCache.data || [];
         }
 
         const data = await response.json();
-        return data.result || [];
+        const results = data.result || [];
+        
+        // Update cache
+        signatureCache = { data: results, ts: Date.now() };
+        
+        return results;
     } catch (e) {
         clearTimeout(timeoutId);
-        return [];
+        return signatureCache.data || [];
     }
 }

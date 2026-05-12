@@ -23,7 +23,7 @@ export async function calculateSuperScore(symbol = 'BTCUSDT') {
         const sentimentScore = calculateSentimentContribution(newsRes?.items || [], symbol);
 
         // --- B. Whale Score (0-100) ---
-        const whaleScore = calculateWhaleContribution(whaleRes, symbol);
+        const whaleScore = calculateWhaleContribution(whaleRes?.alerts || [], symbol);
 
         // --- C. TA Score (0-100) ---
         const taScore = calculateTaContribution(klines);
@@ -82,6 +82,7 @@ export async function calculateSuperScore(symbol = 'BTCUSDT') {
  * Filter news for symbol and calculate sentiment score
  */
 function calculateSentimentContribution(news, symbol) {
+    if (!Array.isArray(news)) return 50;
     const asset = symbol.replace('USDT', '');
     const relevant = news.filter(n =>
         n.title.toUpperCase().includes(asset) ||
@@ -104,6 +105,7 @@ function calculateSentimentContribution(news, symbol) {
  * Calculate score based on whale inflows/outflows
  */
 function calculateWhaleContribution(whales, symbol) {
+    if (!Array.isArray(whales)) return 50;
     const asset = symbol.replace('USDT', '');
     const relevant = whales.filter(w => w.symbol === asset);
 
