@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTrading } from '@/context/TradingContext';
-import { Wallet, Shield, ShieldAlert, Key, History, TrendingUp, DollarSign, PieChart, RefreshCw, ChevronRight, Save, X, Lock } from 'lucide-react';
+import { Wallet, Shield, ShieldAlert, ShieldCheck, Key, History, TrendingUp, DollarSign, PieChart, RefreshCw, ChevronRight, Save, X, Lock } from 'lucide-react';
 import NumberTicker from '@/components/NumberTicker';
 import Skeleton from '@/components/ui/Skeleton';
 import '@/pages/dashboard.css';
@@ -341,6 +341,17 @@ export default function Portfolio() {
                                 );
                             })}
                         </div>
+                    </div>
+
+                    <div className="action-card" style={{ padding: '24px', borderRadius: '24px', background: 'linear-gradient(135deg, rgba(0,255,255,0.05) 0%, transparent 100%)', border: '1px solid rgba(0,255,255,0.1)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                            <Wallet size={18} style={{ color: 'var(--accent)' }} />
+                            <h3 style={{ fontSize: '14px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>Web3 Intelligence</h3>
+                        </div>
+                        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', lineHeight: '1.6', marginBottom: '20px' }}>
+                            Connect MetaMask to track on-chain assets and enable zero-latency trading on Polymarket.
+                        </p>
+                        <SpectrButton style={{ width: '100%' }} icon={ShieldCheck}>Connect Wallet</SpectrButton>
                     </div>
 
                     <div className="action-card" style={{ padding: '24px', borderRadius: '24px', background: 'linear-gradient(135deg, rgba(245,158,11,0.05) 0%, transparent 100%)', border: '1px solid rgba(245,158,11,0.1)' }}>
