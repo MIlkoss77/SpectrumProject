@@ -335,9 +335,9 @@ export default function Academy() {
 
       <div className="dx-card ta-head">
         <div>
-          <h2 style={{ margin: 0 }}>{t('pages.academy.title') || 'Spectr Academy'}</h2>
+          <h2 style={{ margin: 0 }}>{t('pages.academy.title') || 'Spectr Neuro-Library'}</h2>
           <p style={{ margin: 0, color: 'var(--muted)', fontSize: 14 }}>
-            {t('pages.academy.subtitle') || 'Master crypto trading and unlock exclusive scanner features.'}
+            {t('pages.academy.subtitle') || 'Master your mind, biohack your body, and unlock neural trading features.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>

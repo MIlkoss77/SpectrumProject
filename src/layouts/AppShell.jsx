@@ -8,6 +8,7 @@ import { Home, LayoutDashboard, BarChart3, Settings, Shield, User, Menu, X, LogO
 
 import { capitalShield } from '@/services/trading/capitalShield'
 import { useTrading } from '@/context/TradingContext.jsx'
+import { useAppMode } from '@/context/AppModeContext.jsx'
 import '@/pages/dashboard.css'
 import '@/pages/mobile.css'
 import Skeleton from '@/components/ui/Skeleton'
@@ -20,6 +21,7 @@ import { useAuth } from '@/context/AuthContext'
 
 export default function AppShell() {
   const { t } = useTranslation()
+  const { appMode, toggleMode: toggleAppMode } = useAppMode()
   const [navOpen, setNavOpen] = useState(false)
   const [proPlanDismissed, setProPlanDismissed] = useState(() => localStorage.getItem('proPlanDismissed') === '1')
   const [showMore, setShowMore] = useState(false)
@@ -32,17 +34,25 @@ export default function AppShell() {
   const { user, login, logout } = useAuth()
   const location = useLocation()
 
-  const NAV = [
+  const ACADEMY_NAV = [
+    { label: 'Tracker', to: '/tracker', icon: Target },
+    { label: 'Meditations', to: '/meditations', icon: ShieldCheck },
+    { label: 'Library', to: '/academy', icon: GraduationCap },
+    { label: t('app.settings'), to: '/settings', icon: Settings },
+  ]
+
+  const TERMINAL_NAV = [
     { label: t('app.dashboard'), to: '/', icon: LayoutDashboard },
     { label: t('app.portfolio'), to: '/portfolio', icon: Wallet },
     { label: t('app.polymarket'), to: '/polymarket', icon: Layers },
     { label: t('app.signals'), to: '/signals', icon: Activity },
     { label: t('app.news'), to: '/news', icon: Newspaper },
     { label: t('app.ta'), to: '/analytics', icon: PieChart },
-    { label: t('app.academy'), to: '/academy', icon: GraduationCap },
     { label: t('app.pricing'), to: '/pricing', icon: CreditCard },
     { label: t('app.settings'), to: '/settings', icon: Settings },
   ]
+
+  const NAV = appMode === 'academy' ? ACADEMY_NAV : TERMINAL_NAV;
 
 
   useEffect(() => {
@@ -108,12 +118,19 @@ export default function AppShell() {
     }
   }
 
-  const mainMobileNav = [
+  const academyMobileNav = [
+    { label: 'Tracker', to: '/tracker', icon: Target },
+    { label: 'Library', to: '/academy', icon: GraduationCap },
+  ]
+
+  const terminalMobileNav = [
     { label: t('app.dashboard'), to: '/', icon: LayoutDashboard },
     { label: t('app.signals'), to: '/signals', icon: Activity },
     { label: t('app.news'), to: '/news', icon: Newspaper },
     { label: t('app.polymarket'), to: '/polymarket', icon: Layers },
   ]
+
+  const mainMobileNav = appMode === 'academy' ? academyMobileNav : terminalMobileNav;
 
   const moreNav = NAV.filter(item => !mainMobileNav.find(m => m.to === item.to))
 
@@ -201,13 +218,29 @@ export default function AppShell() {
               />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontWeight: 900, fontSize: '16px', letterSpacing: '-0.5px', color: '#fff', textTransform: 'uppercase', lineHeight: 1 }}>
-                  SPECTR <span style={{ color: '#00FFFF' }}>Trading</span>
+                  SPECTR <span style={{ color: appMode === 'academy' ? '#FF00FF' : '#00FFFF' }}>{appMode === 'academy' ? 'Academy' : 'Trading'}</span>
                 </span>
-                <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '1px', marginTop: '4px' }}>NEURAL TERMINAL</span>
+                <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '1px', marginTop: '4px' }}>
+                  {appMode === 'academy' ? 'NEURO-PROGRAMMING' : 'NEURAL TERMINAL'}
+                </span>
               </div>
               <button style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', marginLeft: 'auto' }} onClick={() => setNavOpen(false)} className="lg:hidden">
                   <X size={20} />
               </button>
+          </div>
+
+          <div style={{ padding: '0 16px 20px' }}>
+            <button
+              onClick={toggleAppMode}
+              style={{
+                width: '100%', padding: '10px', borderRadius: '12px',
+                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)',
+                color: '#fff', fontSize: '12px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', transition: 'all 0.2s'
+              }}
+            >
+              {appMode === 'academy' ? <Zap size={14} color="#00FFFF" /> : <GraduationCap size={14} color="#FF00FF" />}
+              SWITCH TO {appMode === 'academy' ? 'TERMINAL' : 'ACADEMY'}
+            </button>
           </div>
 
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, padding: '0 12px' }}>

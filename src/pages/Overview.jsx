@@ -6,6 +6,7 @@ import { getTopActions, calculateSuperScore } from '@/services/ai/superScore'
 import { useWebSocket } from '@/context/WebSocketContext'
 import { useAuth } from '@/context/AuthContext'
 import { useTrade } from '@/context/TradeContext'
+import { useAppMode } from '@/context/AppModeContext'
 import NumberTicker from '@/components/NumberTicker'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -149,6 +150,13 @@ export default function Overview() {
   const { openTrade } = useTrade()
   const { tickers, subscribe, unsubscribe } = useWebSocket()
   const { user } = useAuth()
+  const { appMode } = useAppMode()
+
+  useEffect(() => {
+    if (appMode === 'academy') {
+      navigate('/tracker', { replace: true })
+    }
+  }, [appMode, navigate])
 
   const [loading, setLoading] = useState(true)
   const [topActions, setTopActions] = useState([])

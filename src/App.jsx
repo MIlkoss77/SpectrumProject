@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Web3Provider } from '@/context/Web3Context.jsx'
 import { WebSocketProvider } from '@/context/WebSocketContext.jsx'
 import { AuthProvider } from '@/context/AuthContext.jsx'
+import { AppModeProvider } from '@/context/AppModeContext.jsx'
 import AppShell from '@/layouts/AppShell.jsx'
 import { ErrorBoundary } from 'react-error-boundary'
 import ErrorFallback from '@/components/ErrorFallback.jsx'
@@ -15,6 +16,8 @@ const News = React.lazy(() => import('@/pages/News.jsx'))
 const Analytics = React.lazy(() => import('@/pages/Analytics.jsx'))
 const NotFound = React.lazy(() => import('@/pages/NotFound.jsx'));
 const Academy = React.lazy(() => import('@/pages/Academy.jsx'));
+const AcademyDashboard = React.lazy(() => import('@/pages/AcademyDashboard.jsx'));
+const Meditations = React.lazy(() => import('@/pages/Meditations.jsx'));
 const Settings = React.lazy(() => import('@/pages/Settings.jsx'))
 const Pricing = React.lazy(() => import('@/pages/Pricing.jsx'))
 const Portfolio = React.lazy(() => import('@/pages/Portfolio.jsx'))
@@ -60,10 +63,11 @@ const LoadingSpinner = () => (
 
 export default function App() {
   return (
-    <Web3Provider>
-      <AuthProvider>
-        <TradingProvider>
-          <WebSocketProvider>
+    <AppModeProvider>
+      <Web3Provider>
+        <AuthProvider>
+          <TradingProvider>
+            <WebSocketProvider>
             <TradeProvider>
               <BrowserRouter>
                 <TradeModal />
@@ -78,6 +82,8 @@ export default function App() {
                         <Route path='signals' element={<Signals />} />
                         <Route path='news' element={<News />} />
                         <Route path='academy' element={<Academy />} />
+                        <Route path='tracker' element={<AcademyDashboard />} />
+                        <Route path='meditations' element={<Meditations />} />
                         <Route path='analytics' element={<Analytics />} />
                         <Route path='pricing' element={<Pricing />} />
                         <Route path='settings' element={<Settings />} />
@@ -99,5 +105,6 @@ export default function App() {
         </TradingProvider>
       </AuthProvider>
     </Web3Provider>
+    </AppModeProvider>
   )
 }
