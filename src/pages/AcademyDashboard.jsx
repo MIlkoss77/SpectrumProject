@@ -59,7 +59,7 @@ export default function AcademyDashboard() {
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '16px', borderRadius: '12px', cursor: 'pointer',
                     background: isCompleted ? 'rgba(76, 175, 80, 0.1)' : 'var(--surface-2)',
-                    border: \`1px solid \${isCompleted ? '#4caf50' : 'var(--line)'}\`,
+                    border: `1px solid ${isCompleted ? '#4caf50' : 'var(--line)'}`,
                     transition: 'all 0.2s'
                   }}
                 >

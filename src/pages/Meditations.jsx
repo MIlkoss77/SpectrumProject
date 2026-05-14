@@ -44,8 +44,8 @@ export default function Meditations() {
             animate={{ opacity: 1, scale: 1 }}
             className="dx-card"
             style={{ 
-              background: \`linear-gradient(to right, \${activeTrack.color}20, transparent)\`,
-              borderLeft: \`4px solid \${activeTrack.color}\`,
+              background: `linear-gradient(to right, ${activeTrack.color}20, transparent)`,
+              borderLeft: `4px solid ${activeTrack.color}`,
               display: 'flex', alignItems: 'center', gap: '20px', padding: '24px'
             }}
           >
@@ -67,7 +67,7 @@ export default function Meditations() {
                   <motion.div
                     key={i}
                     animate={isPlaying ? {
-                      height: [\`\${Math.random() * 20 + 10}px\`, \`\${Math.random() * 30 + 10}px\`, \`\${Math.random() * 20 + 10}px\`]
+                      height: [`${Math.random() * 20 + 10}px`, `${Math.random() * 30 + 10}px`, `${Math.random() * 20 + 10}px`]
                     } : { height: '4px' }}
                     transition={{ duration: 0.5, repeat: Infinity, ease: 'easeInOut' }}
                     style={{ flex: 1, backgroundColor: activeTrack.color, borderRadius: '2px', opacity: 0.7 }}
@@ -100,7 +100,7 @@ export default function Meditations() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <div style={{ 
                     width: '40px', height: '40px', borderRadius: '50%', 
-                    background: \`\${track.color}20\`, display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                    background: `${track.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' 
                   }}>
                     {isActive && isPlaying ? <PauseCircle size={20} color={track.color} /> : <PlayCircle size={20} color={track.color} />}
                   </div>

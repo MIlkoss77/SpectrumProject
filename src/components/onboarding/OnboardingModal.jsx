@@ -116,7 +116,7 @@ export default function OnboardingModal() {
                             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
                             style={{
                                 position: 'absolute', top: '25%', left: '-20%', width: '500px', height: '500px',
-                                background: \`radial-gradient(circle, \${currentData.color}40 0%, transparent 70%)\`,
+                                background: `radial-gradient(circle, ${currentData.color}40 0%, transparent 70%)`,
                                 borderRadius: '50%', filter: 'blur(100px)'
                             }}
                         />
@@ -147,7 +147,7 @@ export default function OnboardingModal() {
                                     <motion.div 
                                         initial={false}
                                         animate={{ width: i < currentStep ? '100%' : i === currentStep ? '100%' : '0%' }}
-                                        style={{ height: '100%', background: i <= currentStep ? currentData.color : 'transparent', boxShadow: i <= currentStep ? \`0 0 10px \${currentData.color}\` : 'none' }}
+                                        style={{ height: '100%', background: i <= currentStep ? currentData.color : 'transparent', boxShadow: i <= currentStep ? `0 0 10px ${currentData.color}` : 'none' }}
                                         transition={{ duration: 0.6, ease: "easeInOut" }}
                                     />
                                 </div>
@@ -170,7 +170,7 @@ export default function OnboardingModal() {
                                                 position: 'relative', width: '100px', height: '100px', borderRadius: '24px',
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                 backgroundColor: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)',
-                                                boxShadow: \`0 0 40px \${currentData.color}20\`
+                                                boxShadow: `0 0 40px ${currentData.color}20`
                                             }}
                                         >
                                             <Icon size={40} style={{ color: currentData.color, position: 'relative', zIndex: 10 }} />
@@ -179,7 +179,7 @@ export default function OnboardingModal() {
 
                                     <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', borderRadius: '100px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '16px' }}>
-                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: currentData.color, boxShadow: \`0 0 8px \${currentData.color}\` }} />
+                                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: currentData.color, boxShadow: `0 0 8px ${currentData.color}` }} />
                                             <span style={{ fontSize: '10px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: currentData.color }}>
                                                 {currentData.subtitle}
                                             </span>
@@ -203,7 +203,7 @@ export default function OnboardingModal() {
                                             style={{
                                                 width: '100%', padding: '16px', borderRadius: '16px', background: currentData.color,
                                                 color: '#000', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '2px',
-                                                fontSize: '12px', border: 'none', cursor: 'pointer', boxShadow: \`0 10px 30px \${currentData.color}40\`
+                                                fontSize: '12px', border: 'none', cursor: 'pointer', boxShadow: `0 10px 30px ${currentData.color}40`
                                             }}
                                         >
                                             NEXT PROTOCOL
