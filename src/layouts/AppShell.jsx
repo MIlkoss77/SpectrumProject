@@ -44,6 +44,7 @@ export default function AppShell() {
   const TERMINAL_NAV = [
     { label: t('app.dashboard'), to: '/', icon: LayoutDashboard },
     { label: t('app.portfolio'), to: '/portfolio', icon: Wallet },
+    { label: 'Alerts', to: '/alerts', icon: Bell },
     { label: t('app.polymarket'), to: '/polymarket', icon: Layers },
     { label: t('app.signals'), to: '/signals', icon: Activity },
     { label: t('app.news'), to: '/news', icon: Newspaper },
