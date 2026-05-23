@@ -344,6 +344,28 @@ export default function AppShell() {
               <h3 style={{ margin: 0 }}>{t('ui.menu') || 'Menu'}</h3>
               <button onClick={() => setShowMore(false)} style={{ background: 'none', border: 'none', color: '#fff' }}><X /></button>
             </div>
+            
+            {/* Mobile Mode Switcher */}
+            <div style={{ marginBottom: '20px' }}>
+              <button
+                onClick={() => {
+                  toggleAppMode();
+                  setShowMore(false);
+                }}
+                style={{
+                  width: '100%', padding: '12px', borderRadius: '12px',
+                  background: appMode === 'academy' ? 'rgba(0,255,255,0.08)' : 'rgba(255,0,255,0.08)',
+                  border: `1px solid ${appMode === 'academy' ? 'rgba(0,255,255,0.2)' : 'rgba(255,0,255,0.2)'}`,
+                  color: '#fff', fontSize: '13px', fontWeight: 600,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {appMode === 'academy' ? <Zap size={14} color="#00FFFF" /> : <GraduationCap size={14} color="#FF00FF" />}
+                SWITCH TO {appMode === 'academy' ? 'TERMINAL' : 'ACADEMY'}
+              </button>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               {moreNav.map(({ label, to, icon: Icon }) => (
                 <NavLink key={to} to={to} className="dx-nav-item" style={{ fontSize: 14 }}>
