@@ -258,7 +258,7 @@ export default function AppShell() {
             <div style={{ marginTop: 'auto', padding: '20px 16px 0', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
               <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.15)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px' }}>v5.2.4-STABLE</div>
               <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', lineHeight: 1.6 }}>
-                <div>ИП Дороненко В.С.</div>
+                <div>Дороненко Владислав Сергеевич</div>
                 <div>ИНН: 463245967103</div>
               </div>
             </div>
