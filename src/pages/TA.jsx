@@ -207,8 +207,6 @@ export default function TA() {
   }, [rows, rsi14, macd]);
 
   // ---------- Layout ----------
-  const containerRef = useRef(null);
-  const [containerWidth, setContainerWidth] = useState(window.innerWidth);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
     const h = () => setWindowWidth(window.innerWidth);
@@ -216,21 +214,10 @@ export default function TA() {
     return () => window.removeEventListener('resize', h);
   }, []);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const ro = new ResizeObserver(([entry]) => {
-      setContainerWidth(entry.contentRect.width);
-    });
-    ro.observe(containerRef.current);
-    return () => ro.disconnect();
-  }, []);
-
   const isMobile = windowWidth < 768;
-  const isTiny = windowWidth < 400;
-  const candleMinWidth = isTiny ? 5 : isMobile ? 7 : 6;
-  const availW = Math.max(200, containerWidth - (isMobile ? 0 : 0));
-  const W = Math.max(availW, rows.length * candleMinWidth);
-  const H_PRICE = isMobile ? 200 : 360, H_RSI = isMobile ? 70 : 100, H_MACD = isMobile ? 80 : 120;
+  const candleMinWidth = isMobile ? 8 : 6;
+  const W = Math.max(isMobile ? windowWidth - 32 : 900, rows.length * candleMinWidth);
+  const H_PRICE = isMobile ? 240 : 360, H_RSI = isMobile ? 80 : 100, H_MACD = isMobile ? 90 : 120;
   const perCandle = W / Math.max(1, rows.length);
 
   // Scales
@@ -253,109 +240,95 @@ export default function TA() {
   }
   function onLeave() { setHover(null); }
 
-  function onTouchMove(e) {
-    if (!rows.length || !svgRef.current) return;
-    const touch = e.touches[0];
-    if (!touch) return;
-    const rect = svgRef.current.getBoundingClientRect();
-    const relX = touch.clientX - rect.left;
-    let i = Math.floor(relX / perCandle);
-    i = Math.max(0, Math.min(rows.length - 1, i));
-    setHover({ i, x: i * perCandle });
-  }
-  function onTouchEnd() { setHover(null); }
-
   return (
-    <section className="page md:px-8" ref={containerRef}>
-      <div className="flex items-center justify-between mb-6 md:mb-8">
-        <div className="min-w-0">
-          <h1 className="text-xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-1 md:mb-2 truncate">{t("pages.ta?.title") || "Technical Analysis"}</h1>
-          <p className="text-xs md:text-sm text-white/40 hidden sm:block">Professional charting and signal detection</p>
+    <section className="page md:px-8">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-2">{t("pages.ta?.title") || "Technical Analysis"}</h1>
+          <p className="text-sm text-white/40">Professional charting and signal detection</p>
         </div>
-        <div className="flex items-center gap-2 shrink-0 ml-3">
-          <span className={`px-2 py-1 rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ${loading ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'}`}>
-            {loading ? 'SYNC' : 'LIVE'}
+        <div className="flex items-center gap-2">
+          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${loading ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'}`}>
+            {loading ? 'SYNCING' : 'LIVE DATA'}
           </span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 md:gap-4 mb-6 md:mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
         <div className="ta-field">
-          <label className="text-[9px] md:text-[10px] uppercase font-bold text-white/40 mb-1 block">Symbol</label>
-          <select value={symbol} onChange={(e) => setSymbol(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-cyan-500/50 outline-none">
-            {["BTCUSDT", "ETHUSDT", "TONUSDT", "SOLUSDT", "BNBUSDT"].map(s => <option key={s} value={s}>{s.replace('USDT', '/USDT')}</option>)}
-          </select>
-        </div>
-        <div className="ta-field">
-          <label className="text-[9px] md:text-[10px] uppercase font-bold text-white/40 mb-1 block">Timeframe</label>
-          <select value={tf} onChange={(e) => setTf(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-cyan-500/50 outline-none">
-            {["5m", "15m", "1h", "4h"].map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-        </div>
-        <div className="ta-field">
-          <label className="text-[9px] md:text-[10px] uppercase font-bold text-white/40 mb-1 block">Source</label>
-          <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-cyan-500/50 outline-none">
+          <label className="text-[10px] uppercase font-bold text-white/40 mb-1 block">Source</label>
+          <select value={source} onChange={(e) => setSource(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500/50 outline-none">
             <option value="binance">Binance</option>
             <option value="mock">Mock</option>
           </select>
         </div>
         <div className="ta-field">
-          <label className="text-[9px] md:text-[10px] uppercase font-bold text-white/40 mb-1 block">Bars</label>
-          <input type="number" value={limit} min={100} max={1500} onChange={(e) => setLimit(+e.target.value || 200)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-xs md:text-sm text-white focus:border-cyan-500/50 outline-none" />
+          <label className="text-[10px] uppercase font-bold text-white/40 mb-1 block">Symbol</label>
+          <select value={symbol} onChange={(e) => setSymbol(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500/50 outline-none">
+            {["BTCUSDT", "ETHUSDT", "TONUSDT", "SOLUSDT", "BNBUSDT"].map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div className="ta-field">
+          <label className="text-[10px] uppercase font-bold text-white/40 mb-1 block">Timeframe</label>
+          <select value={tf} onChange={(e) => setTf(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500/50 outline-none">
+            {["5m", "15m", "1h", "4h"].map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <div className="ta-field">
+          <label className="text-[10px] uppercase font-bold text-white/40 mb-1 block">Bars</label>
+          <input type="number" value={limit} min={100} max={1500} onChange={(e) => setLimit(+e.target.value || 200)} className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white focus:border-cyan-500/50 outline-none" />
         </div>
 
         <div className="col-span-2 flex items-end">
-          <button className="w-full h-[34px] md:h-[38px] bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors border-none shadow-lg shadow-cyan-500/20 text-xs md:text-sm" onClick={load} disabled={loading}>
+          <button className="w-full h-[38px] bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-colors border-none shadow-lg shadow-cyan-500/20" onClick={load} disabled={loading}>
             {loading ? "Loading…" : "Refresh"}
           </button>
         </div>
       </div>
 
       {/* MACROGLIDE MATRIX */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         {['5m', '15m', '1h', '4h'].map(tframe => (
-          <div key={tframe} className={`dx-card relative overflow-hidden transition-all duration-300 ${isMobile ? 'p-3' : 'dx-p-4'} ${tf === tframe ? 'bg-cyan-900/10 border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.1)]' : 'bg-black/40 border-white/5 opacity-70 hover:opacity-100 hover:border-white/20'}`}>
+          <div key={tframe} className={`dx-card dx-p-4 relative overflow-hidden transition-all duration-300 ${tf === tframe ? 'bg-cyan-900/10 border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.1)]' : 'bg-black/40 border-white/5 opacity-70 hover:opacity-100 hover:border-white/20'}`}>
             {tf === tframe && <div className="absolute top-0 left-0 w-1 h-full bg-cyan-500 shadow-[0_0_10px_#22d3ee]" />}
 
-            <div className="flex justify-between items-center mb-2 md:mb-3">
-              <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/50">{tframe}</span>
-              {tf === tframe && <span className="text-[8px] md:text-[9px] font-bold bg-cyan-500/20 text-cyan-400 px-1.5 md:px-2 py-0.5 rounded-full">ACTIVE</span>}
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-xs font-bold uppercase tracking-widest text-white/50">{tframe} Outlook</span>
+              {tf === tframe && <span className="text-[9px] font-bold bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full">ACTIVE</span>}
             </div>
-            <div className="flex items-center gap-2 md:gap-4">
-              <div className={`p-1.5 md:p-2 rounded-lg ${closes.length && closes[closes.length - 1] > ema50[ema50.length - 1] ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                {closes.length && closes[closes.length - 1] > ema50[ema50.length - 1] ? <TrendingUp size={isMobile ? 16 : 20} /> : <TrendingDown size={isMobile ? 16 : 20} />}
+            <div className="flex items-center gap-4">
+              <div className={`p-2 rounded-lg ${closes.length && closes[closes.length - 1] > ema50[ema50.length - 1] ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                {closes.length && closes[closes.length - 1] > ema50[ema50.length - 1] ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
               </div>
               <div>
-                <div className={`text-sm md:text-lg font-bold ${rsi14.length && rsi14[rsi14.length - 1] > 60 ? 'text-green-400' : rsi14.length && rsi14[rsi14.length - 1] < 40 ? 'text-red-400' : 'text-white/80'}`}>
-                  {rsi14.length && rsi14[rsi14.length - 1] > 60 ? 'Bull' : rsi14.length && rsi14[rsi14.length - 1] < 40 ? 'Bear' : 'Neutral'}
+                <div className={`text-lg font-bold ${rsi14.length && rsi14[rsi14.length - 1] > 60 ? 'text-green-400' : rsi14.length && rsi14[rsi14.length - 1] < 40 ? 'text-red-400' : 'text-white/80'}`}>
+                  {rsi14.length && rsi14[rsi14.length - 1] > 60 ? 'Bullish' : rsi14.length && rsi14[rsi14.length - 1] < 40 ? 'Bearish' : 'Neutral'}
                 </div>
-                <div className="text-[9px] md:text-[10px] font-mono text-white/40">RSI {rsi14.length ? rsi14[rsi14.length - 1]?.toFixed(1) : '-'}</div>
+                <div className="text-[10px] font-mono text-white/40">RSI: {rsi14.length ? rsi14[rsi14.length - 1]?.toFixed(1) : '-'}</div>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-3 md:gap-6 mb-3 md:mb-4 text-[11px] md:text-xs font-bold text-white/60">
-        <label className="flex items-center gap-1.5 cursor-pointer hover:text-white"><input type="checkbox" checked={showEMA} onChange={e => setShowEMA(e.target.checked)} className="accent-cyan-500 w-3.5 h-3.5" /> EMA</label>
-        <label className="flex items-center gap-1.5 cursor-pointer hover:text-white"><input type="checkbox" checked={showSignals} onChange={e => setShowSignals(e.target.checked)} className="accent-cyan-500 w-3.5 h-3.5" /> Signals</label>
-        <label className="flex items-center gap-1.5 cursor-pointer hover:text-white"><input type="checkbox" checked={showRSI} onChange={e => setShowRSI(e.target.checked)} className="accent-cyan-500 w-3.5 h-3.5" /> RSI</label>
-        <label className="flex items-center gap-1.5 cursor-pointer hover:text-white"><input type="checkbox" checked={showMACD} onChange={e => setShowMACD(e.target.checked)} className="accent-cyan-500 w-3.5 h-3.5" /> MACD</label>
+      <div className="flex gap-6 mb-4 text-xs font-bold text-white/60">
+        <label className="flex items-center gap-2 cursor-pointer hover:text-white"><input type="checkbox" checked={showEMA} onChange={e => setShowEMA(e.target.checked)} className="accent-cyan-500" /> EMA Overlay</label>
+        <label className="flex items-center gap-2 cursor-pointer hover:text-white"><input type="checkbox" checked={showSignals} onChange={e => setShowSignals(e.target.checked)} className="accent-cyan-500" /> AI Signals</label>
+        <label className="flex items-center gap-2 cursor-pointer hover:text-white"><input type="checkbox" checked={showRSI} onChange={e => setShowRSI(e.target.checked)} className="accent-cyan-500" /> RSI</label>
+        <label className="flex items-center gap-2 cursor-pointer hover:text-white"><input type="checkbox" checked={showMACD} onChange={e => setShowMACD(e.target.checked)} className="accent-cyan-500" /> MACD</label>
       </div>
 
       {err && <div className="card" style={{ borderColor: "var(--warn)" }}>{String(err)}</div>}
 
       {/* PRICE + EMA + SIGNALS */}
-      <div className="dx-card bg-black/40 border-white/5 relative mb-3 md:mb-4 overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+      <div className="dx-card bg-black/40 border-white/5 relative mb-4">
         <svg
           ref={svgRef}
           width={W}
           height={H_PRICE}
           onMouseMove={onMove}
           onMouseLeave={onLeave}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          style={{ display: "block", background: "transparent", minWidth: isMobile ? '100%' : undefined }}
+          style={{ display: "block", background: "transparent" }}
         >
           {/* Grid lines */}
           {[0, 0.25, 0.5, 0.75, 1].map(p => (
@@ -396,8 +369,8 @@ export default function TA() {
 
       {/* RSI */}
       {showRSI && (
-        <div className="dx-card bg-black/40 border-white/5 mb-3 md:mb-4 overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <svg width={W} height={H_RSI} style={{ display: "block", minWidth: isMobile ? '100%' : undefined }}>
+        <div className="dx-card bg-black/40 border-white/5 mb-4">
+          <svg width={W} height={H_RSI} style={{ display: "block" }}>
             <line x1="0" x2={W} y1={rsiScale.y(70)} y2={rsiScale.y(70)} stroke="rgba(255,255,255,0.1)" strokeDasharray="4,4" />
             <line x1="0" x2={W} y1={rsiScale.y(30)} y2={rsiScale.y(30)} stroke="rgba(255,255,255,0.1)" strokeDasharray="4,4" />
             <path
@@ -410,8 +383,8 @@ export default function TA() {
 
       {/* MACD */}
       {showMACD && (
-        <div className="dx-card bg-black/40 border-white/5 mb-3 md:mb-4 overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <svg width={W} height={H_MACD} style={{ display: "block", minWidth: isMobile ? '100%' : undefined }}>
+        <div className="dx-card bg-black/40 border-white/5 mb-4">
+          <svg width={W} height={H_MACD} style={{ display: "block" }}>
             <line x1="0" x2={W} y1={macdScale.y(0)} y2={macdScale.y(0)} stroke="rgba(255,255,255,0.1)" />
             <path
               d={rows.map((_, i) => `${i ? "L" : "M"} ${px(i * perCandle)} ${px(macdScale.y(macd.macd[i] ?? 0))}`).join(" ")}
@@ -427,20 +400,20 @@ export default function TA() {
 
       {/* Tooltip */}
       {!!hover && rows[hover.i] && (
-        <div className={`dx-card bg-black/90 border-white/10 p-3 md:p-4 font-mono text-[10px] md:text-xs fixed z-50 pointer-events-none shadow-xl backdrop-blur-md ${isMobile ? 'bottom-20 left-4 right-4' : 'top-24 right-8'}`}>
-          <div className="text-white/50 mb-1.5 md:mb-2 border-b border-white/10 pb-1"><strong className="text-[10px] md:text-xs">{isMobile ? new Date(rows[hover.i].t).toLocaleTimeString() : new Date(rows[hover.i].t).toLocaleString()}</strong></div>
-          <div className="grid grid-cols-2 gap-x-3 md:gap-x-4 gap-y-0.5 md:gap-y-1">
-            <span>O:</span> <span className="text-white">{fmt(rows[hover.i].o)}</span>
-            <span>H:</span> <span className="text-white">{fmt(rows[hover.i].h)}</span>
-            <span>L:</span> <span className="text-white">{fmt(rows[hover.i].l)}</span>
-            <span>C:</span> <span className="text-white">{fmt(rows[hover.i].c)}</span>
+        <div className="dx-card bg-black/90 border-white/10 p-4 font-mono text-xs fixed top-24 right-8 z-50 pointer-events-none shadow-xl backdrop-blur-md">
+          <div className="text-white/50 mb-2 border-b border-white/10 pb-1"><strong>{new Date(rows[hover.i].t).toLocaleString()}</strong></div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+            <span>Open:</span> <span className="text-white">{rows[hover.i].o}</span>
+            <span>High:</span> <span className="text-white">{rows[hover.i].h}</span>
+            <span>Low:</span> <span className="text-white">{rows[hover.i].l}</span>
+            <span>Close:</span> <span className="text-white">{rows[hover.i].c}</span>
           </div>
-          <div className="mt-1.5 md:mt-2 text-cyan-400">RSI: {rsi14[hover.i]?.toFixed(1)}</div>
-          {entries.includes(hover.i) && <div className="mt-1.5 md:mt-2 text-green-400 font-bold border rounded border-green-500/30 bg-green-500/10 px-2 py-0.5 text-center text-[10px] md:text-xs">BUY SIGNAL</div>}
+          <div className="mt-2 text-cyan-400">RSI: {rsi14[hover.i]?.toFixed(1)}</div>
+          {entries.includes(hover.i) && <div className="mt-2 text-green-400 font-bold border rounded border-green-500/30 bg-green-500/10 px-2 py-1 text-center">BUY SIGNAL</div>}
         </div>
       )}
 
-      <div className="text-[9px] md:text-[10px] text-white/20 mt-6 md:mt-8 border-none bg-transparent text-center">
+      <div className="card text-[10px] text-white/20 mt-8 border-none bg-transparent text-center">
         <p>
           ⚠️ MVP Version. Data provided by public APIs. Not financial advice.
         </p>
