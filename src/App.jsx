@@ -19,7 +19,6 @@ const Academy = React.lazy(() => import('@/pages/Academy.jsx'));
 const AcademyDashboard = React.lazy(() => import('@/pages/AcademyDashboard.jsx'));
 const Meditations = React.lazy(() => import('@/pages/Meditations.jsx'));
 const Settings = React.lazy(() => import('@/pages/Settings.jsx'))
-const Pricing = React.lazy(() => import('@/pages/Pricing.jsx'))
 const Portfolio = React.lazy(() => import('@/pages/Portfolio.jsx'))
 const TA = React.lazy(() => import('@/pages/TA.jsx'))
 const Calibration = React.lazy(() => import('@/pages/Calibration.jsx'))
@@ -85,7 +84,6 @@ export default function App() {
                         <Route path='tracker' element={<AcademyDashboard />} />
                         <Route path='meditations' element={<Meditations />} />
                         <Route path='analytics' element={<Analytics />} />
-                        <Route path='pricing' element={<Pricing />} />
                         <Route path='settings' element={<Settings />} />
                         <Route path='forecasts' element={<Forecasts />} />
                         <Route path='events' element={<Events />} />

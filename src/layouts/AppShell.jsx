@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { NavLink, Link, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import PageTransition from '@/components/PageTransition'
@@ -33,6 +33,11 @@ export default function AppShell() {
   const [showNotifications, setShowNotifications] = useState(false)
   const { user, login, logout } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
+  
+  const handleSwitchMode = () => {
+    toggleAppMode()
+  }
 
   const ACADEMY_NAV = [
     { label: 'Tracker', to: '/tracker', icon: Target },
@@ -49,7 +54,6 @@ export default function AppShell() {
     { label: t('app.signals'), to: '/signals', icon: Activity },
     { label: t('app.news'), to: '/news', icon: Newspaper },
     { label: t('app.ta'), to: '/analytics', icon: PieChart },
-    { label: t('app.pricing'), to: '/pricing', icon: CreditCard },
     { label: t('app.settings'), to: '/settings', icon: Settings },
   ]
 
@@ -232,7 +236,7 @@ export default function AppShell() {
 
           <div style={{ padding: '0 16px 20px' }}>
             <button
-              onClick={toggleAppMode}
+              onClick={handleSwitchMode}
               style={{
                 width: '100%', padding: '10px', borderRadius: '12px',
                 background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)',
@@ -252,7 +256,11 @@ export default function AppShell() {
               </NavLink>
             ))}
             <div style={{ marginTop: 'auto', padding: '20px 16px 0', borderTop: '1px solid rgba(255,255,255,0.03)' }}>
-              <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.15)', textTransform: 'uppercase', letterSpacing: '2px' }}>v5.2.4-STABLE</div>
+              <div style={{ fontSize: '10px', fontWeight: 900, color: 'rgba(255,255,255,0.15)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '12px' }}>v5.2.4-STABLE</div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', lineHeight: 1.6 }}>
+                <div>ИП Дороненко В.С.</div>
+                <div>ИНН: 463245967103</div>
+              </div>
             </div>
           </nav>
         </aside>
@@ -349,7 +357,7 @@ export default function AppShell() {
             <div style={{ marginBottom: '20px' }}>
               <button
                 onClick={() => {
-                  toggleAppMode();
+                  handleSwitchMode();
                   setShowMore(false);
                 }}
                 style={{
